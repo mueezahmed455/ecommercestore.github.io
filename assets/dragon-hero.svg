@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <defs>
+    <!-- Dragon body gradient -->
+    <linearGradient id="bodyGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#2a2a5e"/>
+      <stop offset="100%" stop-color="#1a1a3e"/>
+    </linearGradient>
+    <!-- Horn gradient -->
+    <linearGradient id="hornGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <!-- Glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Soft glow -->
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Eye glow -->
+    <filter id="eyeGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Particle filter -->
+    <filter id="particleGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Breath gradient -->
+    <radialGradient id="breathGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="breathGrad2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- No background rect - let particles show through -->
+
+  <!-- Ambient glow behind dragon -->
+  <circle cx="300" cy="300" r="200" fill="#a855f7" opacity="0.05" filter="url(#glow)"/>
+  <circle cx="300" cy="300" r="150" fill="#00d4ff" opacity="0.03" filter="url(#glow)"/>
+
+  <!-- ===== DRAGON BODY ===== -->
+  <g id="dragon">
+    <!-- Main head shape - front facing -->
+    <path d="M300,180 
+             C250,185 200,200 170,230 
+             C140,260 130,300 140,340 
+             C150,380 180,420 220,450 
+             C260,480 280,500 300,510 
+             C320,500 340,480 380,450 
+             C420,420 450,380 460,340 
+             C470,300 460,260 430,230 
+             C400,200 350,185 300,180 Z" 
+          fill="url(#bodyGrad)" stroke="#2a2a5e" stroke-width="1"/>
+
+    <!-- Head top ridge -->
+    <path d="M300,180 C290,170 280,165 270,170 L260,175 L270,180 C280,175 290,178 300,180 Z" fill="#3a3a6e"/>
+    <path d="M300,180 C310,170 320,165 330,170 L340,175 L330,180 C320,175 310,178 300,180 Z" fill="#3a3a6e"/>
+
+    <!-- Left horn -->
+    <path d="M220,200 C200,160 180,120 170,90 C165,75 175,80 185,100 C195,125 210,165 230,200 Z" fill="url(#hornGrad)"/>
+    <!-- Right horn -->
+    <path d="M380,200 C400,160 420,120 430,90 C435,75 425,80 415,100 C405,125 390,165 370,200 Z" fill="url(#hornGrad)"/>
+
+    <!-- Smaller horns -->
+    <path d="M250,195 C240,170 230,145 225,130 C220,120 228,125 235,145 C242,165 255,190 260,200 Z" fill="url(#hornGrad)" opacity="0.7"/>
+    <path d="M350,195 C360,170 370,145 375,130 C380,120 372,125 365,145 C358,165 345,190 340,200 Z" fill="url(#hornGrad)" opacity="0.7"/>
+
+    <!-- Brow ridge -->
+    <path d="M230,260 C250,245 270,240 300,240 C330,240 350,245 370,260 C350,255 330,250 300,250 C270,250 250,255 230,260 Z" fill="#2a2a5e"/>
+
+    <!-- Left eye socket -->
+    <ellipse cx="260" cy="290" rx="35" ry="25" fill="#0a0a1a"/>
+    <!-- Right eye socket -->
+    <ellipse cx="340" cy="290" rx="35" ry="25" fill="#0a0a1a"/>
+
+    <!-- Left eye - with glow animation -->
+    <g>
+      <ellipse cx="260" cy="290" rx="18" ry="14" fill="#00d4ff" filter="url(#eyeGlow)">
+        <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="260" cy="290" rx="8" ry="6" fill="#ffffff">
+        <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="262" cy="287" rx="3" ry="2" fill="#ffffff" opacity="0.9"/>
+    </g>
+
+    <!-- Right eye - with glow animation -->
+    <g>
+      <ellipse cx="340" cy="290" rx="18" ry="14" fill="#00d4ff" filter="url(#eyeGlow)">
+        <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="340" cy="290" rx="8" ry="6" fill="#ffffff">
+        <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="342" cy="287" rx="3" ry="2" fill="#ffffff" opacity="0.9"/>
+    </g>
+
+    <!-- Nose bridge -->
+    <path d="M300,240 L300,340" stroke="#3a3a6e" stroke-width="2" opacity="0.5"/>
+
+    <!-- Snout -->
+    <path d="M260,340 C250,360 245,380 250,400 C260,420 280,430 300,435 C320,430 340,420 350,400 C355,380 350,360 340,340 C330,350 315,355 300,355 C285,355 270,350 260,340 Z" fill="#1a1a3e" stroke="#2a2a5e" stroke-width="1"/>
+
+    <!-- Nostrils -->
+    <ellipse cx="280" cy="395" rx="8" ry="6" fill="#0a0a1a"/>
+    <ellipse cx="320" cy="395" rx="8" ry="6" fill="#0a0a1a"/>
+    <!-- Nostril glow -->
+    <ellipse cx="280" cy="395" rx="5" ry="3" fill="#00d4ff" opacity="0.3" filter="url(#softGlow)">
+      <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="320" cy="395" rx="5" ry="3" fill="#00d4ff" opacity="0.3" filter="url(#softGlow)">
+      <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2s" repeatCount="indefinite"/>
+    </ellipse>
+
+    <!-- Jaw line -->
+    <path d="M250,400 C260,430 280,450 300,455 C320,450 340,430 350,400" fill="none" stroke="#3a3a6e" stroke-width="1.5"/>
+
+    <!-- Cheek scales (left) -->
+    <path d="M200,320 C190,340 185,360 190,380" fill="none" stroke="#3a3a6e" stroke-width="1" opacity="0.6"/>
+    <path d="M210,310 C200,330 195,350 200,370" fill="none" stroke="#3a3a6e" stroke-width="1" opacity="0.5"/>
+    <path d="M220,300 C210,320 205,340 210,360" fill="none" stroke="#3a3a6e" stroke-width="1" opacity="0.4"/>
+
+    <!-- Cheek scales (right) -->
+    <path d="M400,320 C410,340 415,360 410,380" fill="none" stroke="#3a3a6e" stroke-width="1" opacity="0.6"/>
+    <path d="M390,310 C400,330 405,350 400,370" fill="none" stroke="#3a3a6e" stroke-width="1" opacity="0.5"/>
+    <path d="M380,300 C390,320 395,340 390,360" fill="none" stroke="#3a3a6e" stroke-width="1" opacity="0.4"/>
+
+    <!-- Crown/crest plates -->
+    <path d="M300,180 L300,150 L310,160 L305,175 Z" fill="url(#hornGrad)" opacity="0.8"/>
+    <path d="M285,182 L275,155 L290,165 L288,178 Z" fill="url(#hornGrad)" opacity="0.6"/>
+    <path d="M315,182 L325,155 L310,165 L312,178 Z" fill="url(#hornGrad)" opacity="0.6"/>
+
+    <!-- Neck/shoulder area -->
+    <path d="M220,450 C200,470 170,500 150,540 L150,600 L450,600 L450,540 C430,500 400,470 380,450 C360,465 330,475 300,478 C270,475 240,465 220,450 Z" fill="url(#bodyGrad)" stroke="#2a2a5e" stroke-width="1"/>
+
+    <!-- Neck scales -->
+    <path d="M250,480 L270,500 L290,485" fill="none" stroke="#3a3a6e" stroke-width="1" opacity="0.5"/>
+    <path d="M310,485 L330,500 L350,480" fill="none" stroke="#3a3a6e" stroke-width="1" opacity="0.5"/>
+    <path d="M260,500 L280,520 L300,505 L320,520 L340,500" fill="none" stroke="#3a3a6e" stroke-width="1" opacity="0.4"/>
+    <path d="M270,520 L290,540 L300,530 L310,540 L330,520" fill="none" stroke="#3a3a6e" stroke-width="1" opacity="0.3"/>
+
+    <!-- Chest glow -->
+    <ellipse cx="300" cy="520" rx="60" ry="40" fill="#a855f7" opacity="0.05" filter="url(#glow)">
+      <animate attributeName="opacity" values="0.03;0.08;0.03" dur="4s" repeatCount="indefinite"/>
+    </ellipse>
+  </g>
+
+  <!-- ===== BREATH PARTICLES ===== -->
+  <g id="breath-particles">
+    <!-- Cyan particles -->
+    <circle cx="280" cy="420" r="3" fill="url(#breathGrad)" filter="url(#particleGlow)">
+      <animate attributeName="cy" values="420;380;340" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="cx" values="280;270;260" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0.8;0" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;5;2" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="320" cy="425" r="3" fill="url(#breathGrad)" filter="url(#particleGlow)">
+      <animate attributeName="cy" values="425;390;355" dur="3.5s" repeatCount="indefinite" begin="0.5s"/>
+      <animate attributeName="cx" values="320;330;340" dur="3.5s" repeatCount="indefinite" begin="0.5s"/>
+      <animate attributeName="opacity" values="0;0.7;0" dur="3.5s" repeatCount="indefinite" begin="0.5s"/>
+      <animate attributeName="r" values="2;4;2" dur="3.5s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    <circle cx="300" cy="430" r="4" fill="url(#breathGrad)" filter="url(#particleGlow)">
+      <animate attributeName="cy" values="430;385;340" dur="5s" repeatCount="indefinite" begin="1s"/>
+      <animate attributeName="cx" values="300;295;290" dur="5s" repeatCount="indefinite" begin="1s"/>
+      <animate attributeName="opacity" values="0;0.6;0" dur="5s" repeatCount="indefinite" begin="1s"/>
+      <animate attributeName="r" values="3;6;3" dur="5s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+    <circle cx="290" cy="415" r="2" fill="url(#breathGrad2)" filter="url(#particleGlow)">
+      <animate attributeName="cy" values="415;370;325" dur="4.5s" repeatCount="indefinite" begin="1.5s"/>
+      <animate attributeName="cx" values="290;275;265" dur="4.5s" repeatCount="indefinite" begin="1.5s"/>
+      <animate attributeName="opacity" values="0;0.5;0" dur="4.5s" repeatCount="indefinite" begin="1.5s"/>
+      <animate attributeName="r" values="2;4;2" dur="4.5s" repeatCount="indefinite" begin="1.5s"/>
+    </circle>
+    <circle cx="310" cy="418" r="2" fill="url(#breathGrad2)" filter="url(#particleGlow)">
+      <animate attributeName="cy" values="418;375;332" dur="3.8s" repeatCount="indefinite" begin="2s"/>
+      <animate attributeName="cx" values="310;325;335" dur="3.8s" repeatCount="indefinite" begin="2s"/>
+      <animate attributeName="opacity" values="0;0.5;0" dur="3.8s" repeatCount="indefinite" begin="2s"/>
+      <animate attributeName="r" values="2;4;2" dur="3.8s" repeatCount="indefinite" begin="2s"/>
+    </circle>
+
+    <!-- Small floating particles -->
+    <circle cx="250" cy="350" r="1.5" fill="#00d4ff" opacity="0">
+      <animate attributeName="opacity" values="0;0.6;0" dur="3s" repeatCount="indefinite" begin="0.3s"/>
+      <animate attributeName="cy" values="350;320" dur="3s" repeatCount="indefinite" begin="0.3s"/>
+    </circle>
+    <circle cx="350" cy="360" r="1.5" fill="#a855f7" opacity="0">
+      <animate attributeName="opacity" values="0;0.5;0" dur="3.5s" repeatCount="indefinite" begin="0.8s"/>
+      <animate attributeName="cy" values="360;330" dur="3.5s" repeatCount="indefinite" begin="0.8s"/>
+    </circle>
+    <circle cx="200" cy="280" r="1" fill="#00d4ff" opacity="0">
+      <animate attributeName="opacity" values="0;0.4;0" dur="4s" repeatCount="indefinite" begin="1.2s"/>
+      <animate attributeName="cy" values="280;250" dur="4s" repeatCount="indefinite" begin="1.2s"/>
+    </circle>
+    <circle cx="400" cy="290" r="1" fill="#a855f7" opacity="0">
+      <animate attributeName="opacity" values="0;0.4;0" dur="4.2s" repeatCount="indefinite" begin="1.7s"/>
+      <animate attributeName="cy" values="290;260" dur="4.2s" repeatCount="indefinite" begin="1.7s"/>
+    </circle>
+    <circle cx="270" cy="200" r="1" fill="#00d4ff" opacity="0">
+      <animate attributeName="opacity" values="0;0.3;0" dur="5s" repeatCount="indefinite" begin="0.5s"/>
+      <animate attributeName="cy" values="200;170" dur="5s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    <circle cx="330" cy="210" r="1" fill="#a855f7" opacity="0">
+      <animate attributeName="opacity" values="0;0.3;0" dur="4.8s" repeatCount="indefinite" begin="2.2s"/>
+      <animate attributeName="cy" values="210;180" dur="4.8s" repeatCount="indefinite" begin="2.2s"/>
+    </circle>
+  </g>
+
+  <!-- Subtle energy rings -->
+  <ellipse cx="300" cy="350" rx="180" ry="60" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.1">
+    <animate attributeName="rx" values="180;190;180" dur="6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.08;0.15;0.08" dur="6s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="300" cy="350" rx="220" ry="80" fill="none" stroke="#a855f7" stroke-width="0.5" opacity="0.05">
+    <animate attributeName="rx" values="220;230;220" dur="8s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.04;0.1;0.04" dur="8s" repeatCount="indefinite"/>
+  </ellipse>
+</svg>

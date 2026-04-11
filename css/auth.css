@@ -1,0 +1,314 @@
+/* ========================================
+   Authentication Pages Styling
+   Animated background, smooth transitions
+   ======================================== */
+
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--spacing-lg);
+  position: relative;
+}
+
+/* Animated background orbs */
+.auth-container::before,
+.auth-container::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  animation: orbFloat 12s ease-in-out infinite alternate;
+}
+
+.auth-container::before {
+  width: 400px;
+  height: 400px;
+  background: rgba(0, 212, 255, 0.08);
+  top: 10%;
+  left: 10%;
+}
+
+.auth-container::after {
+  width: 350px;
+  height: 350px;
+  background: rgba(168, 85, 247, 0.08);
+  bottom: 10%;
+  right: 10%;
+  animation-delay: -4s;
+}
+
+@keyframes orbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, -20px) scale(1.1); }
+}
+
+.back-link {
+  position: absolute;
+  top: var(--spacing-md);
+  left: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: color var(--transition-fast), transform var(--transition-spring);
+  z-index: 10;
+}
+
+.back-link:hover {
+  color: var(--neon-blue);
+  transform: translateX(-4px);
+}
+
+.back-link svg {
+  transition: transform var(--transition-spring);
+}
+
+.back-link:hover svg {
+  transform: translateX(-4px);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: var(--spacing-xl);
+  position: relative;
+  z-index: 2;
+  animation: cardEnter 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.auth-header .logo {
+  justify-content: center;
+  font-size: 2rem;
+  letter-spacing: -1px;
+}
+
+/* Tab Switcher */
+.auth-tabs {
+  display: flex;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Sliding indicator */
+.auth-tabs::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background: var(--gradient-primary);
+  border-radius: var(--radius-sm);
+  transition: transform var(--transition-base);
+  z-index: 0;
+}
+
+.auth-tabs.signup-active::before {
+  transform: translateX(100%);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 0.75rem;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+  position: relative;
+  z-index: 1;
+}
+
+.auth-tab.active {
+  color: white;
+}
+
+.auth-tab:hover:not(.active) {
+  color: var(--text-primary);
+}
+
+.auth-tab:focus-visible {
+  outline: 2px solid var(--neon-blue);
+  outline-offset: -2px;
+}
+
+/* Auth Forms */
+.auth-form {
+  display: none;
+}
+
+.auth-form.active {
+  display: block;
+  animation: formSlide 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes formSlide {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+  text-align: center;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.auth-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.5;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+  margin-top: var(--spacing-xs);
+}
+
+.strength-bar {
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base), background var(--transition-base);
+  position: relative;
+}
+
+.strength-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: strengthShimmer 2s ease-in-out infinite;
+}
+
+@keyframes strengthShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.strength-fill.weak {
+  width: 25%;
+  background: var(--neon-pink);
+  box-shadow: 0 0 10px rgba(236, 72, 153, 0.4);
+}
+
+.strength-fill.fair {
+  width: 50%;
+  background: var(--neon-orange);
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+}
+
+.strength-fill.good {
+  width: 75%;
+  background: var(--neon-blue);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+}
+
+.strength-fill.strong {
+  width: 100%;
+  background: var(--neon-green);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+}
+
+.strength-text {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  text-align: right;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+/* Auth Message */
+.auth-message {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: var(--spacing-md);
+  min-height: 1.5rem;
+  font-weight: 500;
+}
+
+.auth-message.error {
+  color: var(--neon-pink);
+  animation: messageShake 400ms ease-in-out;
+}
+
+.auth-message.success {
+  color: var(--neon-green);
+}
+
+@keyframes messageShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* Submit Button Loading State */
+.btn.loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

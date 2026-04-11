@@ -1,0 +1,137 @@
+/* ========================================
+   Accessibility Enhancements
+   High contrast mode, font scaling, keyboard nav
+   ======================================== */
+
+/* High Contrast Mode */
+body.high-contrast {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #141414;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-muted: #a0a0a0;
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --neon-blue: #00e5ff;
+  --neon-purple: #d500f9;
+  --neon-pink: #ff4081;
+  --neon-green: #00e676;
+}
+
+body.high-contrast .product-card,
+body.high-contrast .stat-card,
+body.high-contrast .glass {
+  border-width: 2px;
+}
+
+body.high-contrast .btn-primary {
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+}
+
+/* Large Font Mode */
+body.large-font {
+  --font-size-base: 18px;
+  --font-size-sm: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+}
+
+body.large-font .hero-title {
+  font-size: clamp(3rem, 10vw, 6rem);
+}
+
+body.large-font .product-name {
+  font-size: 1.125rem;
+}
+
+/* Enhanced Focus Indicators */
+body.high-contrast :focus-visible {
+  outline-width: 3px;
+  outline-offset: 3px;
+}
+
+/* Screen Reader Only (visually hidden) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip Navigation Link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--neon-blue);
+  color: var(--bg-primary);
+  padding: 0.5rem 1rem;
+  z-index: 3000;
+  font-weight: 500;
+  transition: top 150ms ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Keyboard Navigation Enhancement */
+*:focus-visible {
+  outline: 2px solid var(--neon-blue);
+  outline-offset: 2px;
+}
+
+/* Interactive element hover states for keyboard */
+button:hover,
+a:hover {
+  outline: none;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--neon-blue);
+  outline-offset: 2px;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ARIA live region styling (visually apparent for testing) */
+[role="alert"],
+[aria-live="assertive"],
+[aria-live="polite"] {
+  /* Ensure screen readers announce these */
+}
+
+/* Form validation states */
+.form-input[aria-invalid="true"] {
+  border-color: var(--neon-pink);
+}
+
+.form-input:valid:not(:placeholder-shown) {
+  border-color: var(--neon-green);
+}
+
+/* Color blindness support - add patterns to color-coded elements */
+body.colorblind .toast.success {
+  border-left: 4px solid var(--neon-green);
+}
+
+body.colorblind .toast.error {
+  border-left: 4px solid var(--neon-pink);
+}

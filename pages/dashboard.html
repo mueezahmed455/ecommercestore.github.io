@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Your account dashboard - Dragon-Tech">
+  <title>Dashboard | Dragon-Tech</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/glass.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/accessibility.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/product-modal.css">
+  <link rel="stylesheet" href="../css/light-theme.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body class="page-enter">
+  <!-- Scroll Progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Accessibility Controls -->
+  <div class="a11y-controls" role="toolbar" aria-label="Accessibility controls">
+    <button id="contrastToggle" aria-label="Toggle high contrast mode" title="Toggle contrast">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/>
+      </svg>
+    </button>
+    <button id="fontToggle" aria-label="Toggle font size" title="Toggle font size">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <text x="4" y="18" font-size="14" font-weight="bold">A</text>
+      </svg>
+    </button>
+    <button id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Announcement Banner -->
+  <div id="announcementBanner"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar glass" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="../index.html" class="logo" aria-label="Dragon-Tech Home">
+        <img src="../assets/dragon-logo.png" alt="" class="logo-icon" width="32" height="32" aria-hidden="true">
+        <span class="logo-text">Dragon</span><span class="logo-accent">-Tech</span>
+      </a>
+      <div class="nav-actions">
+        <div id="notificationBell" class="notification-bell" aria-label="Notifications">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="notification-badge" id="notificationBadge" aria-live="polite"></span>
+        </div>
+
+        <span class="user-greeting" id="userGreeting" data-i18n="greeting">Hello</span>
+        <button class="btn btn-ghost" id="logoutBtn" data-i18n="signOut">Sign Out</button>
+
+        <select id="currencySelector" class="selector-inline" aria-label="Select currency">
+          <option value="USD">USD ($)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="GBP">GBP (£)</option>
+          <option value="JPY">JPY (¥)</option>
+        </select>
+
+        <select id="languageSelector" class="selector-inline" aria-label="Select language">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dashboard Content -->
+  <main class="dashboard-container">
+    <div class="container">
+      <h1 class="page-title" data-i18n="dashboardTitle">Your Dashboard</h1>
+
+      
+      <!-- Dragon Egg Incubator Component -->
+      <div class="egg-incubator glass reveal stagger-2" style="padding:2rem; text-align:center; position:relative; overflow:hidden; margin-top:2rem; border:1px solid rgba(0,212,255,0.3);">
+        <h3 style="margin-top:0;">Your Dragon Egg is Incubating...</h3>
+        <p style="color:var(--text-secondary); margin-bottom:2rem;">Spend interacts as heat. Reach $500 total spent to hatch your first companion!</p>
+        
+        <div class="egg-container" style="position:relative; width:150px; height:200px; margin:0 auto;">
+           <div class="egg-shape" style="width:100%; height:100%; background:radial-gradient(ellipse at 30% 30%, #444, #111); border-radius:50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.8), 0 20px 30px rgba(0,0,0,0.5), 0 0 40px rgba(0,212,255,0.4); animation: breathe 3s ease-in-out infinite, wobble 10s ease-in-out infinite;"></div>
+           <div class="egg-cracks" style="position:absolute; top:0; left:0; width:100%; height:100%; background-image:url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 0 L45 20 L55 30 L45 50 L60 65" stroke="rgba(0,212,255,0.8)" fill="none" stroke-width="1.5"/></svg>'); background-size:cover; opacity:0.6;"></div>
+        </div>
+        
+        <style>
+          @keyframes breathe { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.2); } }
+          @keyframes wobble { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(2deg); } 75% { transform: rotate(-2deg); } }
+          
+          .egg-shape:hover {
+             animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+             cursor: pointer;
+             box-shadow: inset -10px -10px 20px rgba(0,0,0,0.8), 0 20px 30px rgba(0,0,0,0.5), 0 0 80px rgba(0,212,255,0.8);
+          }
+          @keyframes shake {
+             0%, 100% {transform: translateX(0);}
+             10%, 30%, 50%, 70%, 90% {transform: translateX(-5px) rotate(-3deg);}
+             20%, 40%, 60%, 80% {transform: translateX(5px) rotate(3deg);}
+          }
+        </style>
+        
+        <div style="margin-top:2rem;">
+          <div style="background:rgba(0,0,0,0.5); width:100%; max-width:300px; height:8px; border-radius:4px; margin:0 auto; overflow:hidden;">
+             <div style="width:72%; height:100%; background:var(--gradient-primary);"></div>
+          </div>
+          <p style="font-size:0.8rem; margin-top:8px; color:var(--neon-blue);">72% Heat Generated ($360 / $500)</p>
+        </div>
+      </div>
+  
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card glass reveal stagger-1">
+          <div class="stat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label" data-i18n="totalSpentLabel">Total Spent</span>
+            <span class="stat-value" id="totalSpent">$0.00</span>
+          </div>
+        </div>
+
+        <div class="stat-card glass reveal stagger-2">
+          <div class="stat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label" data-i18n="ordersLabel">Orders</span>
+            <span class="stat-value" id="orderCount">0</span>
+          </div>
+        </div>
+
+        <div class="stat-card glass reveal stagger-3">
+          <div class="stat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label" data-i18n="rewardsTierLabel">Rewards Tier</span>
+            <span class="stat-value" id="rewardsTier">Bronze</span>
+          </div>
+        </div>
+      </div>
+
+      
+      <!-- Gamified Loyalty Section -->
+      <section class="loyalty-section glass reveal stagger-3" aria-label="Dragon Evolution Status" style="margin-top:2rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <h2 class="section-title" style="margin:0;">Your Dragon Evolution</h2>
+          <span class="loyalty-tier-badge" id="dragonTierBadge" style="background:var(--gradient-primary); color:white; padding:4px 12px; border-radius:12px; font-weight:bold; box-shadow:0 0 10px rgba(0,212,255,0.4);">Wyrmling</span>
+        </div>
+        <div class="loyalty-progress-container" style="position:relative; margin-top:2rem;">
+          <div class="loyalty-steps" style="display:flex; justify-content:space-between; position:relative; z-index:2; font-weight:600;">
+            <div class="step" style="text-align:center; flex:1;">🥚 Egg</div>
+            <div class="step" style="text-align:center; flex:1;">🦎 Wyrmling</div>
+            <div class="step" style="text-align:center; flex:1; opacity:0.5;">🐉 Drake</div>
+            <div class="step" style="text-align:center; flex:1; opacity:0.5;">🐲 Great Wyrm</div>
+          </div>
+          <div class="progress-bar-bg" style="background:var(--bg-tertiary); height:12px; border-radius:6px; margin:1rem 0; overflow:hidden;">
+            <div class="progress-bar-fill" id="dragonProgressBar" style="width:35%; height:100%; background:var(--gradient-primary); transition:width 1s ease;"></div>
+          </div>
+          <p class="loyalty-hint" id="dragonProgressHint" style="text-align:center; color:var(--text-secondary); font-size:0.9rem;">$150 until Drake status (+10% off all orders!)</p>
+        </div>
+      </section>
+
+      <!-- Referral Section -->
+      <section id="referralSection" class="glass reveal stagger-4" aria-label="Referral program">
+        <h2 class="section-title" data-i18n="referralTitle">Refer a Friend</h2>
+        <div id="referralContent">
+          <!-- Referral content injected by JS -->
+        </div>
+      </section>
+
+      <!-- Coupon Section -->
+      <section class="coupon-section glass reveal stagger-4" aria-label="Your coupons">
+        <h2 class="section-title" data-i18n="couponsTitle">Your Coupons</h2>
+        <div id="couponList" class="coupon-list">
+          <p class="empty-state" data-i18n="noCoupons">No coupons yet. Spend over $100 to unlock your first discount!</p>
+        </div>
+      </section>
+
+      <!-- Wishlist Grid -->
+      <section id="wishlistSection" class="glass reveal stagger-5" aria-label="Your wishlist">
+        <h2 class="section-title" data-i18n="wishlistTitle">Your Wishlist</h2>
+        <div id="wishlistGrid" class="products-grid">
+          <!-- Wishlist items injected by JS -->
+        </div>
+      </section>
+
+      <!-- Recently Viewed Section -->
+      <section id="recentlyViewedSection" class="glass reveal stagger-5" aria-label="Recently viewed products">
+        <h2 class="section-title" data-i18n="recentlyViewedTitle">Recently Viewed</h2>
+        <div id="recentlyViewed" class="products-grid">
+          <!-- Recently viewed products injected by JS -->
+        </div>
+      </section>
+
+      <!-- Order History -->
+      <section class="orders-section glass reveal stagger-5" aria-label="Order history">
+        <h2 class="section-title" data-i18n="ordersTitle">Recent Orders</h2>
+        <div id="orderHistory" class="order-list">
+          <p class="empty-state" data-i18n="noOrders">No orders yet. Start shopping!</p>
+        </div>
+      </section>
+
+      <!-- Profile Section -->
+      <section class="profile-section glass reveal stagger-6" aria-label="Profile information">
+        <h2 class="section-title" data-i18n="profileTitle">Profile</h2>
+        <div class="profile-info">
+          <div class="profile-row">
+            <span class="profile-label" data-i18n="nameLabel">Name</span>
+            <span class="profile-value" id="profileName">—</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label" data-i18n="emailLabel">Email</span>
+            <span class="profile-value" id="profileEmail">—</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label" data-i18n="memberSinceLabel">Member Since</span>
+            <span class="profile-value" id="memberSince">—</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="../assets/dragon-logo.png" alt="" class="footer-logo" width="120" aria-hidden="true">
+          <p>&copy; 2026 Dragon-Tech. Crafted with precision.</p>
+        </div>
+        <div class="footer-links">
+          <a href="../index.html">Home</a>
+          <a href="dashboard.html">Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    const app = initializeApp(window.FIREBASE_CONFIG);
+    window.db = { auth: getAuth(app), firestore: getFirestore(app) };
+
+    // Service Worker Registration for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function() {});
+      });
+    }
+  </script>
+
+  <!-- Classic Scripts -->
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/wishlist.js"></script>
+  <script src="../js/recently-viewed.js"></script>
+  <script src="../js/sync-cart.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/currency.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/notifications.js"></script>
+  <script src="../js/announcements.js"></script>
+  <script src="../js/referral.js"></script>
+  <script src="../js/ui.js"></script>
+</body>
+</html>

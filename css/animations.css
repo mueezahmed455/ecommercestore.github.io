@@ -1,0 +1,357 @@
+/* ========================================
+   Animation System
+   Scroll reveals, page transitions, hover effects
+   ======================================== */
+
+/* ========================================
+   SCROLL REVEAL ANIMATIONS
+   Applied via JS IntersectionObserver
+   ======================================== */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Variants */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Stagger delays for grid items */
+.stagger-1 { transition-delay: 80ms; }
+.stagger-2 { transition-delay: 160ms; }
+.stagger-3 { transition-delay: 240ms; }
+.stagger-4 { transition-delay: 320ms; }
+.stagger-5 { transition-delay: 400ms; }
+.stagger-6 { transition-delay: 480ms; }
+.stagger-7 { transition-delay: 560ms; }
+.stagger-8 { transition-delay: 640ms; }
+
+/* ========================================
+   PAGE TRANSITIONS
+   ======================================== */
+.page-enter {
+  animation: pageEnter 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   HOVER EFFECTS
+   ======================================== */
+
+/* Magnetic hover - subtle pull toward cursor */
+.magnetic {
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Glow pulse on hover */
+.glow-pulse {
+  transition: box-shadow var(--transition-base);
+}
+
+.glow-pulse:hover {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.1); }
+  50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.25); }
+}
+
+/* Scale bounce */
+.scale-bounce {
+  transition: transform var(--transition-spring);
+}
+
+.scale-bounce:hover {
+  transform: scale(1.05);
+}
+
+.scale-bounce:active {
+  transform: scale(0.98);
+}
+
+/* Tilt effect */
+.tilt {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* ========================================
+   TEXT ANIMATIONS
+   ======================================== */
+
+/* Typewriter effect */
+.typewriter {
+  overflow: hidden;
+  border-right: 2px solid var(--neon-blue);
+  white-space: nowrap;
+  animation: typing 2s steps(30, end), blink 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: var(--neon-blue); }
+}
+
+/* Gradient text animation */
+.gradient-animate {
+  background: linear-gradient(
+    270deg,
+    var(--neon-blue),
+    var(--neon-purple),
+    var(--neon-pink),
+    var(--neon-blue)
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 6s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ========================================
+   LOADING STATES
+   ======================================== */
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-tertiary) 25%,
+    rgba(255, 255, 255, 0.05) 50%,
+    var(--bg-tertiary) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Spinner variants */
+.spinner-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--neon-blue);
+  animation: dotBounce 1.4s ease-in-out infinite;
+}
+
+.spinner-dots span:nth-child(2) { animation-delay: 0.2s; }
+.spinner-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* ========================================
+   MICRO-INTERACTIONS
+   ======================================== */
+
+/* Ripple effect */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.15) 10%, transparent 10%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.8s;
+}
+
+.ripple:active::after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
+}
+
+/* Float animation */
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Pulse ring */
+.pulse-ring {
+  position: relative;
+}
+
+.pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--neon-blue);
+  border-radius: inherit;
+  animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes pulseRing {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+
+/* ========================================
+   NOTIFICATION BADGE ANIMATION
+   ======================================== */
+.badge-pop {
+  animation: badgePop 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePop {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* ========================================
+   FORM ANIMATIONS
+   ======================================== */
+
+/* Input focus label float */
+.form-group.floating .form-label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all var(--transition-fast);
+  pointer-events: none;
+  color: var(--text-muted);
+}
+
+.form-group.floating .form-input:focus + .form-label,
+.form-group.floating .form-input:not(:placeholder-shown) + .form-label {
+  top: 0;
+  transform: translateY(-50%) scale(0.85);
+  color: var(--neon-blue);
+}
+
+/* Error shake */
+.shake {
+  animation: shake 400ms ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Empty state placeholder */
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--spacing-xl) 0;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+}
+
+/* Scroll progress indicator */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--gradient-primary);
+  z-index: 9999;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 100ms linear;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.scroll-progress.visible {
+  transform: scaleX(1);
+}

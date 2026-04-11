@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm *)",
+      "Bash(test *)",
+      "Bash(grep *)",
+      "Bash(ls *)",
+      "Bash(echo *)",
+      "Bash(xargs *)",
+      "Bash(dir *)"
+    ]
+  },
+  "$version": 3
+}

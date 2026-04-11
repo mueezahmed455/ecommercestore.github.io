@@ -1,0 +1,281 @@
+/* ============================
+   Light Theme Overrides for Dragon-Tech
+   ============================ */
+
+[data-theme="light"] {
+  /* Background Colors */
+  --bg-primary: #f5f5fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eeeef5;
+
+  /* Text Colors */
+  --text-primary: #0a0a1a;
+  --text-secondary: #4a4a6a;
+  --text-muted: #8a8aaa;
+
+  /* Glass Morphism */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.08);
+
+  /* Neon Colors - Adjusted for Light Background */
+  --neon-primary: #6c5ce7;
+  --neon-secondary: #a29bfe;
+  --neon-accent: #e17055;
+  --neon-success: #00b894;
+  --neon-warning: #fdcb6e;
+  --neon-error: #d63031;
+
+  /* Shadows - Lighter, Softer */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.1);
+  --shadow-neon: 0 0 10px rgba(108, 92, 231, 0.15);
+
+  /* Form Inputs */
+  --input-bg: #ffffff;
+  --input-border: rgba(0, 0, 0, 0.12);
+  --input-border-focus: #6c5ce7;
+  --input-text: #0a0a1a;
+  --input-placeholder: #8a8aaa;
+  --input-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+  /* Buttons */
+  --button-primary-bg: #6c5ce7;
+  --button-primary-text: #ffffff;
+  --button-primary-hover: #5a4bd1;
+  --button-secondary-bg: #e8e8f0;
+  --button-secondary-text: #0a0a1a;
+  --button-secondary-hover: #d8d8e8;
+  --button-accent-bg: #e17055;
+  --button-accent-text: #ffffff;
+  --button-accent-hover: #c0554a;
+
+  /* Cards and Surfaces */
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.06);
+  --card-hover-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+
+  /* Navigation */
+  --nav-bg: rgba(255, 255, 255, 0.85);
+  --nav-border: rgba(0, 0, 0, 0.06);
+  --nav-link: #0a0a1a;
+  --nav-link-hover: #6c5ce7;
+
+  /* Footer */
+  --footer-bg: #e8e8f0;
+  --footer-text: #4a4a6a;
+
+  /* Badges and Tags */
+  --badge-bg: #e8e8f0;
+  --badge-text: #4a4a6a;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #c8c8d8;
+  --scrollbar-track: #eeeef5;
+
+  /* Selection */
+  --selection-bg: rgba(108, 92, 231, 0.2);
+  --selection-text: #0a0a1a;
+
+  /* Smooth Theme Transitions */
+  --transition-theme: background 300ms ease, color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+}
+
+/* ============================
+   Smooth Theme Transition
+   ============================ */
+*,
+*::before,
+*::after {
+  transition: var(--transition-theme);
+}
+
+/* ============================
+   Light Theme Specific Overrides
+   ============================ */
+
+[data-theme="light"] body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Card Styling */
+[data-theme="light"] .card,
+[data-theme="light"] .product-card,
+[data-theme="light"] .glass-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="light"] .card:hover,
+[data-theme="light"] .product-card:hover {
+  box-shadow: var(--card-hover-shadow);
+}
+
+/* Navigation */
+[data-theme="light"] .navbar,
+[data-theme="light"] .nav-container {
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--nav-border);
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="light"] .nav-link {
+  color: var(--nav-link);
+}
+
+[data-theme="light"] .nav-link:hover {
+  color: var(--nav-link-hover);
+}
+
+/* Form Inputs */
+[data-theme="light"] input[type="text"],
+[data-theme="light"] input[type="email"],
+[data-theme="light"] input[type="password"],
+[data-theme="light"] input[type="number"],
+[data-theme="light"] input[type="search"],
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  box-shadow: var(--input-shadow);
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: var(--input-placeholder);
+}
+
+[data-theme="light"] input:focus,
+[data-theme="light"] textarea:focus,
+[data-theme="light"] select:focus {
+  border-color: var(--input-border-focus);
+  box-shadow: var(--shadow-neon);
+  outline: none;
+}
+
+/* Buttons */
+[data-theme="light"] .btn-primary {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+}
+
+[data-theme="light"] .btn-primary:hover {
+  background: var(--button-primary-hover);
+}
+
+[data-theme="light"] .btn-secondary {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+}
+
+[data-theme="light"] .btn-secondary:hover {
+  background: var(--button-secondary-hover);
+}
+
+[data-theme="light"] .btn-accent {
+  background: var(--button-accent-bg);
+  color: var(--button-accent-text);
+}
+
+[data-theme="light"] .btn-accent:hover {
+  background: var(--button-accent-hover);
+}
+
+/* Footer */
+[data-theme="light"] footer,
+[data-theme="light"] .footer {
+  background: var(--footer-bg);
+  color: var(--footer-text);
+}
+
+/* Badges */
+[data-theme="light"] .badge,
+[data-theme="light"] .tag {
+  background: var(--badge-bg);
+  color: var(--badge-text);
+}
+
+/* Scrollbar Styling */
+[data-theme="light"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Text Selection */
+[data-theme="light"] ::selection {
+  background: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+/* Accessibility: Focus Visible */
+[data-theme="light"] *:focus-visible {
+  outline: 2px solid var(--neon-primary);
+  outline-offset: 2px;
+}
+
+/* Tables */
+[data-theme="light"] table {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+[data-theme="light"] th,
+[data-theme="light"] td {
+  border-color: var(--card-border);
+}
+
+[data-theme="light"] tr:hover {
+  background: var(--bg-tertiary);
+}
+
+/* Modals */
+[data-theme="light"] .modal,
+[data-theme="light"] .modal-content {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Dropdowns */
+[data-theme="light"] .dropdown-menu {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+  box-shadow: var(--shadow-lg);
+}
+
+[data-theme="light"] .dropdown-item:hover {
+  background: var(--bg-tertiary);
+}
+
+/* Toasts / Alerts */
+[data-theme="light"] .toast,
+[data-theme="light"] .alert {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+  box-shadow: var(--shadow-md);
+  color: var(--text-primary);
+}
+
+/* Code blocks */
+[data-theme="light"] code,
+[data-theme="light"] pre {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}

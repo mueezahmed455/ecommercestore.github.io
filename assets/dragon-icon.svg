@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <!-- Dragon head icon - simplified front-facing silhouette -->
+  <g fill="url(#iconGrad)">
+    <!-- Main head -->
+    <path d="M50,10 C35,12 22,18 15,28 C8,38 6,50 10,62 C14,74 22,84 35,90 L50,95 L65,90 C78,84 86,74 90,62 C94,50 92,38 85,28 C78,18 65,12 50,10 Z"/>
+    <!-- Horns -->
+    <path d="M30,20 C25,12 20,5 18,2 C17,0 20,3 24,10 C27,16 30,22 32,25 Z"/>
+    <path d="M70,20 C75,12 80,5 82,2 C83,0 80,3 76,10 C73,16 70,22 68,25 Z"/>
+  </g>
+  <!-- Eyes -->
+  <ellipse cx="38" cy="45" rx="5" ry="4" fill="#0a0a1a"/>
+  <ellipse cx="38" cy="44" rx="2.5" ry="2" fill="#00d4ff"/>
+  <ellipse cx="62" cy="45" rx="5" ry="4" fill="#0a0a1a"/>
+  <ellipse cx="62" cy="44" rx="2.5" ry="2" fill="#00d4ff"/>
+  <!-- Snout details -->
+  <ellipse cx="42" cy="62" rx="4" ry="3" fill="#0a0a1a" opacity="0.7"/>
+  <ellipse cx="58" cy="62" rx="4" ry="3" fill="#0a0a1a" opacity="0.7"/>
+  <!-- Jaw line -->
+  <path d="M35,72 C42,78 50,80 58,78" fill="none" stroke="#0a0a1a" stroke-width="1" opacity="0.4"/>
+</svg>

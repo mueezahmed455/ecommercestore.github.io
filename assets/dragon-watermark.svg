@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <!-- Dragon watermark - very subtle for backgrounds -->
+  <g opacity="0.025" fill="#00d4ff">
+    <!-- Main head silhouette - front facing, simplified -->
+    <path d="M400,100 
+             C320,110 250,150 200,220 
+             C150,290 130,380 160,470 
+             C190,560 260,640 340,680 
+             L400,710 
+             L460,680 
+             C540,640 610,560 640,470 
+             C670,380 650,290 600,220 
+             C550,150 480,110 400,100 Z"/>
+    <!-- Left horn -->
+    <path d="M280,160 C250,100 220,50 200,20 C190,5 210,15 235,65 C255,110 275,155 290,180 Z"/>
+    <!-- Right horn -->
+    <path d="M520,160 C550,100 580,50 600,20 C610,5 590,15 565,65 C545,110 525,155 510,180 Z"/>
+    <!-- Eye sockets -->
+    <ellipse cx="340" cy="350" rx="40" ry="30" fill="#000000" opacity="0.5"/>
+    <ellipse cx="460" cy="350" rx="40" ry="30" fill="#000000" opacity="0.5"/>
+    <!-- Nostrils -->
+    <ellipse cx="370" cy="500" rx="15" ry="12" fill="#000000" opacity="0.5"/>
+    <ellipse cx="430" cy="500" rx="15" ry="12" fill="#000000" opacity="0.5"/>
+  </g>
+  <!-- Geometric overlay pattern -->
+  <g opacity="0.02" fill="none" stroke="#a855f7" stroke-width="1">
+    <!-- Diamond shapes -->
+    <path d="M400,150 L420,200 L400,250 L380,200 Z"/>
+    <path d="M400,280 L430,350 L400,420 L370,350 Z"/>
+    <path d="M400,450 L440,530 L400,610 L360,530 Z"/>
+    <!-- Side diamonds -->
+    <path d="M300,280 L320,330 L300,380 L280,330 Z"/>
+    <path d="M500,280 L520,330 L500,380 L480,330 Z"/>
+    <path d="M250,400 L270,450 L250,500 L230,450 Z"/>
+    <path d="M550,400 L570,450 L550,500 L530,450 Z"/>
+  </g>
+</svg>

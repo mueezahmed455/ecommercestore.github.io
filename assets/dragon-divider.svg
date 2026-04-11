@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 40" width="400" height="40">
+  <defs>
+    <linearGradient id="divGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#00d4ff" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#a855f7" stop-opacity="1"/>
+      <stop offset="70%" stop-color="#a855f7" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/>
+      <stop offset="20%" stop-color="#00d4ff" stop-opacity="0.3"/>
+      <stop offset="50%" stop-color="#a855f7" stop-opacity="0.5"/>
+      <stop offset="80%" stop-color="#a855f7" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="centerGlow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Left line -->
+  <line x1="0" y1="20" x2="160" y2="20" stroke="url(#lineGrad)" stroke-width="1"/>
+  <!-- Right line -->
+  <line x1="240" y1="20" x2="400" y2="20" stroke="url(#lineGrad)" stroke-width="1"/>
+  <!-- Center dragon head - minimal -->
+  <g transform="translate(200,20) scale(0.25)" filter="url(#centerGlow)">
+    <path d="M0,-35 C-15,-30 -30,-20 -35,-5 C-40,10 -38,25 -30,38 C-22,50 -10,58 0,62 C10,58 22,50 30,38 C38,25 40,10 35,-5 C30,-20 15,-30 0,-35 Z" fill="url(#divGrad)">
+      <animate attributeName="opacity" values="0.7;1;0.7" dur="4s" repeatCount="indefinite"/>
+    </path>
+    <!-- Mini horns -->
+    <path d="M-25,-20 C-30,-35 -35,-45 -38,-52 C-36,-48 -32,-38 -28,-25 Z" fill="url(#divGrad)"/>
+    <path d="M25,-20 C30,-35 35,-45 38,-52 C36,-48 32,-38 28,-25 Z" fill="url(#divGrad)"/>
+    <!-- Mini eyes -->
+    <ellipse cx="-10" cy="5" rx="4" ry="3" fill="#0a0a1a" opacity="0.6"/>
+    <ellipse cx="-10" cy="4.5" rx="2" ry="1.5" fill="#00d4ff" opacity="0.8"/>
+    <ellipse cx="10" cy="5" rx="4" ry="3" fill="#0a0a1a" opacity="0.6"/>
+    <ellipse cx="10" cy="4.5" rx="2" ry="1.5" fill="#00d4ff" opacity="0.8"/>
+  </g>
+  <!-- Accent dots -->
+  <circle cx="175" cy="20" r="1" fill="#00d4ff" opacity="0.4"/>
+  <circle cx="185" cy="20" r="1.5" fill="#00d4ff" opacity="0.3"/>
+  <circle cx="215" cy="20" r="1.5" fill="#a855f7" opacity="0.3"/>
+  <circle cx="225" cy="20" r="1" fill="#a855f7" opacity="0.4"/>
+  <!-- Subtle pulse glow -->
+  <ellipse cx="200" cy="20" rx="30" ry="8" fill="#a855f7" opacity="0.05" filter="url(#centerGlow)">
+    <animate attributeName="opacity" values="0.03;0.08;0.03" dur="4s" repeatCount="indefinite"/>
+  </ellipse>
+</svg>

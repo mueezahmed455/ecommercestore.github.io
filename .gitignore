@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+functions/node_modules/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+# Cloud Functions source (deployed separately via Firebase CLI, not served on GitHub Pages)
+functions/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build
+dist/
+build/

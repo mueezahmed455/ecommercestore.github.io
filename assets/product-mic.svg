@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="bgMic" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="redMic" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444"/>
+      <stop offset="100%" style="stop-color:#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="bodyMic" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a2a3e"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <filter id="glowMic">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="shadowMic" cx="50%" cy="80%">
+      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bgMic)" rx="16"/>
+  <ellipse cx="200" cy="340" rx="60" ry="10" fill="url(#shadowMic)"/>
+  <g filter="url(#glowMic)">
+    <!-- Desk stand base -->
+    <ellipse cx="200" cy="310" rx="40" ry="8" fill="url(#bodyMic)" stroke="#444" stroke-width="1"/>
+    <!-- Stand pole -->
+    <rect x="196" y="250" width="8" height="62" fill="#2a2a3e" stroke="#444" stroke-width="0.5"/>
+    <!-- Mic mount/bracket -->
+    <path d="M180 255 Q175 248 180 240 L220 240 Q225 248 220 255 Z" fill="#2a2a3e" stroke="#444" stroke-width="1"/>
+    <!-- Mic body - capsule shape -->
+    <rect x="170" y="120" width="60" height="120" rx="30" fill="url(#bodyMic)" stroke="url(#redMic)" stroke-width="2"/>
+    <!-- Mic grille pattern -->
+    <line x1="180" y1="130" x2="220" y2="130" stroke="#333" stroke-width="0.8"/>
+    <line x1="178" y1="138" x2="222" y2="138" stroke="#333" stroke-width="0.8"/>
+    <line x1="176" y1="146" x2="224" y2="146" stroke="#333" stroke-width="0.8"/>
+    <line x1="175" y1="154" x2="225" y2="154" stroke="#333" stroke-width="0.8"/>
+    <line x1="174" y1="162" x2="226" y2="162" stroke="#333" stroke-width="0.8"/>
+    <line x1="174" y1="170" x2="226" y2="170" stroke="#333" stroke-width="0.8"/>
+    <line x1="175" y1="178" x2="225" y2="178" stroke="#333" stroke-width="0.8"/>
+    <line x1="176" y1="186" x2="224" y2="186" stroke="#333" stroke-width="0.8"/>
+    <line x1="178" y1="194" x2="222" y2="194" stroke="#333" stroke-width="0.8"/>
+    <line x1="180" y1="202" x2="220" y2="202" stroke="#333" stroke-width="0.8"/>
+    <!-- Grille highlight -->
+    <rect x="172" y="125" width="56" height="85" rx="25" fill="white" opacity="0.03"/>
+    <!-- Recording indicator LED -->
+    <circle cx="200" cy="215" r="4" fill="#ef4444">
+      <animate attributeName="opacity" values="1;0.1;1;0.1;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="200" cy="215" r="8" fill="#ef4444" opacity="0.15">
+      <animate attributeName="opacity" values="0.2;0;0.2;0;0.2" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Pop filter -->
+    <ellipse cx="200" cy="160" rx="45" ry="65" fill="none" stroke="#555" stroke-width="1.5" opacity="0.4"/>
+    <ellipse cx="200" cy="160" rx="42" ry="62" fill="none" stroke="#444" stroke-width="0.5" opacity="0.3"/>
+    <!-- Pop filter mesh dots -->
+    <circle cx="190" cy="140" r="0.5" fill="#555" opacity="0.3"/>
+    <circle cx="200" cy="135" r="0.5" fill="#555" opacity="0.3"/>
+    <circle cx="210" cy="140" r="0.5" fill="#555" opacity="0.3"/>
+    <circle cx="185" cy="150" r="0.5" fill="#555" opacity="0.3"/>
+    <circle cx="195" cy="145" r="0.5" fill="#555" opacity="0.3"/>
+    <circle cx="205" cy="145" r="0.5" fill="#555" opacity="0.3"/>
+    <circle cx="215" cy="150" r="0.5" fill="#555" opacity="0.3"/>
+    <!-- Pop filter arm -->
+    <path d="M245 160 L270 160 L270 240" fill="none" stroke="#444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="270" cy="240" r="4" fill="#2a2a3e" stroke="#444" stroke-width="1"/>
+    <!-- Gain knob -->
+    <circle cx="180" cy="248" r="5" fill="#1a1a2e" stroke="#ef4444" stroke-width="1"/>
+    <circle cx="180" cy="244" r="1.5" fill="#ef4444" opacity="0.6"/>
+  </g>
+  <!-- Sound wave visualization -->
+  <path d="M130 150 Q120 155 130 160" fill="none" stroke="#ef4444" stroke-width="1" opacity="0.3">
+    <animate attributeName="opacity" values="0.1;0.5;0.1" dur="1.5s" repeatCount="indefinite"/>
+  </path>
+  <path d="M118 145 Q105 155 118 165" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.2">
+    <animate attributeName="opacity" values="0.05;0.4;0.05" dur="1.5s" repeatCount="indefinite" begin="0.2s"/>
+  </path>
+  <path d="M106 140 Q90 155 106 170" fill="none" stroke="#ef4444" stroke-width="1" opacity="0.15">
+    <animate attributeName="opacity" values="0.05;0.35;0.05" dur="1.5s" repeatCount="indefinite" begin="0.4s"/>
+  </path>
+  <!-- Floating particles -->
+  <circle cx="100" cy="110" r="2" fill="#ef4444" opacity="0.4">
+    <animate attributeName="cy" values="110;95;110" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="310" cy="140" r="1.5" fill="#f59e0b" opacity="0.3">
+    <animate attributeName="cy" values="140;125;140" dur="3.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="260" cy="90" r="1" fill="#ef4444" opacity="0.3">
+    <animate attributeName="cy" values="90;78;90" dur="2.8s" repeatCount="indefinite"/>
+  </circle>
+</svg>

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Dragon-Tech — Premium curated technology for the modern minimalist">
+  <title>Dragon-Tech — Premium Tech, Refined</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/glass.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/accessibility.css">
+  <link rel="stylesheet" href="css/product-modal.css">
+  <link rel="stylesheet" href="css/light-theme.css">
+</head>
+
+<body class="page-enter">
+  <!-- Scroll Progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Announcement Banner -->
+  <div id="announcementBanner"></div>
+
+  <!-- Accessibility Controls -->
+  <div class="a11y-controls" role="toolbar" aria-label="Accessibility controls">
+    <button id="contrastToggle" aria-label="Toggle high contrast mode" title="Toggle contrast">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor" />
+      </svg>
+    </button>
+    <button id="fontToggle" aria-label="Toggle font size" title="Toggle font size">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <text x="3" y="18" font-size="14" font-weight="bold">A</text>
+      </svg>
+    </button>
+    <button id="themeToggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+      <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+      </svg>
+      <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" style="display:none">
+        <circle cx="12" cy="12" r="5" />
+        <line x1="12" y1="1" x2="12" y2="3" />
+        <line x1="12" y1="21" x2="12" y2="23" />
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+        <line x1="1" y1="12" x2="3" y2="12" />
+        <line x1="21" y1="12" x2="23" y2="12" />
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Navigation -->
+
+  <nav class="navbar glass" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="index.html" class="logo" aria-label="Dragon-Tech Home">
+        <img src="assets/dragon-logo.png" alt="" class="logo-icon" width="36" height="36" aria-hidden="true">
+        <span class="logo-text">Dragon</span><span class="logo-accent">-Tech</span>
+      </a>
+
+      <div class="nav-actions">
+        <div id="authSection">
+          <a href="pages/login.html" class="btn btn-ghost btn-sm">Sign In</a>
+        </div>
+
+        <div id="navClock" class="nav-clock" aria-label="Current time">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            style="vertical-align: middle; margin-right: 6px;">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span id="clockTime">00:00:00</span>
+        </div>
+
+        <div id="notificationBell" class="nav-icon" role="button" tabindex="0" aria-label="Notifications">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+        </div>
+
+        <button id="chatbotNavToggle" class="nav-icon" aria-label="AI Assistant"
+          style="background:none; border:none; color:var(--text-primary); cursor:pointer;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+          </svg>
+        </button>
+
+        <select id="currencySelector" class="nav-select" aria-label="Select currency">
+          <option value="USD">USD $</option>
+          <option value="EUR">EUR \u20ac</option>
+          <option value="GBP">GBP \u00a3</option>
+          <option value="JPY">JPY \u00a5</option>
+        </select>
+
+        <select id="languageSelector" class="nav-select" aria-label="Select language">
+          <option value="en">EN</option>
+          <option value="es">ES</option>
+          <option value="fr">FR</option>
+          <option value="de">DE</option>
+        </select>
+
+        <button class="cart-btn" id="cartBtn" aria-label="Shopping cart" aria-haspopup="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1" />
+            <circle cx="20" cy="21" r="1" />
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+          </svg>
+          <span class="cart-badge" id="cartBadge" aria-live="polite">0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Cart Sidebar -->
+  <aside class="cart-sidebar" id="cartSidebar" role="dialog" aria-label="Shopping cart" aria-hidden="true">
+    <div class="cart-header">
+      <h2>Cart</h2>
+      <button class="close-btn" id="closeCart" aria-label="Close cart">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <p class="empty-cart">Your cart is empty</p>
+    </div>
+
+    <!-- Delivery Options -->
+    <div class="cart-delivery" id="cartDelivery" style="display:none">
+      <h3 class="delivery-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          style="vertical-align: middle; margin-right: 6px;">
+          <rect x="1" y="3" width="15" height="13" />
+          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+          <circle cx="5.5" cy="18.5" r="2.5" />
+          <circle cx="18.5" cy="18.5" r="2.5" />
+        </svg>
+        Delivery Method
+      </h3>
+      <div class="delivery-options">
+        <label class="delivery-option" data-delivery="standard">
+          <input type="radio" name="deliveryMethod" value="standard" checked>
+          <div class="delivery-option-content">
+            <div class="delivery-option-header">
+              <span class="delivery-name">Standard Shipping</span>
+              <span class="delivery-price" data-price="4.99">$4.99</span>
+            </div>
+            <div class="delivery-details">5-7 business days</div>
+            <div class="delivery-eta" id="etaStandard"></div>
+          </div>
+        </label>
+        <label class="delivery-option" data-delivery="express">
+          <input type="radio" name="deliveryMethod" value="express">
+          <div class="delivery-option-content">
+            <div class="delivery-option-header">
+              <span class="delivery-name">Express Shipping</span>
+              <span class="delivery-price" data-price="9.99">$9.99</span>
+            </div>
+            <div class="delivery-details">2-3 business days</div>
+            <div class="delivery-eta" id="etaExpress"></div>
+          </div>
+        </label>
+        <label class="delivery-option" data-delivery="priority">
+          <input type="radio" name="deliveryMethod" value="priority">
+          <div class="delivery-option-content">
+            <div class="delivery-option-header">
+              <span class="delivery-name">Priority Overnight</span>
+              <span class="delivery-price" data-price="19.99">$19.99</span>
+            </div>
+            <div class="delivery-details">Next business day</div>
+            <div class="delivery-eta" id="etaPriority"></div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Coupon Code Input -->
+      <div class="coupon-input-section">
+        <div class="coupon-input-wrapper">
+          <input type="text" id="couponCodeInput" class="coupon-input" placeholder="Enter coupon code"
+            autocomplete="off">
+          <button class="coupon-apply-btn" id="applyCouponBtn">Apply</button>
+        </div>
+        <div class="coupon-message" id="couponMessage" style="display:none"></div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <div class="summary-row">
+          <span class="summary-label">Subtotal</span>
+          <span class="summary-value" id="orderSubtotal">$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Shipping</span>
+          <span class="summary-value" id="orderShipping">$4.99</span>
+        </div>
+        <div class="summary-row discount-row" id="discountRow" style="display:none">
+          <span class="summary-label discount-label">
+            Discount
+            <span class="coupon-badge" id="couponBadge"></span>
+          </span>
+          <span class="summary-value discount-value" id="orderDiscount">-$0.00</span>
+        </div>
+        <div class="summary-row total-row">
+          <span class="summary-label total-label">Total</span>
+          <span class="summary-value total-value" id="orderTotal">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Free Shipping Progress -->
+      <div class="free-shipping-progress" id="freeShippingProgress">
+        <div class="progress-header">
+          <span class="progress-text" id="progressText">$95.01 away from FREE shipping!</span>
+          <span class="progress-percent" id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-footer">
+      <button class="btn btn-primary btn-block" id="checkoutBtn" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          style="vertical-align: middle; margin-right: 6px;">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+          <line x1="1" y1="10" x2="23" y2="10" />
+        </svg>
+        Proceed to Checkout
+      </button>
+    </div>
+  </aside>
+  <div class="cart-overlay" id="cartOverlay"></div>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-particles" id="heroParticles"></div>
+    <div class="hero-dragon" aria-hidden="true">
+      <img src="assets/dragon-hero.png" alt="" loading="eager">
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-title" data-i18n="hero_title">
+        <span class="gradient-text">Technology, Curated</span><br>
+        <span>for Excellence</span>
+      </h1>
+      <p class="hero-subtitle">Premium devices and accessories for professionals who demand performance, reliability,
+        and refined design.</p>
+      <div class="hero-actions">
+        <a href="#products" class="btn btn-primary">Shop Collection</a>
+        <a href="#newsletter" class="btn btn-ghost" style="margin-left: 1rem;">Get Updates</a>
+      </div>
+      <div class="hero-trust"
+        style="margin-top: 3rem; display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; color: var(--text-muted); font-size: 0.875rem;">
+        <span>✓ Free Shipping Over $100</span>
+        <span>✓ 30-Day Returns</span>
+        <span>✓ 2-Year Warranty</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dragon Divider -->
+  <div class="dragon-divider" aria-hidden="true">
+    <img src="assets/dragon-divider.svg" alt="" width="200">
+  </div>
+
+
+  <!-- Blind Box Mystery Drops -->
+  <section class="mystery-box-section glass"
+    style="margin-top:4rem; padding:3rem 0; background:linear-gradient(135deg, rgba(88,28,135,0.2), rgba(0,212,255,0.1));"
+    aria-label="Mystery Drop">
+    <div class="container" style="text-align:center;">
+      <h2
+        style="font-size:2.5rem; margin-bottom:1rem; background:-webkit-linear-gradient(45deg, #a855f7, #ec4899); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+        Dragon's Mystery Hoard 🎲</h2>
+      <p style="color:var(--text-secondary); max-width:600px; margin:0 auto 2rem; font-size:1.1rem;">
+        Take a chance on our monthly Blind Box Drops. For $49, secure a mystery tech bundle guaranteed to be worth at
+        least $100! (Includes 1 rare accessory)
+      </p>
+
+      <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
+        <div class="mystery-box reveal stagger-1"
+          style="width:280px; height:280px; background:rgba(0,0,0,0.4); border:2px solid var(--neon-pink); border-radius:20px; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-direction:column; cursor:pointer; transition:transform 0.3s; box-shadow:0 0 20px rgba(236,72,153,0.3);">
+          <div style="font-size:4rem; margin-bottom:10px; animation:bounce 2s infinite;">📦</div>
+          <h3 style="color:white; margin:0;">Edition #042</h3>
+          <p style="color:var(--neon-pink); font-weight:bold;">$49.00</p>
+          <button class="btn btn-primary" style="margin-top:10px;"
+            onclick="if(window.cart) window.cart.addToCart('mystery-box'); window.showToast('Mystery Hoard Secured!', 'success');">Claim
+            Hoard</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Products Section -->
+  <main>
+    <section id="products" class="products-section" aria-label="Product listings">
+      <div class="container">
+        <h2 class="section-title" data-i18n="products_title">Featured Products</h2>
+
+        <!-- Discovery Controls -->
+        <div class="discovery-controls">
+          <div class="search-wrapper">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search products..."
+              data-i18n-placeholder="search_placeholder">
+          </div>
+          <div class="filter-wrapper">
+            <select id="categoryFilter" aria-label="Filter by category">
+              <option value="all">All Categories</option>
+              <option value="audio">Audio</option>
+              <option value="wearable">Wearables</option>
+              <option value="computers">Computers</option>
+              <option value="accessories">Accessories</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="products-grid" id="productsGrid" role="list">
+          <!-- Products injected by JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Dragon Divider -->
+  <div class="dragon-divider" aria-hidden="true">
+    <img src="assets/dragon-divider.svg" alt="" width="200">
+  </div>
+
+  <!-- Recently Viewed -->
+  <section id="recentlyViewedSection" class="recently-viewed-section" style="display:none">
+    <div class="container">
+      <h2 class="section-title" data-i18n="recently_viewed">Recently Viewed</h2>
+      <div id="recentlyViewed" class="recently-viewed-grid"></div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section id="newsletter" class="newsletter-section glass">
+    <div class="container">
+      <div class="newsletter-content">
+        <div class="newsletter-text">
+          <h3 data-i18n="sign up for our newsletter">Stay Updated</h3>
+          <p>Get notified about new products, exclusive deals, and tech insights.</p>
+        </div>
+        <form id="newsletterForm" class="newsletter-form" aria-label="Newsletter signup">
+          <input type="email" id="newsletterEmail" class="newsletter-input" placeholder="your@email.com" required
+            aria-label="Email address">
+          <button type="submit" class="btn btn-primary" data-i18n="newsletter_submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="assets/dragon-logo.png" alt="" class="footer-logo" width="120" aria-hidden="true">
+          <p data-i18n="footer_text">&copy; 2026 Dragon-Tech. Premium technology for professionals.</p>
+        </div>
+        <div class="footer-links">
+          <a href="index.html" data-i18n="nav_home">Home</a>
+          <a href="#products">Products</a>
+          <a href="#newsletter">Newsletter</a>
+          <a href="pages/login.html">Account</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+  <!-- Stripe Modal -->
+  <div class="modal-overlay" id="stripeModalOverlay"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center;">
+    <div class="stripe-modal glass"
+      style="background:#111128; padding:30px; border-radius:16px; width:400px; max-width:90%; position:relative;">
+      <h3 style="margin-bottom:20px; color:white; text-align:center;">Complete Payment</h3>
+      <form id="payment-form">
+        <div id="card-element" style="background:#fff; padding:12px; border-radius:8px; margin-bottom:20px;"></div>
+        <button type="submit" class="btn btn-primary btn-block" id="submitPaymentBtn">Pay Now</button>
+        <button type="button" class="btn btn-ghost btn-block" id="cancelPaymentBtn"
+          style="margin-top:10px;">Cancel</button>
+        <div id="card-errors" role="alert" style="color:#ff6b6b; margin-top:10px; font-size:14px; text-align:center;">
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://js.stripe.com/v3/"></script>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+    const app = initializeApp(window.FIREBASE_CONFIG);
+    window.db = { auth: getAuth(app), firestore: getFirestore(app) };
+
+    // Auth state for navigation
+    onAuthStateChanged(window.db.auth, function (user) {
+      var authSection = document.getElementById('authSection');
+      if (user) {
+        authSection.innerHTML = '<a href="pages/dashboard.html" class="btn btn-ghost btn-sm">Dashboard</a>';
+      } else {
+        authSection.innerHTML = '<a href="pages/login.html" class="btn btn-ghost btn-sm">Sign In</a>';
+      }
+    });
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').catch(function () { });
+      });
+    }
+
+    // Initialize clock
+    function updateClock() {
+      var clockEl = document.getElementById('clockTime');
+      if (!clockEl) return;
+      var now = new Date();
+      var hours = String(now.getHours()).padStart(2, '0');
+      var minutes = String(now.getMinutes()).padStart(2, '0');
+      var seconds = String(now.getSeconds()).padStart(2, '0');
+      clockEl.textContent = hours + ':' + minutes + ':' + seconds;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+
+  <!-- Classic Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/product-modal.js"></script>
+  <script src="js/wishlist.js"></script>
+  <script src="js/recently-viewed.js"></script>
+  <script src="js/sync-cart.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/currency.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/newsletter.js"></script>
+  <script src="js/announcements.js"></script>
+  <script src="js/referral.js"></script>
+  <script src="js/reviews.js"></script>
+  <script src="js/ui.js"></script>
+
+  <!-- Sleek AI Chatbot Sidebar -->
+  <aside class="chatbot-sidebar" id="chatbotSidebar" aria-label="AI Shopping Assistant" aria-hidden="true"
+    style="right:0; width:380px; max-width:100vw; transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); position:fixed; top:0; height:100vh; background:var(--bg-primary); z-index:1100; border-left:1px solid var(--glass-border); display:flex; flex-direction:column; box-shadow:-5px 0 30px rgba(0,0,0,0.5);">
+    <div class="cart-header"
+      style="border-bottom:1px solid var(--glass-border); padding:20px; display:flex; align-items:center; justify-content:space-between; background:var(--bg-secondary);">
+      <h2 style="margin:0; font-size:1.2rem; display:flex; align-items:center; gap:8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--neon-blue)" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+        AI Assistant
+      </h2>
+      <button class="close-btn" id="closeChatbotSidebar" aria-label="Close Assistant"
+        style="background:none; border:none; cursor:pointer; color:var(--text-primary);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div id="aiMessageFeed"
+      style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:15px; scroll-behavior:smooth;">
+      <div
+        style="align-self:flex-start; background:var(--bg-secondary); padding:12px 16px; border-radius:0 16px 16px 16px; font-size:0.95rem; color:var(--text-primary); max-width:85%;">
+        Hello! I'm your Dragon-AI assistant. How can I help you find the perfect setup today?
+      </div>
+    </div>
+    <div
+      style="padding:15px; border-top:1px solid var(--glass-border); display:flex; gap:10px; background:var(--bg-primary);">
+      <input type="text" id="aiChatInput" placeholder="Ask me anything..."
+        style="flex:1; background:var(--bg-secondary); border:1px solid var(--glass-border); border-radius:24px; padding:12px 16px; color:var(--text-primary); outline:none;">
+      <button id="aiChatSend"
+        style="background:var(--neon-blue); border:none; border-radius:50%; width:44px; height:44px; color:black; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13" />
+          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const chatSidebar = document.getElementById('chatbotSidebar');
+      const toggle = document.getElementById('chatbotNavToggle');
+      const close = document.getElementById('closeChatbotSidebar');
+      const overlay = document.getElementById('cartOverlay');
+      const input = document.getElementById('aiChatInput');
+      const send = document.getElementById('aiChatSend');
+      const feed = document.getElementById('aiMessageFeed');
+
+      let chatOpen = false;
+      function setChatState(open) {
+        chatOpen = open;
+        chatSidebar.style.transform = open ? 'translateX(0)' : 'translateX(100%)';
+        chatSidebar.setAttribute('aria-hidden', !open);
+        if (overlay) overlay.classList.toggle('open', open);
+        if (open) setTimeout(() => input.focus(), 300);
+      }
+
+      if (toggle) toggle.addEventListener('click', () => setChatState(true));
+      if (close) close.addEventListener('click', () => setChatState(false));
+      if (overlay) overlay.addEventListener('click', () => { if (chatOpen) setChatState(false); });
+
+      function addChat(text, user) {
+        const d = document.createElement('div');
+        d.style.cssText = user
+          ? 'align-self:flex-end; background:var(--gradient-primary); color:white; padding:12px 16px; border-radius:16px 16px 0 16px; font-size:0.95rem; max-width:85%;'
+          : 'align-self:flex-start; background:var(--bg-secondary); color:var(--text-primary); padding:12px 16px; border-radius:0 16px 16px 16px; font-size:0.95rem; max-width:85%;';
+        d.textContent = text;
+        feed.appendChild(d);
+        feed.scrollTop = feed.scrollHeight;
+      }
+
+      send.addEventListener('click', () => {
+        if (!input.value.trim()) return;
+        const msg = input.value;
+        addChat(msg, true);
+        input.value = '';
+
+        setTimeout(() => {
+          // AI Core Logic - Search Products
+          let lowerMsg = msg.toLowerCase();
+          let found = null;
+          if (window.PRODUCTS) {
+            found = window.PRODUCTS.filter(p =>
+              p.name.toLowerCase().includes(lowerMsg) ||
+              p.description.toLowerCase().includes(lowerMsg) ||
+              p.category.toLowerCase().includes(lowerMsg)
+            );
+          }
+
+          if (lowerMsg.includes('hello') || lowerMsg.includes('hi')) {
+            addChat("Greetings! I'm the Dragon-AI Assistant. How can I upgrade your setup today?");
+            return;
+          }
+
+          if (found && found.length > 0) {
+            let item = found[0]; // recommend the best match
+            let htmlReply = "I found the perfect match for you:<br><br>" +
+              "<div style='background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); padding:10px; border-radius:10px; text-align:center;'>" +
+              "<img src='" + item.image + "' style='width:100px; height:100px; object-fit:contain; drop-shadow(0 0 10px rgba(255,255,255,0.1));'></div>" +
+              "<strong>" + item.name + "</strong><br>" +
+              "<span style='color:var(--neon-blue)'>$" + item.price.toFixed(2) + "</span><br><br>" +
+              "<button onclick='window.cart.addToCart(\"" + item.id + "\")' style='background:var(--gradient-primary); border:none; padding:8px 16px; border-radius:20px; color:white; cursor:pointer;'>Add to Cart</button>";
+
+            const d = document.createElement('div');
+            d.style.cssText = 'align-self:flex-start; background:var(--bg-secondary); border: 1px solid var(--glass-border); color:var(--text-primary); padding:12px 16px; border-radius:0 16px 16px 16px; font-size:0.95rem; max-width:90%; position:relative; overflow:hidden; box-shadow: 0 5px 20px rgba(0,225,255,0.1);';
+            d.innerHTML = htmlReply;
+            feed.appendChild(d);
+            feed.scrollTop = feed.scrollHeight;
+          } else {
+            addChat("I couldn't find exactly what you're looking for, but you can explore our 'Mystery Box' drops for a guaranteed premium tech surprise!");
+
+            setTimeout(() => {
+              const d = document.createElement('div');
+              d.style.cssText = 'align-self:flex-start; background:var(--bg-secondary); border: 1px solid var(--neon-pink); color:white; padding:12px 16px; border-radius:0 16px 16px 16px; font-size:0.95rem; max-width:90%; max-width:85%; box-shadow: 0 0 15px rgba(255,16,122,0.2);';
+              d.innerHTML = "<strong>Mystery Box Drop #042</strong><br><span style='color:#FF107A'>$49.00</span><br><br><button onclick='window.cart.addToCart(\"mystery-box\")' style='background:var(--neon-pink); color:white; border:none; padding:8px 16px; border-radius:20px; cursor:pointer;'>Claim Hoard</button>";
+              feed.appendChild(d);
+              feed.scrollTop = feed.scrollHeight;
+            }, 800);
+          }
+        }, 600);
+      });
+      input.addEventListener('keypress', (e) => { if (e.key === 'Enter') send.click(); });
+    });
+  </script>
+</body>
+
+</html>

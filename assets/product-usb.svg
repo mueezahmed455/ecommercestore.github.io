@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="bgUsb" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="cyanUsb" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff"/>
+      <stop offset="100%" style="stop-color:#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="bodyUsb" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a2a3e"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <filter id="glowUsb">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="shadowUsb" cx="50%" cy="75%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bgUsb)" rx="16"/>
+  <ellipse cx="200" cy="270" rx="100" ry="12" fill="url(#shadowUsb)"/>
+  <g filter="url(#glowUsb)">
+    <!-- Main hub body -->
+    <rect x="100" y="180" width="200" height="60" rx="8" fill="url(#bodyUsb)" stroke="url(#cyanUsb)" stroke-width="2"/>
+    <!-- Top surface detail -->
+    <rect x="110" y="185" width="180" height="15" rx="4" fill="#22223a" opacity="0.5"/>
+    <!-- Brand text line -->
+    <rect x="160" y="190" width="80" height="4" rx="2" fill="#00d4ff" opacity="0.3"/>
+
+    <!-- USB-C input port (left side) -->
+    <rect x="88" y="198" width="16" height="24" rx="4" fill="#1a1a2e" stroke="#00d4ff" stroke-width="1.5"/>
+    <rect x="91" y="204" width="10" height="12" rx="3" fill="#0a0a15"/>
+
+    <!-- Port 1: USB-A -->
+    <rect x="115" y="230" width="30" height="12" rx="2" fill="#0a0a15" stroke="#444" stroke-width="1"/>
+    <circle cx="130" cy="224" r="2.5" fill="#22c55e">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Port 2: USB-A -->
+    <rect x="155" y="230" width="30" height="12" rx="2" fill="#0a0a15" stroke="#444" stroke-width="1"/>
+    <circle cx="170" cy="224" r="2.5" fill="#00d4ff">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" begin="0.4s"/>
+    </circle>
+
+    <!-- Port 3: HDMI -->
+    <rect x="195" y="228" width="36" height="14" rx="2" fill="#0a0a15" stroke="#444" stroke-width="1"/>
+    <circle cx="213" cy="222" r="2.5" fill="#a855f7">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" begin="0.8s"/>
+    </circle>
+
+    <!-- Port 4: USB-C output -->
+    <rect x="243" y="230" width="20" height="12" rx="4" fill="#0a0a15" stroke="#444" stroke-width="1"/>
+    <circle cx="253" cy="224" r="2.5" fill="#f59e0b">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" begin="1.2s"/>
+    </circle>
+
+    <!-- Port 5: Ethernet -->
+    <rect x="273" y="226" width="22" height="16" rx="2" fill="#0a0a15" stroke="#444" stroke-width="1"/>
+    <circle cx="284" cy="220" r="2.5" fill="#22c55e">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+    </circle>
+
+    <!-- Connection cable from USB-C input -->
+    <path d="M88 210 Q60 210 50 200 Q40 190 45 170" fill="none" stroke="#444" stroke-width="4" stroke-linecap="round"/>
+    <path d="M88 210 Q60 210 50 200 Q40 190 45 170" fill="none" stroke="#555" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Cable connector tip -->
+    <rect x="40" y="162" width="10" height="16" rx="3" fill="#2a2a3e" stroke="#00d4ff" stroke-width="1"/>
+
+    <!-- Activity LED on top -->
+    <circle cx="140" cy="193" r="2" fill="#00d4ff">
+      <animate attributeName="opacity" values="1;0.1;1;0.1;1;0.5;1" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="155" cy="193" r="2" fill="#22c55e">
+      <animate attributeName="opacity" values="0.5;1;0.5;1;0.2;1;0.5" dur="3s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <!-- Floating particles -->
+  <circle cx="100" cy="130" r="2" fill="#00d4ff" opacity="0.4">
+    <animate attributeName="cy" values="130;115;130" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="310" cy="150" r="1.5" fill="#3b82f6" opacity="0.3">
+    <animate attributeName="cy" values="150;135;150" dur="3.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="60" cy="140" r="1" fill="#22c55e" opacity="0.3">
+    <animate attributeName="cy" values="140;128;140" dur="2.8s" repeatCount="indefinite"/>
+  </circle>
+</svg>

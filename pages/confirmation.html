@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Order confirmation - Dragon-Tech">
+  <title>Order Confirmed | Dragon-Tech</title>
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/glass.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/accessibility.css">
+  <link rel="stylesheet" href="../css/product-modal.css">
+  <link rel="stylesheet" href="../css/light-theme.css">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Page-specific inline styles -->
+  <style>
+    .confirmation-page {
+      min-height: calc(100vh - 200px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-2xl) var(--spacing-md);
+    }
+
+    .confirmation-card {
+      max-width: 640px;
+      width: 100%;
+      padding: var(--spacing-xl);
+    }
+
+    /* Success Checkmark */
+    .success-checkmark {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .checkmark-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+      animation: checkmarkPop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      transform: scale(0);
+    }
+
+    @keyframes checkmarkPop {
+      0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+      60% { transform: scale(1.15) rotate(5deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    .checkmark-circle svg {
+      width: 40px;
+      height: 40px;
+      stroke: white;
+      stroke-width: 3;
+      fill: none;
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      animation: checkmarkDraw 300ms 300ms ease forwards;
+    }
+
+    @keyframes checkmarkDraw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Confirmation Header */
+    .confirmation-header {
+      text-align: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .confirmation-header h1 {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 700;
+      margin-bottom: var(--spacing-xs);
+      letter-spacing: -0.5px;
+    }
+
+    .confirmation-header p {
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+    }
+
+    /* Order Details */
+    .order-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .order-detail-item {
+      padding: var(--spacing-sm) 0;
+    }
+
+    .order-detail-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .order-detail-value {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .order-detail-value.price {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: var(--font-size-xl);
+    }
+
+    /* Order Items */
+    .order-items {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .order-items h2 {
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      margin-bottom: var(--spacing-md);
+      letter-spacing: -0.3px;
+    }
+
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-sm) 0;
+      border-bottom: 1px solid var(--glass-border);
+      animation: slideInRight 300ms ease-out both;
+    }
+
+    .order-item:nth-child(1) { animation-delay: 100ms; }
+    .order-item:nth-child(2) { animation-delay: 200ms; }
+    .order-item:nth-child(3) { animation-delay: 300ms; }
+    .order-item:nth-child(4) { animation-delay: 400ms; }
+    .order-item:nth-child(5) { animation-delay: 500ms; }
+
+    .order-item-image {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      background: var(--bg-tertiary);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .order-item-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .order-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .order-item-name {
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .order-item-qty {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .order-item-price {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--neon-blue);
+      white-space: nowrap;
+    }
+
+    /* Order Total Row */
+    .order-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-md) 0;
+      margin-top: var(--spacing-sm);
+      border-top: 2px solid var(--glass-border);
+    }
+
+    .order-total-row span:first-child {
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+    }
+
+    .order-total-row span:last-child {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Action Buttons */
+    .confirmation-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+    }
+
+    .confirmation-actions .btn {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    /* Loading / Error States */
+    .loading-state,
+    .error-state {
+      text-align: center;
+      padding: var(--spacing-xl) 0;
+    }
+
+    .loading-state .spinner-dots {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .error-state svg {
+      color: var(--neon-pink);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .error-state h2 {
+      font-size: var(--font-size-lg);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .error-state p {
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--spacing-md);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .order-details {
+        grid-template-columns: 1fr;
+      }
+
+      .confirmation-actions {
+        flex-direction: column;
+      }
+
+      .confirmation-actions .btn {
+        min-width: unset;
+      }
+    }
+  </style>
+</head>
+<body class="page-enter">
+  <!-- Scroll Progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Accessibility Controls -->
+  <div class="a11y-controls" role="toolbar" aria-label="Accessibility controls">
+    <button id="contrastToggle" aria-label="Toggle high contrast mode" title="Toggle contrast">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/>
+      </svg>
+    </button>
+    <button id="fontToggle" aria-label="Toggle font size" title="Toggle font size">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <text x="4" y="18" font-size="14" font-weight="bold">A</text>
+      </svg>
+    </button>
+    <button id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Announcement Banner -->
+  <div id="announcementBanner"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar glass" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="../index.html" class="logo" aria-label="Dragon-Tech Home">
+        <img src="../assets/dragon-logo.png" alt="" class="logo-icon" width="32" height="32" aria-hidden="true">
+        <span class="logo-text">Dragon</span><span class="logo-accent">-Tech</span>
+      </a>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Confirmation Content -->
+  <main class="confirmation-page">
+    <div class="confirmation-card glass reveal stagger-1" id="confirmationCard">
+      <!-- Loading state shown by default -->
+      <div class="loading-state" id="loadingState">
+        <div class="spinner-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p>Loading your order details...</p>
+      </div>
+
+      <!-- Error state (hidden by default) -->
+      <div class="error-state" id="errorState" style="display: none;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <h2>Order Not Found</h2>
+        <p id="errorMessage">We couldn't find the order you're looking for.</p>
+        <a href="../index.html" class="btn btn-primary">Continue Shopping</a>
+      </div>
+
+      <!-- Success content (hidden by default) -->
+      <div id="orderContent" style="display: none;">
+        <!-- Success Checkmark -->
+        <div class="success-checkmark">
+          <div class="checkmark-circle">
+            <svg viewBox="0 0 24 24">
+              <polyline points="6 12 10 16 18 8"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Header -->
+        <div class="confirmation-header">
+          <h1>Order Confirmed!</h1>
+          <p>Thank you for your purchase. Your order is being processed.</p>
+        </div>
+
+        <!-- Order Details -->
+        <div class="order-details">
+          <div class="order-detail-item">
+            <div class="order-detail-label">Order ID</div>
+            <div class="order-detail-value" id="orderId">--</div>
+          </div>
+          <div class="order-detail-item">
+            <div class="order-detail-label">Estimated Delivery</div>
+            <div class="order-detail-value" id="estimatedDelivery">7-10 business days</div>
+          </div>
+          <div class="order-detail-item">
+            <div class="order-detail-label">Order Date</div>
+            <div class="order-detail-value" id="orderDate">--</div>
+          </div>
+          <div class="order-detail-item">
+            <div class="order-detail-label">Order Total</div>
+            <div class="order-detail-value price" id="orderTotal">$0.00</div>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="order-items">
+          <h2>Items in Your Order</h2>
+          <div id="orderItemsList">
+            <!-- Items injected by JS -->
+          </div>
+          <div class="order-total-row">
+            <span>Total</span>
+            <span id="orderTotalBottom">$0.00</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="confirmation-actions">
+          <a href="../index.html" class="btn btn-ghost">Continue Shopping</a>
+          <a href="dashboard.html" class="btn btn-primary">View Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="../assets/dragon-logo.png" alt="" class="footer-logo" width="120" aria-hidden="true">
+          <p>&copy; 2026 Dragon-Tech. Crafted with precision.</p>
+        </div>
+        <div class="footer-links">
+          <a href="../index.html">Home</a>
+          <a href="dashboard.html">Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    const app = initializeApp(window.FIREBASE_CONFIG);
+    window.db = { auth: getAuth(app), firestore: getFirestore(app) };
+
+    // Service Worker Registration for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function() {});
+      });
+    }
+  </script>
+
+  <!-- Classic Scripts -->
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/confirmation.js"></script>
+  <script src="../js/ui.js"></script>
+</body>
+</html>

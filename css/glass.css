@@ -1,0 +1,180 @@
+/* ========================================
+   Cyberpunk Glassmorphism Components
+   Ultra-premium frosted glass with neon accents
+   ======================================== */
+
+/* Base glass - Cyberpunk Edition */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+}
+
+/* Animated gradient border on hover - Cyberpunk */
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 240, 255, 0.3),
+    rgba(180, 0, 255, 0.3),
+    rgba(255, 0, 160, 0.3),
+    rgba(0, 240, 255, 0.3)
+  );
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  animation: borderRotate 4s linear infinite;
+  pointer-events: none;
+}
+
+.glass:hover::before {
+  opacity: 1;
+}
+
+@keyframes borderRotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Glass Card with hover lift — Cyberpunk */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  padding: var(--spacing-lg);
+  transition: transform var(--transition-slow), box-shadow var(--transition-slow), border-color var(--transition-base);
+  will-change: transform;
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+}
+
+.glass-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 60px rgba(0, 240, 255, 0.25), var(--glass-inset);
+  border-color: rgba(0, 240, 255, 0.3);
+}
+
+/* Glass Panel — Cyberpunk */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  padding: var(--spacing-md);
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+}
+
+/* Neon Border on Hover - Enhanced */
+.glass-neon {
+  position: relative;
+}
+
+.glass-neon::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: var(--gradient-cyber);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  filter: blur(10px);
+}
+
+.glass-neon:hover::after {
+  opacity: 0.6;
+}
+
+/* Glow Effect on Focus - Cyberpunk */
+.glass:focus-within {
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.3), var(--glass-inset);
+  border-color: rgba(0, 240, 255, 0.4);
+}
+
+/* Inner shine overlay - Enhanced */
+.glass-shine {
+  position: relative;
+}
+
+.glass-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    transparent 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Sweep shine animation - Cyberpunk */
+.glass-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-sweep::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 240, 255, 0.08),
+    transparent
+  );
+  animation: sweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sweep {
+  0%, 100% { left: -100%; }
+  50% { left: 150%; }
+}
+
+/* Cyberpunk Glass Variants */
+.glass-cyan {
+  background: rgba(0, 240, 255, 0.05);
+  border-color: rgba(0, 240, 255, 0.2);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.15), var(--glass-inset);
+}
+
+.glass-purple {
+  background: rgba(180, 0, 255, 0.05);
+  border-color: rgba(180, 0, 255, 0.2);
+  box-shadow: 0 0 30px rgba(180, 0, 255, 0.15), var(--glass-inset);
+}
+
+.glass-pink {
+  background: rgba(255, 0, 160, 0.05);
+  border-color: rgba(255, 0, 160, 0.2);
+  box-shadow: 0 0 30px rgba(255, 0, 160, 0.15), var(--glass-inset);
+}

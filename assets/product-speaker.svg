@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="purple4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a855f7"/>
+      <stop offset="100%" style="stop-color:#ec4899"/>
+    </linearGradient>
+    <filter id="glow4">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="shadow4" cx="50%" cy="80%">
+      <stop offset="0%" style="stop-color:#a855f7;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg4)" rx="16"/>
+  <ellipse cx="200" cy="310" rx="50" ry="12" fill="url(#shadow4)"/>
+  <!-- Speaker body -->
+  <g filter="url(#glow4)">
+    <ellipse cx="200" cy="220" rx="60" ry="70" fill="#1e1e2e" stroke="url(#purple4)" stroke-width="2"/>
+    <!-- Speaker grille rings -->
+    <ellipse cx="200" cy="200" rx="35" ry="12" fill="none" stroke="#333" stroke-width="1"/>
+    <ellipse cx="200" cy="200" rx="25" ry="8" fill="none" stroke="#444" stroke-width="1"/>
+    <ellipse cx="200" cy="200" rx="15" ry="5" fill="none" stroke="#555" stroke-width="1"/>
+    <circle cx="200" cy="200" r="4" fill="#a855f7" opacity="0.6">
+      <animate attributeName="r" values="3;5;3" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Base ring -->
+    <ellipse cx="200" cy="275" rx="40" ry="8" fill="none" stroke="url(#purple4)" stroke-width="1.5"/>
+  </g>
+  <!-- Sound waves -->
+  <path d="M130 195 Q110 200 130 205" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.3">
+    <animate attributeName="opacity" values="0.1;0.5;0.1" dur="2s" repeatCount="indefinite"/>
+  </path>
+  <path d="M115 190 Q90 200 115 210" fill="none" stroke="#ec4899" stroke-width="1" opacity="0.2">
+    <animate attributeName="opacity" values="0.05;0.4;0.05" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+  </path>
+  <path d="M270 195 Q290 200 270 205" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.3">
+    <animate attributeName="opacity" values="0.1;0.5;0.1" dur="2s" repeatCount="indefinite"/>
+  </path>
+  <path d="M285 190 Q310 200 285 210" fill="none" stroke="#ec4899" stroke-width="1" opacity="0.2">
+    <animate attributeName="opacity" values="0.05;0.4;0.05" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+  </path>
+  <!-- Floating particles -->
+  <circle cx="120" cy="130" r="2" fill="#a855f7" opacity="0.4">
+    <animate attributeName="cy" values="130;118;130" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="290" cy="160" r="1.5" fill="#ec4899" opacity="0.3">
+    <animate attributeName="cy" values="160;145;160" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>

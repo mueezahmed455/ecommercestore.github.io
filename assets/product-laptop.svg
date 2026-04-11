@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="blue3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff"/>
+      <stop offset="100%" style="stop-color:#3b82f6"/>
+    </linearGradient>
+    <filter id="glow3">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="shadow3" cx="50%" cy="75%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg3)" rx="16"/>
+  <ellipse cx="200" cy="310" rx="90" ry="12" fill="url(#shadow3)"/>
+  <!-- Laptop body -->
+  <g filter="url(#glow3)">
+    <!-- Screen -->
+    <rect x="110" y="120" width="180" height="120" rx="8" fill="#1a1a2e" stroke="url(#blue3)" stroke-width="2"/>
+    <rect x="118" y="128" width="164" height="104" rx="4" fill="#0a0a15"/>
+    <!-- Screen content - code lines -->
+    <rect x="130" y="145" width="60" height="3" rx="1.5" fill="#00d4ff" opacity="0.6"/>
+    <rect x="130" y="155" width="90" height="3" rx="1.5" fill="#a855f7" opacity="0.4"/>
+    <rect x="140" y="165" width="70" height="3" rx="1.5" fill="#22c55e" opacity="0.5"/>
+    <rect x="140" y="175" width="50" height="3" rx="1.5" fill="#00d4ff" opacity="0.4"/>
+    <rect x="130" y="185" width="80" height="3" rx="1.5" fill="#a855f7" opacity="0.3"/>
+    <rect x="130" y="195" width="40" height="3" rx="1.5" fill="#22c55e" opacity="0.5"/>
+    <!-- Camera dot -->
+    <circle cx="200" cy="124" r="2" fill="#333"/>
+    <!-- Base -->
+    <path d="M95 245 L110 240 L290 240 L305 245 L310 255 L90 255 Z" fill="#1e1e2e" stroke="#333" stroke-width="1"/>
+    <rect x="175" y="242" width="50" height="3" rx="1.5" fill="#333"/>
+  </g>
+  <!-- Floating particles -->
+  <circle cx="100" cy="100" r="2" fill="#00d4ff" opacity="0.4">
+    <animate attributeName="cy" values="100;88;100" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="310" cy="140" r="1.5" fill="#3b82f6" opacity="0.3">
+    <animate attributeName="cy" values="140;125;140" dur="4s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="260" cy="90" r="1" fill="#00d4ff" opacity="0.3">
+    <animate attributeName="cy" values="90;78;90" dur="3.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>

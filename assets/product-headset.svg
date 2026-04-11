@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="bgHeadset" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="cyanHeadset" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff"/>
+      <stop offset="100%" style="stop-color:#a855f7"/>
+    </linearGradient>
+    <linearGradient id="earcupHeadset" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a2a3e"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <filter id="glowHeadset">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="shadowHeadset" cx="50%" cy="75%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bgHeadset)" rx="16"/>
+  <ellipse cx="200" cy="310" rx="80" ry="12" fill="url(#shadowHeadset)"/>
+  <g filter="url(#glowHeadset)">
+    <!-- Headband -->
+    <path d="M130 180 Q130 100 200 90 Q270 100 270 180" fill="none" stroke="#2a2a3e" stroke-width="14" stroke-linecap="round"/>
+    <path d="M130 180 Q130 100 200 90 Q270 100 270 180" fill="none" stroke="#444" stroke-width="12" stroke-linecap="round"/>
+    <!-- Headband inner accent -->
+    <path d="M145 175 Q145 112 200 102 Q255 112 255 175" fill="none" stroke="url(#cyanHeadset)" stroke-width="1.5" opacity="0.6">
+      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.5s" repeatCount="indefinite"/>
+    </path>
+    <!-- Left earcup -->
+    <rect x="115" y="170" width="35" height="60" rx="12" fill="url(#earcupHeadset)" stroke="url(#cyanHeadset)" stroke-width="2"/>
+    <!-- Left earcup cushion -->
+    <rect x="148" y="178" width="8" height="44" rx="4" fill="#1e1e2e" stroke="#555" stroke-width="0.5"/>
+    <!-- Left RGB ring -->
+    <circle cx="132" cy="200" r="14" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.6">
+      <animate attributeName="opacity" values="0.3;0.9;0.3" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="132" cy="200" r="8" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.4">
+      <animate attributeName="opacity" values="0.2;0.7;0.2" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+    </circle>
+    <!-- Right earcup -->
+    <rect x="250" y="170" width="35" height="60" rx="12" fill="url(#earcupHeadset)" stroke="url(#cyanHeadset)" stroke-width="2"/>
+    <!-- Right earcup cushion -->
+    <rect x="244" y="178" width="8" height="44" rx="4" fill="#1e1e2e" stroke="#555" stroke-width="0.5"/>
+    <!-- Right RGB ring -->
+    <circle cx="267" cy="200" r="14" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.6">
+      <animate attributeName="opacity" values="0.3;0.9;0.3" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="267" cy="200" r="8" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.4">
+      <animate attributeName="opacity" values="0.2;0.7;0.2" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+    </circle>
+    <!-- Microphone boom -->
+    <path d="M115 210 Q90 215 80 235 Q75 245 80 250" fill="none" stroke="#444" stroke-width="3" stroke-linecap="round"/>
+    <!-- Mic tip -->
+    <circle cx="80" cy="250" r="5" fill="#2a2a3e" stroke="#00d4ff" stroke-width="1.5">
+      <animate attributeName="stroke-opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Mic LED indicator -->
+    <circle cx="80" cy="250" r="2" fill="#00d4ff">
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <!-- Audio wave particles -->
+  <path d="M60 240 Q55 250 60 260" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.3">
+    <animate attributeName="opacity" values="0.1;0.5;0.1" dur="1.5s" repeatCount="indefinite"/>
+  </path>
+  <path d="M50 235 Q42 250 50 265" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.2">
+    <animate attributeName="opacity" values="0.05;0.4;0.05" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+  </path>
+  <!-- Floating particles -->
+  <circle cx="100" cy="120" r="2" fill="#00d4ff" opacity="0.4">
+    <animate attributeName="cy" values="120;105;120" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="300" cy="140" r="1.5" fill="#a855f7" opacity="0.3">
+    <animate attributeName="cy" values="140;125;140" dur="3.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="200" cy="70" r="1" fill="#00d4ff" opacity="0.3">
+    <animate attributeName="cy" values="70;58;70" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>

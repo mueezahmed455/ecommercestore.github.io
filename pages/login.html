@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in or create an account - Dragon-Tech">
+  <title>Sign In | Dragon-Tech</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/glass.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/accessibility.css">
+  <link rel="stylesheet" href="../css/auth.css">
+  <link rel="stylesheet" href="../css/light-theme.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body class="page-enter">
+  <!-- Accessibility Controls -->
+  <div class="a11y-controls" role="toolbar" aria-label="Accessibility controls">
+    <button id="contrastToggle" aria-label="Toggle high contrast mode" title="Toggle contrast">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/>
+      </svg>
+    </button>
+    <button id="fontToggle" aria-label="Toggle font size" title="Toggle font size">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <text x="4" y="18" font-size="14" font-weight="bold">A</text>
+      </svg>
+    </button>
+    <button id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+      <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Announcement Banner -->
+  <div id="announcementBanner"></div>
+
+  <!-- Back to home -->
+  <a href="../index.html" class="back-link" aria-label="Back to store">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="19" y1="12" x2="5" y2="12"/>
+      <polyline points="12 19 5 12 12 5"/>
+    </svg>
+    Back to Store
+  </a>
+
+  <!-- Auth Container -->
+  <main class="auth-container">
+    <div class="auth-card glass">
+      <!-- Logo -->
+      <div class="auth-header">
+        <a href="../index.html" class="logo" aria-label="Dragon-Tech Home">
+          <img src="../assets/dragon-logo.svg" alt="" class="logo-icon" width="32" height="32" aria-hidden="true">
+          <span class="logo-text">Dragon</span><span class="logo-accent">-Tech</span>
+        </a>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="auth-tabs" role="tablist" aria-label="Authentication mode">
+        <button class="auth-tab active" data-tab="login" role="tab" aria-selected="true" aria-controls="loginForm" id="loginTab">
+          Sign In
+        </button>
+        <button class="auth-tab" data-tab="signup" role="tab" aria-selected="false" aria-controls="signupForm" id="signupTab">
+          Create Account
+        </button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form active" role="tabpanel" aria-labelledby="loginTab" novalidate>
+        <h2 class="auth-title">Welcome Back</h2>
+        <p class="auth-subtitle">Sign in to access your account and continue shopping.</p>
+
+        <div class="form-group">
+          <label for="loginEmail" class="form-label">Email Address</label>
+          <input
+            type="email"
+            id="loginEmail"
+            name="email"
+            class="form-input"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+            aria-required="true"
+            aria-describedby="loginEmailError"
+          >
+          <span class="form-error" id="loginEmailError" role="alert"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword" class="form-label">Password</label>
+          <div class="password-wrapper">
+            <input
+              type="password"
+              id="loginPassword"
+              name="password"
+              class="form-input"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+              aria-required="true"
+              aria-describedby="loginPasswordError"
+            >
+            <button type="button" class="toggle-password" aria-label="Show password" data-target="loginPassword">
+              <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <span class="form-error" id="loginPasswordError" role="alert"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="loginSubmit">
+          Sign In
+        </button>
+
+        <p class="auth-message" id="loginMessage" role="status"></p>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signupForm" class="auth-form" role="tabpanel" aria-labelledby="signupTab" novalidate>
+        <h2 class="auth-title">Create Your Account</h2>
+        <p class="auth-subtitle">Join Dragon-Tech for exclusive deals and premium service.</p>
+
+        <div class="form-group">
+          <label for="signupName" class="form-label">Full Name</label>
+          <input
+            type="text"
+            id="signupName"
+            name="name"
+            class="form-input"
+            placeholder="John Doe"
+            autocomplete="name"
+            required
+            aria-required="true"
+            aria-describedby="signupNameError"
+            minlength="2"
+            maxlength="100"
+          >
+          <span class="form-error" id="signupNameError" role="alert"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="signupEmail" class="form-label">Email Address</label>
+          <input
+            type="email"
+            id="signupEmail"
+            name="email"
+            class="form-input"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+            aria-required="true"
+            aria-describedby="signupEmailError"
+          >
+          <span class="form-error" id="signupEmailError" role="alert"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="signupPassword" class="form-label">Password</label>
+          <div class="password-wrapper">
+            <input
+              type="password"
+              id="signupPassword"
+              name="password"
+              class="form-input"
+              placeholder="Minimum 8 characters"
+              autocomplete="new-password"
+              required
+              aria-required="true"
+              aria-describedby="signupPasswordError passwordStrength"
+              minlength="8"
+              maxlength="128"
+            >
+            <button type="button" class="toggle-password" aria-label="Show password" data-target="signupPassword">
+              <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <span class="form-error" id="signupPasswordError" role="alert"></span>
+          <div class="password-strength" id="passwordStrength" aria-live="polite">
+            <div class="strength-bar">
+              <div class="strength-fill"></div>
+            </div>
+            <span class="strength-text"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="signupConfirm" class="form-label">Confirm Password</label>
+          <input
+            type="password"
+            id="signupConfirm"
+            name="confirmPassword"
+            class="form-input"
+            placeholder="Re-enter your password"
+            autocomplete="new-password"
+            required
+            aria-required="true"
+            aria-describedby="signupConfirmError"
+          >
+          <span class="form-error" id="signupConfirmError" role="alert"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="signupSubmit">
+          Create Account
+        </button>
+
+        <p class="auth-message" id="signupMessage" role="status"></p>
+      </form>
+    </div>
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+    const app = initializeApp(window.FIREBASE_CONFIG);
+    window.db = { auth: getAuth(app), firestore: getFirestore(app) };
+
+    // Redirect if already logged in
+    onAuthStateChanged(window.db.auth, (user) => {
+      if (user) {
+        window.location.href = 'dashboard.html';
+      }
+    });
+
+    // Service Worker Registration for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function() {});
+      });
+    }
+  </script>
+
+  <!-- Classic Scripts -->
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/currency.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/announcements.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/ui.js"></script>
+</body>
+</html>

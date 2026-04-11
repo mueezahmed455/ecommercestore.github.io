@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <defs>
+    <linearGradient id="dragonGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <!-- Dragon head silhouette - side profile -->
+  <g fill="url(#dragonGrad)">
+    <!-- Horn -->
+    <path d="M20,5 L30,0 L35,15 Z"/>
+    <!-- Head top -->
+    <path d="M35,15 C40,10 55,8 70,12 L85,18 C95,22 100,28 100,35 L100,42 C100,48 95,52 85,55 L70,58 C55,60 40,58 30,55 L20,50 C15,45 12,38 15,30 Z"/>
+    <!-- Jaw -->
+    <path d="M100,42 C108,44 115,48 120,52 L130,56 C125,58 115,58 105,56 L95,52 L85,48 Z"/>
+    <!-- Snout -->
+    <path d="M120,52 C130,50 145,48 160,46 L175,44 C185,42 195,40 200,38 L195,42 C185,46 170,50 155,52 L140,54 C130,55 125,54 120,52 Z"/>
+    <!-- Upper teeth -->
+    <path d="M145,46 L148,50 L151,46 Z"/>
+    <path d="M160,44 L163,48 L166,44 Z"/>
+    <path d="M175,42 L178,46 L181,42 Z"/>
+    <!-- Lower teeth -->
+    <path d="M140,52 L143,48 L146,52 Z"/>
+    <path d="M155,50 L158,46 L161,50 Z"/>
+    <!-- Eye -->
+    <ellipse cx="75" cy="28" rx="5" ry="4" fill="#0a0a1a"/>
+    <ellipse cx="76" cy="27" rx="2" ry="2" fill="#00d4ff"/>
+    <!-- Nostril -->
+    <ellipse cx="185" cy="40" rx="2" ry="1.5" fill="#0a0a1a"/>
+    <!-- Neck spikes -->
+    <path d="M30,55 L25,62 L35,58 Z"/>
+    <path d="M20,50 L12,58 L25,54 Z"/>
+    <path d="M12,44 L5,52 L18,48 Z"/>
+  </g>
+</svg>

@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="bgRouter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="cyanRouter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff"/>
+      <stop offset="100%" style="stop-color:#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="bodyRouter" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a2a3e"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <filter id="glowRouter">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="shadowRouter" cx="50%" cy="75%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bgRouter)" rx="16"/>
+  <ellipse cx="200" cy="310" rx="80" ry="12" fill="url(#shadowRouter)"/>
+  <g filter="url(#glowRouter)">
+    <!-- Router base -->
+    <path d="M140 240 Q135 260 140 275 L260 275 Q265 260 260 240 Z" fill="url(#bodyRouter)" stroke="url(#cyanRouter)" stroke-width="2"/>
+    <!-- Router top dome -->
+    <ellipse cx="200" cy="240" rx="65" ry="20" fill="url(#bodyRouter)" stroke="url(#cyanRouter)" stroke-width="2"/>
+    <!-- Top surface detail -->
+    <ellipse cx="200" cy="235" rx="50" ry="12" fill="#22223a" opacity="0.5"/>
+    <!-- Status LEDs on top -->
+    <circle cx="175" cy="235" r="2.5" fill="#00d4ff">
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="190" cy="233" r="2.5" fill="#22c55e">
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+    </circle>
+    <circle cx="205" cy="233" r="2.5" fill="#00d4ff">
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+    </circle>
+    <circle cx="220" cy="235" r="2.5" fill="#a855f7">
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite" begin="0.9s"/>
+    </circle>
+    <!-- Front LED strip -->
+    <path d="M160 260 Q200 265 240 260" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.5">
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <!-- Antenna 1 (left) -->
+    <path d="M155 240 Q140 180 130 140" fill="none" stroke="#2a2a3e" stroke-width="5" stroke-linecap="round"/>
+    <path d="M155 240 Q140 180 130 140" fill="none" stroke="#444" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="130" cy="138" r="4" fill="#2a2a3e" stroke="url(#cyanRouter)" stroke-width="1.5"/>
+    <circle cx="130" cy="138" r="2" fill="#00d4ff" opacity="0.5">
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Antenna 2 (center-left) -->
+    <path d="M175 238 Q170 170 165 130" fill="none" stroke="#2a2a3e" stroke-width="5" stroke-linecap="round"/>
+    <path d="M175 238 Q170 170 165 130" fill="none" stroke="#444" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="165" cy="128" r="4" fill="#2a2a3e" stroke="url(#cyanRouter)" stroke-width="1.5"/>
+    <circle cx="165" cy="128" r="2" fill="#00d4ff" opacity="0.5">
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite" begin="0.4s"/>
+    </circle>
+    <!-- Antenna 3 (center-right) -->
+    <path d="M225 238 Q230 170 235 130" fill="none" stroke="#2a2a3e" stroke-width="5" stroke-linecap="round"/>
+    <path d="M225 238 Q230 170 235 130" fill="none" stroke="#444" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="235" cy="128" r="4" fill="#2a2a3e" stroke="url(#cyanRouter)" stroke-width="1.5"/>
+    <circle cx="235" cy="128" r="2" fill="#00d4ff" opacity="0.5">
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite" begin="0.8s"/>
+    </circle>
+    <!-- Antenna 4 (right) -->
+    <path d="M245 240 Q260 180 270 140" fill="none" stroke="#2a2a3e" stroke-width="5" stroke-linecap="round"/>
+    <path d="M245 240 Q260 180 270 140" fill="none" stroke="#444" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="270" cy="138" r="4" fill="#2a2a3e" stroke="url(#cyanRouter)" stroke-width="1.5"/>
+    <circle cx="270" cy="138" r="2" fill="#00d4ff" opacity="0.5">
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite" begin="1.2s"/>
+    </circle>
+  </g>
+  <!-- WiFi signal waves -->
+  <!-- Wave set 1 - center -->
+  <path d="M160 100 Q200 70 240 100" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.2">
+    <animate attributeName="opacity" values="0.1;0.5;0.1" dur="2s" repeatCount="indefinite"/>
+  </path>
+  <path d="M145 90 Q200 55 255 90" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.15">
+    <animate attributeName="opacity" values="0.05;0.4;0.05" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+  </path>
+  <path d="M130 80 Q200 40 270 80" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity="0.1">
+    <animate attributeName="opacity" values="0.05;0.3;0.05" dur="2s" repeatCount="indefinite" begin="0.6s"/>
+  </path>
+  <!-- Floating particles -->
+  <circle cx="90" cy="120" r="2" fill="#00d4ff" opacity="0.4">
+    <animate attributeName="cy" values="120;105;120" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="310" cy="150" r="1.5" fill="#3b82f6" opacity="0.3">
+    <animate attributeName="cy" values="150;135;150" dur="3.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="200" cy="60" r="1" fill="#00d4ff" opacity="0.3">
+    <animate attributeName="cy" values="60;48;60" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="120" cy="180" r="1.5" fill="#a855f7" opacity="0.3">
+    <animate attributeName="cy" values="180;165;180" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="290" cy="100" r="1" fill="#00d4ff" opacity="0.3">
+    <animate attributeName="cy" values="100;85;100" dur="2.8s" repeatCount="indefinite"/>
+  </circle>
+</svg>
