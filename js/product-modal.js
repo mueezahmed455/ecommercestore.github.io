@@ -13,6 +13,13 @@
   var reviewFormVisible = false;
   var reviewsCache = {};
 
+  var BADGE_LABELS = {
+    'sale': { text: 'SALE', color: '#FF107A' },
+    'new': { text: 'NEW', color: '#00E1FF' },
+    'bestseller': { text: 'BESTSELLER', color: '#FF6600' },
+    'exclusive': { text: 'EXCLUSIVE', color: '#B026FF' }
+  };
+
   // ---- Utilities ----
 
   function escapeHtml(text) {
@@ -295,6 +302,9 @@
 
   function buildModalHTML(product) {
     var inWishlist = isInWishlist(product.id);
+    var currentPrice = product.salePrice || product.price;
+    var originalPrice = product.salePrice ? product.price : null;
+    var discount = product.salePrice ? Math.round((1 - product.salePrice / product.price) * 100) : 0;
 
     return '<div class="product-modal-overlay" id="productModalOverlay" role="dialog" aria-modal="true" aria-label="' + escapeHtml(product.name) + '">' +
       '<div class="product-modal">' +
@@ -307,18 +317,24 @@
         '<div class="product-modal-body">' +
           '<div class="product-modal-content">' +
             '<div class="product-modal-gallery">' +
-              (product.category ? '<div class="product-modal-image-badge"><span class="tier-badge tier-' + escapeHtml(product.category) + '">' + escapeHtml(product.category) + '</span></div>' : '') +
+              (product.badge ? '<div class="product-modal-image-badge"><span class="tier-badge" style="background:' + (BADGE_LABELS[product.badge] ? BADGE_LABELS[product.badge].color : 'var(--neon-blue)') + '; color:white; font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:4px; text-transform:uppercase;">' + (BADGE_LABELS[product.badge] ? BADGE_LABELS[product.badge].text : product.badge) + '</span></div>' : '') +
               '<img src="' + product.image + '" alt="' + escapeHtml(product.name) + '" class="product-modal-image">' +
             '</div>' +
             '<div class="product-modal-details">' +
-              (product.category ? '<span class="product-modal-category">' + escapeHtml(product.category) + '</span>' : '') +
+              (product.category ? '<span class="product-modal-category" style="text-transform:capitalize; color:var(--text-muted); font-size:0.75rem; font-weight:600; letter-spacing:1px;">' + escapeHtml(product.category) + '</span>' : '') +
               '<h2 class="product-modal-name">' + escapeHtml(product.name) + '</h2>' +
-              '<div class="product-modal-price-row">' +
-                '<span class="product-modal-price">$' + product.price.toFixed(2) + '</span>' +
+              '<div class="product-modal-price-row" style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">' +
+                '<span class="product-modal-price" style="font-size:1.75rem; font-family:var(--font-display); font-weight:700; color:' + (product.salePrice ? 'var(--neon-pink)' : 'var(--neon-blue)') + ';">$' + currentPrice.toFixed(2) + '</span>' +
+                (originalPrice ? '<span class="product-modal-original" style="font-size:1.1rem; color:var(--text-muted); text-decoration:line-through;">$' + originalPrice.toFixed(2) + '</span>' : '') +
+                (discount > 0 ? '<span class="discount-tag" style="background:var(--neon-pink); color:white; font-size:0.7rem; font-weight:700; padding:4px 8px; border-radius:4px;">' + discount + '% OFF</span>' : '') +
               '</div>' +
-              '<p class="product-modal-description">' + escapeHtml(product.description) + '</p>' +
+              '<p class="product-modal-description" style="color:var(--text-secondary); line-height:1.6; margin-bottom:20px;">' + escapeHtml(product.description) + '</p>' +
+              '<div class="product-modal-stock" style="display:flex; align-items:center; gap:8px; margin-bottom:16px; font-size:0.85rem;">' +
+                '<span style="width:8px; height:8px; border-radius:50%; background:' + (product.inStock !== false ? 'var(--neon-green)' : 'var(--neon-pink)') + ';"></span>' +
+                '<span style="color:' + (product.inStock !== false ? 'var(--neon-green)' : 'var(--neon-pink)') + ';">' + (product.inStock !== false ? 'In Stock' : 'Out of Stock') + '</span>' +
+              '</div>' +
               '<div class="product-modal-actions">' +
-                '<button class="modal-add-to-cart-btn" id="modalAddCartBtn">' +
+                '<button class="modal-add-to-cart-btn" id="modalAddCartBtn"' + (product.inStock === false ? ' disabled' : '') + '>' +
                   'Add to Cart' +
                 '</button>' +
                 '<button class="modal-wishlist-btn' + (inWishlist ? ' active' : '') + '" id="modalWishlistBtn" aria-label="Toggle wishlist">' +
@@ -493,5 +509,6 @@
   // ---- Global API ----
 
   window.openProductModal = openModal;
+  window.showProductModal = openModal; // Alias for compatibility
 
 })();

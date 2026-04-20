@@ -40,204 +40,144 @@
    * Initialize Dashboard - check auth
    */
   async function initDashboard() {
-    try {
-      var fbAuth = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
-
-      fbAuth.onAuthStateChanged(window.db.auth, function(user) {
-        if (!user) {
-          showToast('Please sign in to view your dashboard', 'error');
-          window.location.href = 'pages/login.html';
-          return;
-        }
-        loadDashboard(user);
-      });
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      window.location.href = 'pages/login.html';
+    const user = window.storage.getCurrentUser();
+    if (!user) {
+      showToast('Please sign in to view your dashboard', 'error');
+      window.location.href = 'login.html';
+      return;
     }
+    loadDashboard(user);
   }
 
   /**
    * Load all dashboard data
    */
   async function loadDashboard(user) {
-    await Promise.all([
-      loadUserProfile(user),
-      loadUserStats(user),
-      loadUserOrders(user),
-      loadUserCoupons(user)
-    ]);
+    loadUserProfile(user);
+    loadUserStats(user);
+    loadUserOrders(user);
+    loadUserCoupons(user);
     setupLogout();
   }
 
   /**
    * Load user profile info
    */
-  async function loadUserProfile(user) {
-    try {
-      var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-      var userRef = fbFirestore.doc(window.db.firestore, 'users', user.uid);
-      var userSnap = await fbFirestore.getDoc(userRef);
+  function loadUserProfile(user) {
+    var greeting = document.getElementById('userGreeting');
+    if (greeting) greeting.textContent = 'Hi, ' + escapeHtml(user.name || 'User');
 
-      if (userSnap.exists()) {
-        var data = userSnap.data();
+    var profileName = document.getElementById('profileName');
+    if (profileName) profileName.textContent = escapeHtml(user.name || '\u2014');
 
-        var greeting = document.getElementById('userGreeting');
-        if (greeting) greeting.textContent = 'Hi, ' + escapeHtml(data.name || 'User');
+    var profileEmail = document.getElementById('profileEmail');
+    if (profileEmail) profileEmail.textContent = escapeHtml(user.email || '\u2014');
 
-        var profileName = document.getElementById('profileName');
-        if (profileName) profileName.textContent = escapeHtml(data.name || '\u2014');
-
-        var profileEmail = document.getElementById('profileEmail');
-        if (profileEmail) profileEmail.textContent = escapeHtml(data.email || '\u2014');
-
-        var memberSince = document.getElementById('memberSince');
-        if (memberSince && data.createdAt) {
-          memberSince.textContent = formatDate(data.createdAt);
-        }
-      } else {
-        var greeting = document.getElementById('userGreeting');
-        if (greeting) greeting.textContent = 'Hi, ' + escapeHtml(user.displayName || 'User');
-      }
-    } catch (error) {
-      console.error('Failed to load profile:', error);
+    var memberSince = document.getElementById('memberSince');
+    if (memberSince && user.createdAt) {
+      memberSince.textContent = formatDate(user.createdAt);
     }
   }
 
   /**
    * Load user stats
    */
-  async function loadUserStats(user) {
-    try {
-      var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-      var userRef = fbFirestore.doc(window.db.firestore, 'users', user.uid);
-      var userSnap = await fbFirestore.getDoc(userRef);
+  function loadUserStats(user) {
+    var orders = window.storage.getOrders(user.uid);
+    var totalSpent = orders.reduce((sum, order) => sum + (order.total || 0), 0);
 
-      if (userSnap.exists()) {
-        var data = userSnap.data();
-        var totalSpent = data.total_spent || 0;
+    var totalEl = document.getElementById('totalSpent');
+    if (totalEl) totalEl.textContent = formatCurrency(totalSpent);
 
-        var totalEl = document.getElementById('totalSpent');
-        if (totalEl) totalEl.textContent = formatCurrency(totalSpent);
+    var orderCountEl = document.getElementById('orderCount');
+    if (orderCountEl) orderCountEl.textContent = orders.length;
 
-        var tier = getRewardsTier(totalSpent);
-        var tierEl = document.getElementById('rewardsTier');
-        if (tierEl) tierEl.textContent = tier.icon + ' ' + tier.name;
-      }
-    } catch (error) {
-      console.error('Failed to load stats:', error);
+    var tier = getRewardsTier(totalSpent);
+    var tierEl = document.getElementById('rewardsTier');
+    if (tierEl) tierEl.textContent = tier.icon + ' ' + tier.name;
+
+    // Update Dragon Evolution
+    updateDragonEvolution(totalSpent);
+  }
+
+  function updateDragonEvolution(totalSpent) {
+    var bar = document.getElementById('dragonProgressBar');
+    var badge = document.getElementById('dragonTierBadge');
+    var hint = document.getElementById('dragonProgressHint');
+    
+    if (!bar || !badge) return;
+
+    if (totalSpent >= 500) {
+      bar.style.width = '100%';
+      badge.textContent = 'Great Wyrm';
+      hint.textContent = 'You have reached the ultimate evolution!';
+    } else if (totalSpent >= 250) {
+      bar.style.width = '75%';
+      badge.textContent = 'Drake';
+      hint.textContent = '$' + (500 - totalSpent).toFixed(2) + ' until Great Wyrm status!';
+    } else if (totalSpent >= 100) {
+      bar.style.width = '50%';
+      badge.textContent = 'Wyrmling';
+      hint.textContent = '$' + (250 - totalSpent).toFixed(2) + ' until Drake status!';
+    } else {
+      bar.style.width = '25%';
+      badge.textContent = 'Egg';
+      hint.textContent = '$' + (100 - totalSpent).toFixed(2) + ' until Wyrmling hatches!';
     }
   }
 
   /**
    * Load user order history
    */
-  async function loadUserOrders(user) {
-    try {
-      var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-      var ordersRef = fbFirestore.collection(window.db.firestore, 'orders');
-      var q = fbFirestore.query(
-        ordersRef,
-        fbFirestore.where('userId', '==', user.uid),
-        fbFirestore.orderBy('createdAt', 'desc'),
-        fbFirestore.limit(10)
-      );
+  function loadUserOrders(user) {
+    var orders = window.storage.getOrders(user.uid);
+    var orderListEl = document.getElementById('orderHistory');
 
-      var snapshot = await fbFirestore.getDocs(q);
-      var orderListEl = document.getElementById('orderHistory');
-      var orderCountEl = document.getElementById('orderCount');
+    if (orders.length === 0) {
+      if (orderListEl) orderListEl.innerHTML = '<p class="empty-state">No orders yet. Start shopping!</p>';
+      return;
+    }
 
-      if (snapshot.empty) {
-        if (orderListEl) orderListEl.innerHTML = '<p class="empty-state">No orders yet. Start shopping!</p>';
-        if (orderCountEl) orderCountEl.textContent = '0';
-        return;
-      }
+    if (orderListEl) {
+      var html = '';
+      orders.slice().reverse().forEach(function(order) {
+        var date = new Date(order.createdAt);
+        var dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-      if (orderCountEl) orderCountEl.textContent = snapshot.size;
-
-      if (orderListEl) {
-        var html = '';
-        snapshot.docs.forEach(function(docSnap) {
-          var order = docSnap.data();
-          var date = order.createdAt && order.createdAt.toDate ? order.createdAt.toDate() : new Date();
-          var dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-
-          html += '<div class="order-item">' +
-            '<div>' +
-              '<div class="order-date">' + dateStr + '</div>' +
-              '<div class="order-status ' + (order.status || 'completed') + '">' + capitalize(order.status || 'completed') + '</div>' +
-            '</div>' +
-            '<div class="order-total">' + formatCurrency(order.total || 0) + '</div>' +
-          '</div>';
-        });
-        orderListEl.innerHTML = html;
-      }
-    } catch (error) {
-      console.error('Failed to load orders:', error);
-      var orderListEl = document.getElementById('orderHistory');
-      if (orderListEl) orderListEl.innerHTML = '<p class="empty-state">Unable to load orders</p>';
+        html += '<div class="order-item">' +
+          '<div>' +
+            '<div class="order-date">' + dateStr + '</div>' +
+            '<div class="order-status ' + (order.status || 'completed') + '">' + capitalize(order.status || 'completed') + '</div>' +
+          '</div>' +
+          '<div class="order-total">' + formatCurrency(order.total || 0) + '</div>' +
+        '</div>';
+      });
+      orderListEl.innerHTML = html;
     }
   }
 
   /**
    * Load user coupons
    */
-  async function loadUserCoupons(user) {
-    try {
-      var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-      var couponsRef = fbFirestore.collection(window.db.firestore, 'coupons');
-      var q = fbFirestore.query(
-        couponsRef,
-        fbFirestore.where('userId', '==', user.uid),
-        fbFirestore.orderBy('createdAt', 'desc')
-      );
-      var snapshot = await fbFirestore.getDocs(q);
-
-      var couponListEl = document.getElementById('couponList');
-
-      if (snapshot.empty) {
-        if (couponListEl) {
-          couponListEl.innerHTML = '<p class="empty-state">No coupons yet. Spend over $100 to unlock your first discount!</p>';
-        }
-        return;
-      }
-
-      if (couponListEl) {
-        var html = '';
-        snapshot.docs.forEach(function(docSnap) {
-          var coupon = docSnap.data();
-          var expiryStr = coupon.expiresAt ? new Date(coupon.expiresAt).toLocaleDateString() : 'N/A';
-
-          html += '<div class="coupon-card">' +
-            '<div class="coupon-value">' + (coupon.discount || '10') + '% OFF</div>' +
-            '<div class="coupon-code">' + escapeHtml(coupon.code || '\u2014') + '</div>' +
-            '<div class="coupon-expiry">Expires: ' + expiryStr + '</div>' +
-          '</div>';
-        });
-        couponListEl.innerHTML = html;
-      }
-    } catch (error) {
-      console.error('Failed to load coupons:', error);
+  function loadUserCoupons(user) {
+    // Simulated coupons for now
+    var couponListEl = document.getElementById('couponList');
+    if (couponListEl) {
+      couponListEl.innerHTML = '<p class="empty-state">No coupons yet. Spend over $100 to unlock your first discount!</p>';
     }
   }
 
   /**
    * Setup logout button
    */
-  async function setupLogout() {
+  function setupLogout() {
     var logoutBtn = document.getElementById('logoutBtn');
     if (!logoutBtn) return;
 
-    logoutBtn.addEventListener('click', async function() {
-      try {
-        var fbAuth = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
-        await fbAuth.signOut(window.db.auth);
-        showToast('Signed out successfully', 'success');
-        window.location.href = '../index.html';
-      } catch (error) {
-        console.error('Logout failed:', error);
-        showToast('Failed to sign out', 'error');
-      }
+    logoutBtn.addEventListener('click', function() {
+      window.storage.logout();
+      showToast('Signed out successfully', 'success');
+      setTimeout(() => { window.location.href = '../index.html'; }, 800);
     });
   }
 

@@ -275,36 +275,25 @@
   <!-- Toast Notification -->
   <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-    import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-
-    const app = initializeApp(window.FIREBASE_CONFIG);
-    window.db = { auth: getAuth(app), firestore: getFirestore(app) };
-
-    // Service Worker Registration for PWA
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js').catch(function() {});
-      });
-    }
-  </script>
-
-  <!-- Classic Scripts -->
-  <script src="../js/firebase-config.js"></script>
+  <!-- Scripts -->
   <script src="../js/utils.js"></script>
-  <script src="../js/dashboard.js"></script>
-  <script src="../js/wishlist.js"></script>
-  <script src="../js/recently-viewed.js"></script>
-  <script src="../js/sync-cart.js"></script>
   <script src="../js/theme.js"></script>
+  <script src="../js/storage-service.js"></script>
   <script src="../js/currency.js"></script>
   <script src="../js/i18n.js"></script>
   <script src="../js/notifications.js"></script>
   <script src="../js/announcements.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/wishlist.js"></script>
+  <script src="../js/recently-viewed.js"></script>
   <script src="../js/referral.js"></script>
   <script src="../js/ui.js"></script>
+
+  <script>
+    // Auth guard
+    if (window.storage && !window.storage.getCurrentUser()) {
+      window.location.href = 'login.html';
+    }
+  </script>
 </body>
 </html>

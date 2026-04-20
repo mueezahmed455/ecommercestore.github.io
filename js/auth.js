@@ -102,26 +102,16 @@
     submitBtn.classList.add('loading');
 
     try {
-      var fbAuth = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
-      var userCred = await fbAuth.signInWithEmailAndPassword(window.db.auth, email, password);
-      
-      // Admin Panel Access Logic
-      try {
-        var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-        var userDocRef = fbFirestore.doc(window.db.firestore, 'users', userCred.user.uid);
-        var userDocSnap = await fbFirestore.getDoc(userDocRef);
-        
-        if (userDocSnap.exists() && userDocSnap.data().role === 'admin') {
-           showToast('Admin access verified.', 'success');
-           window.location.href = 'pages/admin.html';
-           return;
-        }
-      } catch(e) {
-        console.warn('Role verification issue:', e);
-      }
+      // Use Local Storage Service instead of Firebase
+      const user = window.storage.login(email, password);
       
       showToast('Successfully signed in', 'success');
-      window.location.href = 'pages/dashboard.html';
+      
+      // Redirect to dashboard or previous page
+      setTimeout(() => {
+        window.location.href = window.location.search.includes('redirect=admin') ? 'admin.html' : 'dashboard.html';
+      }, 800);
+      
     } catch (error) {
       handleAuthError(error, 'login');
     } finally {
@@ -147,11 +137,6 @@
       isValid = false;
     }
 
-    if (name.length > 100) {
-      showError('signupNameError', 'Name must be less than 100 characters');
-      isValid = false;
-    }
-
     if (!validateEmail(email)) {
       showError('signupEmailError', 'Please enter a valid email address');
       isValid = false;
@@ -174,29 +159,15 @@
     submitBtn.classList.add('loading');
 
     try {
-      var fbAuth = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
-      var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-
-      // Create auth user
-      var userCredential = await fbAuth.createUserWithEmailAndPassword(window.db.auth, email, password);
-
-      // Set display name
-      await fbAuth.updateProfile(userCredential.user, { displayName: name });
-
-      // Create user document in Firestore
-      await fbFirestore.setDoc(
-        fbFirestore.doc(window.db.firestore, 'users', userCredential.user.uid),
-        {
-          name: name,
-          email: email,
-          total_spent: 0,
-          createdAt: fbFirestore.serverTimestamp(),
-          updatedAt: fbFirestore.serverTimestamp()
-        }
-      );
+      // Use Local Storage Service instead of Firebase
+      window.storage.signup(name, email, password);
 
       showToast('Account created successfully!', 'success');
-      window.location.href = 'pages/dashboard.html';
+      
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 800);
+      
     } catch (error) {
       handleAuthError(error, 'signup');
     } finally {
