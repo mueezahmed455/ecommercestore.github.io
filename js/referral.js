@@ -1,7 +1,8 @@
 /**
  * Referral System Module
- * Generates referral codes from Firebase UIDs, tracks referrals on checkout,
+ * Generates referral codes from UIDs, tracks referrals on checkout,
  * and provides a dashboard referral section.
+ * Pure local version using window.storage and localStorage.
  */
 (function() {
   'use strict';
@@ -17,7 +18,11 @@
     return div.innerHTML;
   }
 
-  
+  function showToast(message, type) {
+    if (window.utils && window.utils.showToast) {
+      window.utils.showToast(message, type);
+    }
+  }
 
   /**
    * Generate referral code: first 8 chars of UID, uppercased.
@@ -63,8 +68,6 @@
 
   /**
    * Get the referral code for the current logged-in user.
-   * @param {object} user - Firebase user object
-   * @returns {string}
    */
   function getReferralCode(user) {
     if (!user || !user.uid) return '';
@@ -73,17 +76,18 @@
 
   /**
    * Get the full referral link for the current page.
-   * @param {string} code - Referral code
-   * @returns {string} Full URL with ?ref=CODE
    */
   function getReferralLink(code) {
     var baseUrl = window.location.origin + window.location.pathname;
+    // Handle pages/ directory
+    if (baseUrl.endsWith('dashboard.html')) {
+        baseUrl = baseUrl.replace('pages/dashboard.html', 'index.html');
+    }
     return baseUrl + '?ref=' + code;
   }
 
   /**
    * Copy the user's referral link to clipboard and show a toast.
-   * @param {string} code - Referral code
    */
   function copyReferralLink(code) {
     var link = getReferralLink(code);
@@ -96,7 +100,6 @@
 
   /**
    * On page load: check URL for ?ref=CODE and store in localStorage.
-   * Only stores if the referrer is not the current user.
    */
   function captureReferralFromUrl() {
     var refCode = getQueryParam('ref');
@@ -115,11 +118,6 @@
 
   /**
    * Record a referral when an order is placed.
-   * Adds referralCode to order doc and increments referrer's count.
-   * Call this from checkout flow before or after creating the order.
-   *
-   * @param {object} orderData - The order data being written
-   * @returns {object} Modified orderData with referralCode field (if referral exists)
    */
   async function recordReferralOnCheckout(orderData) {
     var referralCode;
@@ -135,8 +133,7 @@
     orderData.referralCode = referralCode;
 
     // Increment the referral count for the referrer
-    // We need to find the user whose UID starts with this code
-    await incrementReferralCount(referralCode);
+    incrementReferralCount(referralCode);
 
     // Clear the referral storage so it isn't reused
     try {
@@ -148,28 +145,18 @@
 
   /**
    * Find a user by their referral code prefix and increment their referral_count.
-   * This is a best-effort operation -- errors are logged but not thrown.
    */
-  async function incrementReferralCount(code) {
-    if (!window.db || !window.db.firestore) return;
+  function incrementReferralCount(code) {
+    if (!window.storage || !window.storage.getUsers) return;
 
     try {
-      var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-      var usersRef = fbFirestore.collection(window.db.firestore, 'users');
-
-      // Find user whose UID starts with the referral code
-      var snapshot = await fbFirestore.getDocs(usersRef);
-      snapshot.docs.forEach(function(docSnap) {
-        var uid = docSnap.id;
-        if (generateCode(uid) === code) {
-          var userRef = fbFirestore.doc(window.db.firestore, 'users', uid);
-          fbFirestore.updateDoc(userRef, {
-            referral_count: fbFirestore.increment(1)
-          }).catch(function(err) {
-            console.error('Failed to increment referral count:', err);
-          });
-        }
-      });
+      var users = window.storage.getUsers();
+      var referrer = users.find(u => generateCode(u.uid) === code);
+      if (referrer) {
+        referrer.referral_count = (referrer.referral_count || 0) + 1;
+        // In this local version, users list is in localStorage
+        localStorage.setItem('dragon_users', JSON.stringify(users));
+      }
     } catch (error) {
       console.error('Failed to process referral increment:', error);
     }
@@ -177,31 +164,16 @@
 
   /**
    * Render the referral section in the dashboard.
-   * Shows the user's code, their link, a copy button, and referral count.
-   *
-   * @param {object} user - Firebase user object
    */
-  async function renderReferralSection(user) {
+  function renderReferralSection(user) {
     var section = document.getElementById('referralSection');
     if (!section || !user) return;
 
     var code = getReferralCode(user);
     var link = getReferralLink(code);
 
-    // Fetch referral count from Firestore
-    var referralCount = 0;
-    if (window.db && window.db.firestore) {
-      try {
-        var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-        var userRef = fbFirestore.doc(window.db.firestore, 'users', user.uid);
-        var snap = await fbFirestore.getDoc(userRef);
-        if (snap.exists() && snap.data().referral_count) {
-          referralCount = snap.data().referral_count;
-        }
-      } catch (error) {
-        console.warn('Could not fetch referral count:', error);
-      }
-    }
+    // Fetch referral count from local storage
+    var referralCount = user.referral_count || 0;
 
     section.innerHTML =
       '<div class="referral-content">' +
@@ -244,91 +216,24 @@
     }
   }
 
-  // ---- Hook into checkout ----
-
-  /**
-   * Patch window.cart.processCheckout to include referral data.
-   * This is a non-destructive override that wraps the existing checkout.
-   */
-  function patchCheckoutForReferral() {
-    if (!window.cart || !window.cart.processCheckout) return;
-
-    var originalCheckout = window.cart.processCheckout;
-
-    window.cart.processCheckout = async function() {
-      // Run the original checkout
-      await originalCheckout();
-
-      // After checkout succeeds, record referral
-      // Note: the cart module already handles order creation,
-      // so we patch by adding referral to the most recent order.
-      var referralCode;
-      try {
-        referralCode = localStorage.getItem(REFERRAL_STORAGE_KEY);
-      } catch (e) {
-        return;
-      }
-      if (!referralCode) return;
-
-      // Find the most recent order for this user and add referral code
-      if (window.db && window.db.auth && window.db.auth.currentUser && window.db.firestore) {
-        try {
-          var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-          var ordersRef = fbFirestore.collection(window.db.firestore, 'orders');
-          var q = fbFirestore.query(
-            ordersRef,
-            fbFirestore.where('userId', '==', window.db.auth.currentUser.uid),
-            fbFirestore.orderBy('createdAt', 'desc'),
-            fbFirestore.limit(1)
-          );
-          var snapshot = await fbFirestore.getDocs(q);
-          if (!snapshot.empty) {
-            var orderDoc = snapshot.docs[0];
-            // Only update if referralCode is not already set
-            if (!orderDoc.data().referralCode) {
-              var orderRef = fbFirestore.doc(window.db.firestore, 'orders', orderDoc.id);
-              await fbFirestore.updateDoc(orderRef, {
-                referralCode: referralCode
-              });
-              await incrementReferralCount(referralCode);
-            }
-          }
-          try {
-            localStorage.removeItem(REFERRAL_STORAGE_KEY);
-          } catch (e) { /* storage unavailable */ }
-        } catch (error) {
-          console.error('Failed to record referral on order:', error);
-        }
-      }
-    };
-  }
-
   // ---- Initialize ----
 
   function init() {
-    // Always capture referral from URL on page load
     captureReferralFromUrl();
-
-    // Patch checkout to record referrals
-    if (window.cart && window.cart.processCheckout) {
-      patchCheckoutForReferral();
-    } else {
-      // Cart not loaded yet; retry after a short delay
-      setTimeout(function() {
-        if (window.cart && window.cart.processCheckout) {
-          patchCheckoutForReferral();
-        }
-      }, 500);
-    }
 
     // Render referral section if element exists (dashboard page)
     var section = document.getElementById('referralSection');
-    if (section && window.db && window.db.auth) {
-      window.db.auth.onAuthStateChanged(function(user) {
+    if (section && window.storage) {
+        var user = window.storage.getCurrentUser();
         if (user) {
-          renderReferralSection(user);
+            renderReferralSection(user);
         }
-      });
+        
+        window.addEventListener('auth-change', function(e) {
+            if (e.detail) {
+                renderReferralSection(e.detail);
+            }
+        });
     }
   }
 
@@ -345,8 +250,7 @@
     copyReferralLink: copyReferralLink,
     captureReferralFromUrl: captureReferralFromUrl,
     recordReferralOnCheckout: recordReferralOnCheckout,
-    renderReferralSection: renderReferralSection,
-    patchCheckoutForReferral: patchCheckoutForReferral
+    renderReferralSection: renderReferralSection
   };
 
 })();

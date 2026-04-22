@@ -1,436 +1,337 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Order confirmation - Dragon-Tech">
+  <meta name="description" content="Order confirmed — Dragon-Tech">
   <title>Order Confirmed | Dragon-Tech</title>
-
-  <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Stylesheets -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/main.css">
-  <link rel="stylesheet" href="../css/glass.css">
-  <link rel="stylesheet" href="../css/animations.css">
-  <link rel="stylesheet" href="../css/accessibility.css">
-  <link rel="stylesheet" href="../css/product-modal.css">
-  <link rel="stylesheet" href="../css/light-theme.css">
-  <link rel="manifest" href="manifest.json">
-
-  <!-- Page-specific inline styles -->
   <style>
-    .confirmation-page {
-      min-height: calc(100vh - 200px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--spacing-2xl) var(--spacing-md);
+    body { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; }
+
+    .conf-page {
+      position: relative; z-index: 2;
+      width: 100%; max-width: 620px;
+      text-align: center;
     }
 
-    .confirmation-card {
-      max-width: 640px;
-      width: 100%;
-      padding: var(--spacing-xl);
-    }
-
-    /* Success Checkmark */
-    .success-checkmark {
-      display: flex;
-      justify-content: center;
-      margin-bottom: var(--spacing-lg);
-    }
-
-    .checkmark-circle {
-      width: 80px;
-      height: 80px;
+    /* Success Animation */
+    .success-ring {
+      width: 100px; height: 100px;
       border-radius: 50%;
-      background: var(--gradient-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
-      animation: checkmarkPop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-      transform: scale(0);
+      border: 3px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 28px;
+      position: relative;
+      box-shadow: 0 0 40px rgba(0,168,255,0.3), inset 0 0 20px rgba(0,168,255,0.05);
+      animation: ringPulse 2s ease-in-out infinite;
     }
 
-    @keyframes checkmarkPop {
-      0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-      60% { transform: scale(1.15) rotate(5deg); opacity: 1; }
-      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    @keyframes ringPulse {
+      0%,100% { box-shadow: 0 0 30px rgba(0,168,255,0.3); }
+      50%      { box-shadow: 0 0 60px rgba(0,168,255,0.5), 0 0 100px rgba(0,168,255,0.15); }
     }
 
-    .checkmark-circle svg {
-      width: 40px;
-      height: 40px;
-      stroke: white;
-      stroke-width: 3;
-      fill: none;
-      stroke-dasharray: 48;
-      stroke-dashoffset: 48;
-      animation: checkmarkDraw 300ms 300ms ease forwards;
+    .success-check {
+      font-size: 2.5rem;
+      color: var(--accent);
+      animation: checkPop 0.5s var(--t-spring) 0.2s both;
     }
 
-    @keyframes checkmarkDraw {
-      to { stroke-dashoffset: 0; }
+    @keyframes checkPop {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
     }
 
-    /* Confirmation Header */
-    .confirmation-header {
-      text-align: center;
-      margin-bottom: var(--spacing-lg);
-    }
-
-    .confirmation-header h1 {
-      font-size: clamp(1.5rem, 4vw, 2rem);
-      font-weight: 700;
-      margin-bottom: var(--spacing-xs);
-      letter-spacing: -0.5px;
-    }
-
-    .confirmation-header p {
-      color: var(--text-secondary);
-      font-size: var(--font-size-sm);
-    }
-
-    /* Order Details */
-    .order-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--spacing-md);
-      margin-bottom: var(--spacing-lg);
-    }
-
-    .order-detail-item {
-      padding: var(--spacing-sm) 0;
-    }
-
-    .order-detail-label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
-
-    .order-detail-value {
-      font-size: var(--font-size-base);
-      font-weight: 600;
+    .conf-title {
+      font-family: var(--font-display);
+      font-size: 2rem; font-weight: 800;
       color: var(--text-primary);
+      margin-bottom: 10px;
+      animation: fadeUp 0.6s var(--t-base) 0.3s both;
     }
 
-    .order-detail-value.price {
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-size: var(--font-size-xl);
-    }
-
-    /* Order Items */
-    .order-items {
-      margin-bottom: var(--spacing-lg);
-    }
-
-    .order-items h2 {
-      font-size: var(--font-size-lg);
-      font-weight: 600;
-      margin-bottom: var(--spacing-md);
-      letter-spacing: -0.3px;
-    }
-
-    .order-item {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      padding: var(--spacing-sm) 0;
-      border-bottom: 1px solid var(--glass-border);
-      animation: slideInRight 300ms ease-out both;
-    }
-
-    .order-item:nth-child(1) { animation-delay: 100ms; }
-    .order-item:nth-child(2) { animation-delay: 200ms; }
-    .order-item:nth-child(3) { animation-delay: 300ms; }
-    .order-item:nth-child(4) { animation-delay: 400ms; }
-    .order-item:nth-child(5) { animation-delay: 500ms; }
-
-    .order-item-image {
-      width: 56px;
-      height: 56px;
-      border-radius: var(--radius-md);
-      background: var(--bg-tertiary);
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-
-    .order-item-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .order-item-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .order-item-name {
-      font-size: var(--font-size-sm);
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .order-item-qty {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .order-item-price {
-      font-size: var(--font-size-sm);
-      font-weight: 600;
-      color: var(--neon-blue);
-      white-space: nowrap;
-    }
-
-    /* Order Total Row */
-    .order-total-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--spacing-md) 0;
-      margin-top: var(--spacing-sm);
-      border-top: 2px solid var(--glass-border);
-    }
-
-    .order-total-row span:first-child {
-      font-size: var(--font-size-lg);
-      font-weight: 600;
-    }
-
-    .order-total-row span:last-child {
-      font-size: var(--font-size-xl);
-      font-weight: 700;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* Action Buttons */
-    .confirmation-actions {
-      display: flex;
-      gap: var(--spacing-sm);
-      flex-wrap: wrap;
-    }
-
-    .confirmation-actions .btn {
-      flex: 1;
-      min-width: 180px;
-    }
-
-    /* Loading / Error States */
-    .loading-state,
-    .error-state {
-      text-align: center;
-      padding: var(--spacing-xl) 0;
-    }
-
-    .loading-state .spinner-dots {
-      margin-bottom: var(--spacing-md);
-    }
-
-    .error-state svg {
-      color: var(--neon-pink);
-      margin-bottom: var(--spacing-md);
-    }
-
-    .error-state h2 {
-      font-size: var(--font-size-lg);
-      margin-bottom: var(--spacing-xs);
-    }
-
-    .error-state p {
+    .conf-subtitle {
       color: var(--text-secondary);
-      font-size: var(--font-size-sm);
-      margin-bottom: var(--spacing-md);
+      font-size: 1rem;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s var(--t-base) 0.4s both;
     }
 
-    /* Responsive */
-    @media (max-width: 600px) {
-      .order-details {
-        grid-template-columns: 1fr;
-      }
+    /* Order Box */
+    .order-box {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s var(--t-base) 0.5s both;
+      text-align: left;
+    }
 
-      .confirmation-actions {
-        flex-direction: column;
-      }
+    .order-box-head {
+      padding: 20px 24px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 10px;
+    }
 
-      .confirmation-actions .btn {
-        min-width: unset;
-      }
+    .order-box-id { font-family: var(--font-mono, monospace); font-size: 0.78rem; color: var(--text-muted); }
+    .order-box-status { }
+
+    .order-items-list { padding: 16px 24px; }
+
+    .conf-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .conf-item:last-child { border-bottom: none; }
+
+    .conf-item-img {
+      width: 54px; height: 54px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .conf-item-img img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+
+    .conf-item-name { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+    .conf-item-meta { font-size: 0.78rem; color: var(--text-muted); }
+    .conf-item-price { margin-left: auto; font-weight: 700; color: var(--accent); font-size: 0.9rem; }
+
+    /* Totals */
+    .order-totals {
+      padding: 16px 24px;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .total-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.875rem; margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+
+    .total-row.grand {
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--text-primary);
+      padding-top: 10px;
+      border-top: 1px solid var(--border-subtle);
+      margin-top: 4px;
+    }
+
+    .total-row.grand .total-val { color: var(--accent); font-family: var(--font-display); }
+
+    /* Delivery banner */
+    .delivery-banner {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 20px;
+      background: rgba(0,168,255,0.06);
+      border: 1px solid rgba(0,168,255,0.15);
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s var(--t-base) 0.6s both;
+      text-align: left;
+    }
+
+    .delivery-icon { font-size: 1.8rem; flex-shrink: 0; }
+    .delivery-text-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+    .delivery-text-sub { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Actions */
+    .conf-actions {
+      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+      animation: fadeUp 0.6s var(--t-base) 0.7s both;
+    }
+
+    /* Fireworks canvas */
+    #fwCanvas {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 1;
     }
   </style>
 </head>
-<body class="page-enter">
-  <!-- Scroll Progress -->
-  <div class="scroll-progress" id="scrollProgress"></div>
+<body>
 
-  <!-- Accessibility Controls -->
-  <div class="a11y-controls" role="toolbar" aria-label="Accessibility controls">
-    <button id="contrastToggle" aria-label="Toggle high contrast mode" title="Toggle contrast">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/>
-      </svg>
-    </button>
-    <button id="fontToggle" aria-label="Toggle font size" title="Toggle font size">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <text x="4" y="18" font-size="14" font-weight="bold">A</text>
-      </svg>
-    </button>
-    <button id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="5"/>
-        <line x1="12" y1="1" x2="12" y2="3"/>
-        <line x1="12" y1="21" x2="12" y2="23"/>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-        <line x1="1" y1="12" x2="3" y2="12"/>
-        <line x1="21" y1="12" x2="23" y2="12"/>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-      </svg>
-    </button>
+  <canvas id="psCanvas"></canvas>
+  <canvas id="fwCanvas"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="toast-stack" id="toastStack" role="region" aria-live="polite"></div>
+
+  <div class="conf-page">
+
+    <!-- Success Icon -->
+    <div class="success-ring">
+      <div class="success-check">✓</div>
+    </div>
+
+    <h1 class="conf-title">Order Confirmed!</h1>
+    <p class="conf-subtitle" id="confSubtitle">Thank you for your order. We're processing it right now.</p>
+
+    <!-- Order Box -->
+    <div class="order-box" id="orderBox">
+      <div class="order-box-head">
+        <div>
+          <div style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Order ID</div>
+          <div class="order-box-id" id="orderId">Loading…</div>
+        </div>
+        <span class="status-badge status-processing" id="orderStatus">Processing</span>
+      </div>
+      <div class="order-items-list" id="orderItems">
+        <p style="color:var(--text-muted);font-size:0.85rem;">Loading order details…</p>
+      </div>
+      <div class="order-totals" id="orderTotals"></div>
+    </div>
+
+    <!-- Delivery -->
+    <div class="delivery-banner">
+      <div class="delivery-icon">🚚</div>
+      <div>
+        <div class="delivery-text-title">Estimated Delivery</div>
+        <div class="delivery-text-sub" id="deliveryEst">Within 3–5 business days</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="conf-actions">
+      <a href="dashboard.html" class="btn btn-primary">View My Orders</a>
+      <a href="../index.html" class="btn btn-outline">Continue Shopping</a>
+    </div>
   </div>
 
-  <!-- Announcement Banner -->
-  <div id="announcementBanner"></div>
-
-  <!-- Navigation -->
-  <nav class="navbar glass" role="navigation" aria-label="Main navigation">
-    <div class="nav-container">
-      <a href="../index.html" class="logo" aria-label="Dragon-Tech Home">
-        <img src="../assets/dragon-logo.png" alt="" class="logo-icon" width="32" height="32" aria-hidden="true">
-        <span class="logo-text">Dragon</span><span class="logo-accent">-Tech</span>
-      </a>
-      <div class="nav-actions">
-        <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Confirmation Content -->
-  <main class="confirmation-page">
-    <div class="confirmation-card glass reveal stagger-1" id="confirmationCard">
-      <!-- Loading state shown by default -->
-      <div class="loading-state" id="loadingState">
-        <div class="spinner-dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <p>Loading your order details...</p>
-      </div>
-
-      <!-- Error state (hidden by default) -->
-      <div class="error-state" id="errorState" style="display: none;">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <h2>Order Not Found</h2>
-        <p id="errorMessage">We couldn't find the order you're looking for.</p>
-        <a href="../index.html" class="btn btn-primary">Continue Shopping</a>
-      </div>
-
-      <!-- Success content (hidden by default) -->
-      <div id="orderContent" style="display: none;">
-        <!-- Success Checkmark -->
-        <div class="success-checkmark">
-          <div class="checkmark-circle">
-            <svg viewBox="0 0 24 24">
-              <polyline points="6 12 10 16 18 8"/>
-            </svg>
-          </div>
-        </div>
-
-        <!-- Header -->
-        <div class="confirmation-header">
-          <h1>Order Confirmed!</h1>
-          <p>Thank you for your purchase. Your order is being processed.</p>
-        </div>
-
-        <!-- Order Details -->
-        <div class="order-details">
-          <div class="order-detail-item">
-            <div class="order-detail-label">Order ID</div>
-            <div class="order-detail-value" id="orderId">--</div>
-          </div>
-          <div class="order-detail-item">
-            <div class="order-detail-label">Estimated Delivery</div>
-            <div class="order-detail-value" id="estimatedDelivery">7-10 business days</div>
-          </div>
-          <div class="order-detail-item">
-            <div class="order-detail-label">Order Date</div>
-            <div class="order-detail-value" id="orderDate">--</div>
-          </div>
-          <div class="order-detail-item">
-            <div class="order-detail-label">Order Total</div>
-            <div class="order-detail-value price" id="orderTotal">$0.00</div>
-          </div>
-        </div>
-
-        <!-- Order Items -->
-        <div class="order-items">
-          <h2>Items in Your Order</h2>
-          <div id="orderItemsList">
-            <!-- Items injected by JS -->
-          </div>
-          <div class="order-total-row">
-            <span>Total</span>
-            <span id="orderTotalBottom">$0.00</span>
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="confirmation-actions">
-          <a href="../index.html" class="btn btn-ghost">Continue Shopping</a>
-          <a href="dashboard.html" class="btn btn-primary">View Dashboard</a>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <img src="../assets/dragon-logo.png" alt="" class="footer-logo" width="120" aria-hidden="true">
-          <p>&copy; 2026 Dragon-Tech. Crafted with precision.</p>
-        </div>
-        <div class="footer-links">
-          <a href="../index.html">Home</a>
-          <a href="dashboard.html">Dashboard</a>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Toast Notification -->
-  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
-
-  <!-- Scripts -->
   <script src="../js/utils.js"></script>
-  <script src="../js/theme.js"></script>
   <script src="../js/storage-service.js"></script>
   <script src="../js/currency.js"></script>
-  <script src="../js/confirmation.js"></script>
-  <script src="../js/ui.js"></script>
+  <script src="../js/products.js"></script>
+
+  <script>
+  (function () {
+    // Theme
+    var saved = localStorage.getItem('dragon_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+
+    function fmt(v) { return window.currency ? window.currency.formatPrice(v) : '$' + v.toFixed(2); }
+    function fmtDate(ts) { return new Date(ts).toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' }); }
+
+    // Get order ID from URL
+    var params = new URLSearchParams(window.location.search);
+    var orderId = params.get('id');
+
+    if (!orderId || !window.storage) {
+      document.getElementById('confSubtitle').textContent = 'Your order was placed successfully.';
+      return;
+    }
+
+    var order = window.storage.getOrderById(orderId);
+    if (!order) {
+      document.getElementById('confSubtitle').textContent = 'Order details could not be found.';
+      return;
+    }
+
+    // Populate
+    document.getElementById('orderId').textContent = '#' + order.id;
+    document.getElementById('confSubtitle').textContent =
+      'Hi ' + (order.userName || 'there') + '! Your order has been placed successfully.';
+
+    var status = order.status || 'processing';
+    var statusEl = document.getElementById('orderStatus');
+    if (statusEl) { statusEl.textContent = status; statusEl.className = 'status-badge status-' + status; }
+
+    // Items
+    var itemsEl = document.getElementById('orderItems');
+    if (itemsEl && order.items) {
+      itemsEl.innerHTML = order.items.map(function(it) {
+        return '<div class="conf-item">' +
+          '<div class="conf-item-img"><img src="../' + (it.image||'assets/product-earbuds.svg') + '" alt="' + (it.name||'') + '"></div>' +
+          '<div><div class="conf-item-name">' + (it.name||'Product') + '</div>' +
+          '<div class="conf-item-meta">Qty: ' + it.qty + '</div></div>' +
+          '<div class="conf-item-price">' + fmt((it.price||0) * it.qty) + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    // Totals
+    var totalsEl = document.getElementById('orderTotals');
+    if (totalsEl) {
+      var rows = '';
+      rows += '<div class="total-row"><span>Subtotal</span><span>' + fmt(order.subtotal || order.total) + '</span></div>';
+      if (order.discount > 0) {
+        rows += '<div class="total-row"><span>Discount (' + (order.discountCode||'') + ')</span><span style="color:#00c97b;">−' + fmt(order.discount) + '</span></div>';
+      }
+      rows += '<div class="total-row"><span>Shipping</span><span>' + (order.shipping === 0 ? 'Free' : fmt(order.shipping||4.99)) + '</span></div>';
+      rows += '<div class="total-row grand"><span>Total Paid</span><span class="total-val">' + fmt(order.total) + '</span></div>';
+      totalsEl.innerHTML = rows;
+    }
+
+    // Delivery date
+    var delivEl = document.getElementById('deliveryEst');
+    if (delivEl && order.deliveryEst) {
+      delivEl.textContent = 'By ' + fmtDate(order.deliveryEst);
+    }
+
+    // ---- Fireworks ----
+    (function () {
+      var c = document.getElementById('fwCanvas');
+      if (!c) return;
+      var ctx = c.getContext('2d');
+      c.width = window.innerWidth; c.height = window.innerHeight;
+      window.addEventListener('resize', function () { c.width = window.innerWidth; c.height = window.innerHeight; });
+
+      var particles = [];
+      var COLORS = ['#00a8ff','#7b2fff','#00ffd4','#ff0080','#fbbf24','#ffffff'];
+
+      function burst(x, y) {
+        for (var i = 0; i < 60; i++) {
+          var angle = (Math.PI * 2) * (i / 60);
+          var speed = Math.random() * 6 + 2;
+          particles.push({
+            x: x, y: y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - Math.random() * 3,
+            alpha: 1,
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+            size: Math.random() * 4 + 1,
+            decay: Math.random() * 0.02 + 0.01
+          });
+        }
+      }
+
+      // Fire 3 bursts
+      var w = c.width, h = c.height;
+      setTimeout(function () { burst(w * 0.25, h * 0.35); }, 200);
+      setTimeout(function () { burst(w * 0.75, h * 0.3); }, 400);
+      setTimeout(function () { burst(w * 0.5, h * 0.25); }, 600);
+
+      function animFW() {
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.fillRect(0, 0, c.width, c.height);
+        particles = particles.filter(function (p) { return p.alpha > 0; });
+        particles.forEach(function (p) {
+          p.x += p.vx; p.y += p.vy;
+          p.vy += 0.12; // gravity
+          p.alpha -= p.decay;
+          ctx.globalAlpha = Math.max(0, p.alpha);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        if (particles.length > 0) requestAnimationFrame(animFW);
+        else ctx.clearRect(0, 0, c.width, c.height);
+      }
+      animFW();
+    })();
+
+  })();
+  </script>
 </body>
 </html>

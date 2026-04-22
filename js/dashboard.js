@@ -11,6 +11,26 @@
 
   
 
+  function escapeHtml(text) {
+    if (window.utils && window.utils.escapeHtml) {
+      return window.utils.escapeHtml(text);
+    }
+    return text;
+  }
+
+  function formatCurrency(amount) {
+    if (window.currency && window.currency.formatPrice) {
+      return window.currency.formatPrice(amount);
+    }
+    return '$' + (amount || 0).toFixed(2);
+  }
+
+  function showToast(msg, type) {
+    if (window.utils && window.utils.showToast) {
+      window.utils.showToast(msg, type);
+    }
+  }
+
   function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }

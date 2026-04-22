@@ -31,11 +31,11 @@
 
   function initAdminGuard() {
     const user = window.storage.getCurrentUser();
-    if (!user) {
+    // Strict Guard: Must exist AND have admin role AND match the hardcoded Admin UID
+    if (!user || user.role !== 'admin' || user.uid !== 'uid_admin_001') {
       window.location.href = 'login.html';
       return;
     }
-    // Static demo: allow anyone to see the dashboard, but in prod you'd check role
     initAdminPanel();
   }
 
@@ -174,6 +174,26 @@
     });
   }
 
+  function escapeHtml(text) {
+    if (window.utils && window.utils.escapeHtml) {
+      return window.utils.escapeHtml(text);
+    }
+    return text;
+  }
+
+  function formatCurrency(amount) {
+    if (window.currency && window.currency.formatPrice) {
+      return window.currency.formatPrice(amount);
+    }
+    return '$' + (amount || 0).toFixed(2);
+  }
+
+  function showToast(msg, type) {
+    if (window.utils && window.utils.showToast) {
+      window.utils.showToast(msg, type);
+    }
+  }
+
   // ---- Stats ----
 
   function loadStats() {
@@ -188,17 +208,14 @@
     if (ordersEl) ordersEl.textContent = totalOrders;
 
     var usersEl = document.getElementById('totalUsers');
-    const uniqueUserIds = new Set(orders.map(o => o.userId));
-    if (usersEl) usersEl.textContent = Math.max(uniqueUserIds.size, 1);
+    const users = window.storage.getUsers();
+    if (usersEl) usersEl.textContent = users.length;
   }
 
   // ---- Users ----
 
   function loadUsers() {
-    allUsers = [
-      { id: 'u_1', name: 'Admin User', email: 'admin@dragon.tech', role: 'admin', total_spent: 0, createdAt: new Date().toISOString() },
-      { id: 'u_2', name: 'John Doe', email: 'john@example.com', role: 'user', total_spent: 350, createdAt: new Date().toISOString() }
-    ];
+    allUsers = window.storage.getUsers();
     var tbody = document.getElementById('usersTableBody');
     if (tbody) renderUsersTable(tbody);
   }
@@ -212,7 +229,7 @@
     var html = '';
     users.forEach(function(user) {
       html += '<tr>' +
-        '<td>' + escapeHtml(user.id.substring(0, 8)) + '</td>' +
+        '<td>' + escapeHtml((user.uid || user.id).substring(0, 8)) + '</td>' +
         '<td>' + escapeHtml(user.name || '\u2014') + '</td>' +
         '<td>' + escapeHtml(user.email || '\u2014') + '</td>' +
         '<td>' + formatCurrency(user.total_spent || 0) + '</td>' +
@@ -244,7 +261,7 @@
     orders.forEach(function(order) {
       html += '<tr>' +
         '<td>' + escapeHtml(order.id.substring(0, 10)) + '</td>' +
-        '<td>' + escapeHtml(order.userId || '\u2014') + '</td>' +
+        '<td>' + escapeHtml(order.userName || order.userId || '\u2014') + '</td>' +
         '<td>' + formatCurrency(order.total) + '</td>' +
         '<td><span class="status-badge ' + (order.status || 'pending') + '">' + capitalize(order.status) + '</span></td>' +
         '<td>' + formatDate(order.createdAt) + '</td>' +

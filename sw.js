@@ -70,15 +70,6 @@
     var request = event.request;
     var url = new URL(request.url);
 
-    // Network-first for Firestore / Firebase API calls
-    if (
-      url.hostname.includes("firestore.googleapis.com") ||
-      url.hostname.includes("firebase")
-    ) {
-      event.respondWith(networkFirst(request));
-      return;
-    }
-
     // Cache-first for static assets (css, js, svg, fonts, images, manifest)
     if (isStaticAsset(url.pathname)) {
       event.respondWith(cacheFirst(request));

@@ -1,299 +1,708 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Your account dashboard - Dragon-Tech">
+  <meta name="description" content="Your Dragon-Tech account dashboard — orders, wishlist, and profile.">
   <title>Dashboard | Dragon-Tech</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Stylesheets -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/main.css">
-  <link rel="stylesheet" href="../css/glass.css">
-  <link rel="stylesheet" href="../css/animations.css">
-  <link rel="stylesheet" href="../css/accessibility.css">
-  <link rel="stylesheet" href="../css/dashboard.css">
-  <link rel="stylesheet" href="../css/product-modal.css">
-  <link rel="stylesheet" href="../css/light-theme.css">
-  <link rel="manifest" href="manifest.json">
+  <style>
+    body { padding-top: var(--nav-h); }
+
+    /* Sidebar Layout */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 32px;
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 40px var(--space-lg) 80px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Sidebar */
+    .dash-sidebar {
+      position: sticky;
+      top: calc(var(--nav-h) + 20px);
+      height: fit-content;
+    }
+
+    .user-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 16px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .user-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .user-avatar {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.4rem; font-weight: 700; color: white;
+      margin: 0 auto 14px;
+      box-shadow: var(--glow-blue);
+    }
+
+    .user-name {
+      font-weight: 700; font-size: 1rem;
+      color: var(--text-primary); margin-bottom: 4px;
+    }
+
+    .user-email {
+      font-size: 0.78rem; color: var(--text-muted);
+      word-break: break-all; margin-bottom: 12px;
+    }
+
+    .user-role-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: var(--radius-full);
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .role-user    { background: rgba(0,168,255,0.1); color: var(--accent); }
+    .role-admin   { background: rgba(123,47,255,0.1); color: var(--accent-2); }
+
+    /* Nav menu */
+    .dash-nav {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .dash-nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px;
+      font-size: 0.875rem; font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--t-fast);
+      border-bottom: 1px solid var(--border-subtle);
+      border-left: 3px solid transparent;
+    }
+
+    .dash-nav-item:last-child { border-bottom: none; }
+
+    .dash-nav-item:hover { color: var(--text-primary); background: var(--border-subtle); }
+
+    .dash-nav-item.active {
+      color: var(--accent);
+      background: rgba(0,168,255,0.06);
+      border-left-color: var(--accent);
+    }
+
+    .dash-nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* Content Panels */
+    .dash-content {}
+
+    .dash-panel { display: none; }
+    .dash-panel.active { display: block; animation: fadeUp 0.3s var(--t-base) both; }
+
+    /* Stats Row */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      transition: all var(--t-fast);
+    }
+
+    .stat-card:hover { border-color: var(--border-strong); }
+
+    .stat-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .stat-value { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--text-primary); }
+
+    .stat-value.accent { color: var(--accent); }
+    .stat-value.green  { color: #00c97b; }
+
+    /* Section headers */
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .panel-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* Order Cards */
+    .order-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 12px;
+      transition: all var(--t-fast);
+    }
+
+    .order-card:hover { border-color: var(--border-strong); }
+
+    .order-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+    }
+
+    .order-id { font-family: var(--font-mono, monospace); font-size: 0.78rem; color: var(--text-muted); }
+    .order-date { font-size: 0.82rem; color: var(--text-muted); }
+    .order-total { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+
+    .order-items-preview {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;
+    }
+
+    .order-item-thumb {
+      width: 50px; height: 50px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .order-item-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+
+    .order-item-more {
+      width: 50px; height: 50px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .order-footer { display: flex; align-items: center; justify-content: space-between; }
+
+    /* Delivery progress */
+    .delivery-track {
+      display: flex; align-items: center; gap: 0;
+      margin: 14px 0;
+    }
+
+    .track-step {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+      position: relative;
+    }
+
+    .track-step::before {
+      content: '';
+      position: absolute;
+      top: 10px; left: 50%; right: -50%;
+      height: 2px;
+      background: var(--border-subtle);
+      z-index: 0;
+    }
+
+    .track-step:last-child::before { display: none; }
+
+    .track-dot {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-default);
+      z-index: 1;
+      transition: all var(--t-base);
+    }
+
+    .track-step.done .track-dot {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(0,168,255,0.4);
+    }
+
+    .track-step.done::before { background: var(--accent); }
+
+    .track-label { font-size: 0.65rem; color: var(--text-muted); text-align: center; margin-top: 2px; }
+    .track-step.done .track-label { color: var(--accent); }
+
+    /* Empty state */
+    .empty-panel {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 200px; color: var(--text-muted); gap: 12px; text-align: center;
+      border: 1px dashed var(--border-subtle);
+      border-radius: var(--radius-lg); padding: 40px;
+    }
+
+    .empty-icon { font-size: 3rem; opacity: 0.5; }
+
+    /* Profile */
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* Wishlist grid */
+    .wishlist-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+    }
+
+    .wishlist-mini-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all var(--t-fast);
+    }
+
+    .wishlist-mini-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+    .wmc-img {
+      height: 110px; background: var(--bg-surface);
+      display: flex; align-items: center; justify-content: center; padding: 16px;
+    }
+
+    .wmc-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .wmc-body { padding: 10px; }
+    .wmc-name { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wmc-price { font-size: 0.85rem; font-weight: 700; color: var(--accent); }
+
+    @media (max-width: 768px) {
+      .dashboard-layout { grid-template-columns: 1fr; }
+      .dash-sidebar { position: static; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .profile-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-<body class="page-enter">
-  <!-- Scroll Progress -->
-  <div class="scroll-progress" id="scrollProgress"></div>
+<body>
 
-  <!-- Accessibility Controls -->
-  <div class="a11y-controls" role="toolbar" aria-label="Accessibility controls">
-    <button id="contrastToggle" aria-label="Toggle high contrast mode" title="Toggle contrast">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/>
-      </svg>
-    </button>
-    <button id="fontToggle" aria-label="Toggle font size" title="Toggle font size">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <text x="4" y="18" font-size="14" font-weight="bold">A</text>
-      </svg>
-    </button>
-    <button id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="5"/>
-        <line x1="12" y1="1" x2="12" y2="3"/>
-        <line x1="12" y1="21" x2="12" y2="23"/>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-        <line x1="1" y1="12" x2="3" y2="12"/>
-        <line x1="21" y1="12" x2="23" y2="12"/>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-      </svg>
-    </button>
-  </div>
+  <canvas id="psCanvas"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
 
-  <!-- Announcement Banner -->
-  <div id="announcementBanner"></div>
-
-  <!-- Navigation -->
-  <nav class="navbar glass" role="navigation" aria-label="Main navigation">
-    <div class="nav-container">
-      <a href="../index.html" class="logo" aria-label="Dragon-Tech Home">
-        <img src="../assets/dragon-logo.png" alt="" class="logo-icon" width="32" height="32" aria-hidden="true">
-        <span class="logo-text">Dragon</span><span class="logo-accent">-Tech</span>
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="../index.html" class="logo">
+        <div class="logo-mark">D</div>
+        <div class="logo-name">DRAGON<span class="logo-accent">-TECH</span></div>
       </a>
-      <div class="nav-actions">
-        <div id="notificationBell" class="notification-bell" aria-label="Notifications">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-          <span class="notification-badge" id="notificationBadge" aria-live="polite"></span>
-        </div>
-
-        <span class="user-greeting" id="userGreeting" data-i18n="greeting">Hello</span>
-        <button class="btn btn-ghost" id="logoutBtn" data-i18n="signOut">Sign Out</button>
-
-        <select id="currencySelector" class="selector-inline" aria-label="Select currency">
-          <option value="USD">USD ($)</option>
-          <option value="EUR">EUR (€)</option>
-          <option value="GBP">GBP (£)</option>
-          <option value="JPY">JPY (¥)</option>
-        </select>
-
-        <select id="languageSelector" class="selector-inline" aria-label="Select language">
-          <option value="en">English</option>
-          <option value="es">Español</option>
-          <option value="fr">Français</option>
-          <option value="de">Deutsch</option>
-        </select>
+      <div class="nav-controls">
+        <a href="../index.html" class="btn btn-outline btn-sm">← Back to Store</a>
+        <button class="btn btn-ghost btn-sm" id="logoutBtn">Sign Out</button>
       </div>
     </div>
   </nav>
 
-  <!-- Dashboard Content -->
-  <main class="dashboard-container">
-    <div class="container">
-      <h1 class="page-title" data-i18n="dashboardTitle">Your Dashboard</h1>
+  <!-- Toast -->
+  <div class="toast-stack" id="toastStack" role="region" aria-live="polite"></div>
 
-      
-      <!-- Dragon Egg Incubator Component -->
-      <div class="egg-incubator glass reveal stagger-2" style="padding:2rem; text-align:center; position:relative; overflow:hidden; margin-top:2rem; border:1px solid rgba(0,212,255,0.3);">
-        <h3 style="margin-top:0;">Your Dragon Egg is Incubating...</h3>
-        <p style="color:var(--text-secondary); margin-bottom:2rem;">Spend interacts as heat. Reach $500 total spent to hatch your first companion!</p>
-        
-        <div class="egg-container" style="position:relative; width:150px; height:200px; margin:0 auto;">
-           <div class="egg-shape" style="width:100%; height:100%; background:radial-gradient(ellipse at 30% 30%, #444, #111); border-radius:50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.8), 0 20px 30px rgba(0,0,0,0.5), 0 0 40px rgba(0,212,255,0.4); animation: breathe 3s ease-in-out infinite, wobble 10s ease-in-out infinite;"></div>
-           <div class="egg-cracks" style="position:absolute; top:0; left:0; width:100%; height:100%; background-image:url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 0 L45 20 L55 30 L45 50 L60 65" stroke="rgba(0,212,255,0.8)" fill="none" stroke-width="1.5"/></svg>'); background-size:cover; opacity:0.6;"></div>
-        </div>
-        
-        <style>
-          @keyframes breathe { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.2); } }
-          @keyframes wobble { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(2deg); } 75% { transform: rotate(-2deg); } }
-          
-          .egg-shape:hover {
-             animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-             cursor: pointer;
-             box-shadow: inset -10px -10px 20px rgba(0,0,0,0.8), 0 20px 30px rgba(0,0,0,0.5), 0 0 80px rgba(0,212,255,0.8);
-          }
-          @keyframes shake {
-             0%, 100% {transform: translateX(0);}
-             10%, 30%, 50%, 70%, 90% {transform: translateX(-5px) rotate(-3deg);}
-             20%, 40%, 60%, 80% {transform: translateX(5px) rotate(3deg);}
-          }
-        </style>
-        
-        <div style="margin-top:2rem;">
-          <div style="background:rgba(0,0,0,0.5); width:100%; max-width:300px; height:8px; border-radius:4px; margin:0 auto; overflow:hidden;">
-             <div style="width:72%; height:100%; background:var(--gradient-primary);"></div>
-          </div>
-          <p style="font-size:0.8rem; margin-top:8px; color:var(--neon-blue);">72% Heat Generated ($360 / $500)</p>
-        </div>
-      </div>
-  
+  <!-- Dashboard -->
+  <div class="dashboard-layout">
 
-      <!-- Stats Grid -->
-      <div class="stats-grid">
-        <div class="stat-card glass reveal stagger-1">
-          <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label" data-i18n="totalSpentLabel">Total Spent</span>
-            <span class="stat-value" id="totalSpent">$0.00</span>
-          </div>
-        </div>
-
-        <div class="stat-card glass reveal stagger-2">
-          <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-              <line x1="3" y1="6" x2="21" y2="6"/>
-              <path d="M16 10a4 4 0 0 1-8 0"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label" data-i18n="ordersLabel">Orders</span>
-            <span class="stat-value" id="orderCount">0</span>
-          </div>
-        </div>
-
-        <div class="stat-card glass reveal stagger-3">
-          <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label" data-i18n="rewardsTierLabel">Rewards Tier</span>
-            <span class="stat-value" id="rewardsTier">Bronze</span>
-          </div>
-        </div>
+    <!-- Sidebar -->
+    <aside class="dash-sidebar">
+      <div class="user-card" id="userCard">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <div class="user-name" id="userName">Loading…</div>
+        <div class="user-email" id="userEmail"></div>
+        <span class="user-role-badge role-user" id="userRoleBadge">User</span>
       </div>
 
-      
-      <!-- Gamified Loyalty Section -->
-      <section class="loyalty-section glass reveal stagger-3" aria-label="Dragon Evolution Status" style="margin-top:2rem;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-          <h2 class="section-title" style="margin:0;">Your Dragon Evolution</h2>
-          <span class="loyalty-tier-badge" id="dragonTierBadge" style="background:var(--gradient-primary); color:white; padding:4px 12px; border-radius:12px; font-weight:bold; box-shadow:0 0 10px rgba(0,212,255,0.4);">Wyrmling</span>
+      <nav class="dash-nav" role="navigation" aria-label="Dashboard sections">
+        <div class="dash-nav-item active" data-panel="overview">
+          <svg class="dash-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          Overview
         </div>
-        <div class="loyalty-progress-container" style="position:relative; margin-top:2rem;">
-          <div class="loyalty-steps" style="display:flex; justify-content:space-between; position:relative; z-index:2; font-weight:600;">
-            <div class="step" style="text-align:center; flex:1;">🥚 Egg</div>
-            <div class="step" style="text-align:center; flex:1;">🦎 Wyrmling</div>
-            <div class="step" style="text-align:center; flex:1; opacity:0.5;">🐉 Drake</div>
-            <div class="step" style="text-align:center; flex:1; opacity:0.5;">🐲 Great Wyrm</div>
+        <div class="dash-nav-item" data-panel="orders">
+          <svg class="dash-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          Orders
+        </div>
+        <div class="dash-nav-item" data-panel="wishlist">
+          <svg class="dash-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          Wishlist
+        </div>
+        <div class="dash-nav-item" data-panel="profile">
+          <svg class="dash-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Profile
+        </div>
+        <div class="dash-nav-item" data-panel="settings" id="adminNavItem" style="display:none;">
+          <svg class="dash-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          Admin Panel
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dash-content">
+
+      <!-- ====== OVERVIEW PANEL ====== -->
+      <div class="dash-panel active" id="panelOverview">
+        <div class="panel-header">
+          <h1 class="panel-title">Overview</h1>
+          <span style="font-size:0.82rem;color:var(--text-muted);" id="overviewDate"></span>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Orders</div>
+            <div class="stat-value accent" id="statOrders">0</div>
           </div>
-          <div class="progress-bar-bg" style="background:var(--bg-tertiary); height:12px; border-radius:6px; margin:1rem 0; overflow:hidden;">
-            <div class="progress-bar-fill" id="dragonProgressBar" style="width:35%; height:100%; background:var(--gradient-primary); transition:width 1s ease;"></div>
+          <div class="stat-card">
+            <div class="stat-label">Total Spent</div>
+            <div class="stat-value green" id="statSpent">$0.00</div>
           </div>
-          <p class="loyalty-hint" id="dragonProgressHint" style="text-align:center; color:var(--text-secondary); font-size:0.9rem;">$150 until Drake status (+10% off all orders!)</p>
-        </div>
-      </section>
-
-      <!-- Referral Section -->
-      <section id="referralSection" class="glass reveal stagger-4" aria-label="Referral program">
-        <h2 class="section-title" data-i18n="referralTitle">Refer a Friend</h2>
-        <div id="referralContent">
-          <!-- Referral content injected by JS -->
-        </div>
-      </section>
-
-      <!-- Coupon Section -->
-      <section class="coupon-section glass reveal stagger-4" aria-label="Your coupons">
-        <h2 class="section-title" data-i18n="couponsTitle">Your Coupons</h2>
-        <div id="couponList" class="coupon-list">
-          <p class="empty-state" data-i18n="noCoupons">No coupons yet. Spend over $100 to unlock your first discount!</p>
-        </div>
-      </section>
-
-      <!-- Wishlist Grid -->
-      <section id="wishlistSection" class="glass reveal stagger-5" aria-label="Your wishlist">
-        <h2 class="section-title" data-i18n="wishlistTitle">Your Wishlist</h2>
-        <div id="wishlistGrid" class="products-grid">
-          <!-- Wishlist items injected by JS -->
-        </div>
-      </section>
-
-      <!-- Recently Viewed Section -->
-      <section id="recentlyViewedSection" class="glass reveal stagger-5" aria-label="Recently viewed products">
-        <h2 class="section-title" data-i18n="recentlyViewedTitle">Recently Viewed</h2>
-        <div id="recentlyViewed" class="products-grid">
-          <!-- Recently viewed products injected by JS -->
-        </div>
-      </section>
-
-      <!-- Order History -->
-      <section class="orders-section glass reveal stagger-5" aria-label="Order history">
-        <h2 class="section-title" data-i18n="ordersTitle">Recent Orders</h2>
-        <div id="orderHistory" class="order-list">
-          <p class="empty-state" data-i18n="noOrders">No orders yet. Start shopping!</p>
-        </div>
-      </section>
-
-      <!-- Profile Section -->
-      <section class="profile-section glass reveal stagger-6" aria-label="Profile information">
-        <h2 class="section-title" data-i18n="profileTitle">Profile</h2>
-        <div class="profile-info">
-          <div class="profile-row">
-            <span class="profile-label" data-i18n="nameLabel">Name</span>
-            <span class="profile-value" id="profileName">—</span>
-          </div>
-          <div class="profile-row">
-            <span class="profile-label" data-i18n="emailLabel">Email</span>
-            <span class="profile-value" id="profileEmail">—</span>
-          </div>
-          <div class="profile-row">
-            <span class="profile-label" data-i18n="memberSinceLabel">Member Since</span>
-            <span class="profile-value" id="memberSince">—</span>
+          <div class="stat-card">
+            <div class="stat-label">Wishlist Items</div>
+            <div class="stat-value" id="statWishlist">0</div>
           </div>
         </div>
-      </section>
-    </div>
-  </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <img src="../assets/dragon-logo.png" alt="" class="footer-logo" width="120" aria-hidden="true">
-          <p>&copy; 2026 Dragon-Tech. Crafted with precision.</p>
+        <!-- Recent Orders -->
+        <div class="panel-header" style="margin-top:32px;">
+          <h2 class="panel-title" style="font-size:1rem;">Recent Orders</h2>
+          <button class="btn btn-ghost btn-sm" data-panel="orders">View All</button>
         </div>
-        <div class="footer-links">
-          <a href="../index.html">Home</a>
-          <a href="dashboard.html">Dashboard</a>
+        <div id="recentOrdersList">
+          <div class="empty-panel">
+            <div class="empty-icon">📦</div>
+            <p>No orders yet — start shopping!</p>
+            <a href="../index.html" class="btn btn-primary btn-sm" style="margin-top:8px;">Browse Products</a>
+          </div>
         </div>
       </div>
-    </div>
-  </footer>
 
-  <!-- Toast Notification -->
-  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+      <!-- ====== ORDERS PANEL ====== -->
+      <div class="dash-panel" id="panelOrders">
+        <div class="panel-header">
+          <h1 class="panel-title">My Orders</h1>
+          <span class="status-badge status-processing" id="orderCount">0 Orders</span>
+        </div>
+        <div id="allOrdersList">
+          <div class="empty-panel">
+            <div class="empty-icon">📦</div>
+            <p>No orders yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== WISHLIST PANEL ====== -->
+      <div class="dash-panel" id="panelWishlist">
+        <div class="panel-header">
+          <h1 class="panel-title">My Wishlist</h1>
+          <button class="btn btn-ghost btn-sm" id="clearWishlistBtn">Clear All</button>
+        </div>
+        <div class="wishlist-mini-grid" id="wishlistGrid"></div>
+      </div>
+
+      <!-- ====== PROFILE PANEL ====== -->
+      <div class="dash-panel" id="panelProfile">
+        <div class="panel-header">
+          <h1 class="panel-title">Profile Settings</h1>
+        </div>
+        <div style="background:var(--bg-elevated);border:1px solid var(--border-default);border-radius:var(--radius-xl);padding:32px;max-width:500px;">
+          <div class="form-group">
+            <label class="form-label" for="profileName">Full Name</label>
+            <input type="text" id="profileName" class="form-input" placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="profileEmail" class="form-input" disabled style="opacity:0.6;cursor:not-allowed;">
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Email cannot be changed.</div>
+          </div>
+          <button class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
+
+          <div style="border-top:1px solid var(--border-subtle);margin:24px 0;"></div>
+          <h3 style="font-size:0.9rem;font-weight:600;color:var(--text-secondary);margin-bottom:16px;">Danger Zone</h3>
+          <button class="btn btn-danger btn-sm" id="logoutDangerBtn">Sign Out of Account</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Theme toggle -->
+  <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </button>
 
   <!-- Scripts -->
   <script src="../js/utils.js"></script>
-  <script src="../js/theme.js"></script>
   <script src="../js/storage-service.js"></script>
   <script src="../js/currency.js"></script>
-  <script src="../js/i18n.js"></script>
-  <script src="../js/notifications.js"></script>
-  <script src="../js/announcements.js"></script>
-  <script src="../js/dashboard.js"></script>
-  <script src="../js/wishlist.js"></script>
-  <script src="../js/recently-viewed.js"></script>
-  <script src="../js/referral.js"></script>
-  <script src="../js/ui.js"></script>
 
   <script>
-    // Auth guard
-    if (window.storage && !window.storage.getCurrentUser()) {
-      window.location.href = 'login.html';
+  (function () {
+    'use strict';
+
+    // ---- Theme ----
+    var saved = localStorage.getItem('dragon_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    var themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) themeBtn.addEventListener('click', function () {
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('dragon_theme', next);
+    });
+
+    // ---- Auth Guard ----
+    var user = window.storage ? window.storage.getCurrentUser() : null;
+    if (!user) { window.location.href = 'login.html'; return; }
+
+    // ---- Particles (minimal) ----
+    (function() {
+      var c = document.getElementById('psCanvas');
+      if (!c) return;
+      var ctx = c.getContext('2d');
+      c.width = window.innerWidth; c.height = window.innerHeight;
+      window.addEventListener('resize', function () { c.width = window.innerWidth; c.height = window.innerHeight; });
+      var pts = [];
+      for (var i = 0; i < 40; i++) pts.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*1.2+0.3, vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3, a: Math.random()*.3+.05 });
+      function draw() {
+        ctx.clearRect(0,0,c.width,c.height);
+        pts.forEach(function(p) {
+          p.x+=p.vx; p.y+=p.vy;
+          if(p.x<0||p.x>c.width) p.vx*=-1;
+          if(p.y<0||p.y>c.height) p.vy*=-1;
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fillStyle='rgba(0,168,255,'+p.a+')'; ctx.fill();
+        });
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // ---- Populate user info ----
+    function populateUser() {
+      var av = document.getElementById('userAvatar');
+      var nm = document.getElementById('userName');
+      var em = document.getElementById('userEmail');
+      var rb = document.getElementById('userRoleBadge');
+      if (av) av.textContent = (user.name || 'U')[0].toUpperCase();
+      if (nm) nm.textContent = user.name || 'User';
+      if (em) em.textContent = user.email || '';
+      if (rb) {
+        rb.textContent = user.role === 'admin' ? '👑 Admin' : '👤 Member';
+        rb.className = 'user-role-badge ' + (user.role === 'admin' ? 'role-admin' : 'role-user');
+      }
+      if (user.role === 'admin') {
+        var adminNav = document.getElementById('adminNavItem');
+        if (adminNav) { adminNav.style.display = ''; adminNav.setAttribute('data-href', 'admin.html'); }
+      }
+      var pn = document.getElementById('profileName');
+      var pe = document.getElementById('profileEmail');
+      if (pn) pn.value = user.name || '';
+      if (pe) pe.value = user.email || '';
+
+      var dateEl = document.getElementById('overviewDate');
+      if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
     }
+
+    // ---- Format ----
+    function fmt(v) { return window.currency ? window.currency.formatPrice(v) : '$' + v.toFixed(2); }
+    function fmtDate(ts) { return window.utils ? window.utils.formatDate(ts) : new Date(ts).toLocaleDateString(); }
+
+    // ---- Order card ----
+    function statusClass(s) {
+      var m = { completed:'completed', processing:'processing', pending:'pending', cancelled:'cancelled' };
+      return 'status-' + (m[s] || 'pending');
+    }
+
+    function getTrackSteps(status) {
+      var steps = ['Placed', 'Processing', 'Shipped', 'Delivered'];
+      var doneMap = { placed:1, processing:2, shipped:3, completed:4 };
+      return { steps: steps, done: doneMap[status] || (status === 'cancelled' ? 0 : 1) };
+    }
+
+    function buildOrderCard(order) {
+      var items = order.items || [];
+      var track = getTrackSteps(order.status);
+      var thumbsHtml = items.slice(0, 3).map(function (it) {
+        return '<div class="order-item-thumb"><img src="../' + (it.image || 'assets/product-earbuds.svg') + '" alt="' + (it.name||'') + '"></div>';
+      }).join('');
+      if (items.length > 3) thumbsHtml += '<div class="order-item-more">+' + (items.length - 3) + '</div>';
+
+      var trackHtml = track.steps.map(function (s, i) {
+        return '<div class="track-step' + (i < track.done ? ' done' : '') + '">' +
+          '<div class="track-dot"></div><div class="track-label">' + s + '</div></div>';
+      }).join('');
+
+      return '<div class="order-card">' +
+        '<div class="order-head">' +
+          '<div><div class="order-id">#' + order.id + '</div><div class="order-date">' + fmtDate(order.createdAt) + '</div></div>' +
+          '<div style="display:flex;align-items:center;gap:10px;">' +
+            '<span class="status-badge ' + statusClass(order.status) + '">' + (order.status||'Processing') + '</span>' +
+            '<span class="order-total">' + fmt(order.total || 0) + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="order-items-preview">' + thumbsHtml + '</div>' +
+        '<div class="delivery-track">' + trackHtml + '</div>' +
+        '<div class="order-footer">' +
+          '<span style="font-size:0.78rem;color:var(--text-muted);">' + (items.length) + ' item' + (items.length !== 1 ? 's' : '') + '</span>' +
+          '<span style="font-size:0.78rem;color:var(--text-muted);">Est. delivery: ' + fmtDate(order.deliveryEst || order.createdAt) + '</span>' +
+        '</div>' +
+      '</div>';
+    }
+
+    // ---- Load data ----
+    function loadOverview() {
+      var orders = window.storage.getOrders(user.uid);
+      var wishlist = window.storage.getWishlist();
+
+      var s1 = document.getElementById('statOrders');
+      var s2 = document.getElementById('statSpent');
+      var s3 = document.getElementById('statWishlist');
+      if (s1) s1.textContent = orders.length;
+      if (s2) s2.textContent = fmt(user.totalSpent || 0);
+      if (s3) s3.textContent = wishlist.length;
+
+      var recentEl = document.getElementById('recentOrdersList');
+      if (recentEl) {
+        if (!orders.length) {
+          recentEl.innerHTML = '<div class="empty-panel"><div class="empty-icon">📦</div><p>No orders yet — start shopping!</p><a href="../index.html" class="btn btn-primary btn-sm" style="margin-top:8px;">Browse Products</a></div>';
+        } else {
+          recentEl.innerHTML = orders.slice(0, 3).map(buildOrderCard).join('');
+        }
+      }
+    }
+
+    function loadOrders() {
+      var orders = window.storage.getOrders(user.uid);
+      var listEl = document.getElementById('allOrdersList');
+      var countEl = document.getElementById('orderCount');
+      if (countEl) countEl.textContent = orders.length + ' Order' + (orders.length !== 1 ? 's' : '');
+      if (!listEl) return;
+      if (!orders.length) {
+        listEl.innerHTML = '<div class="empty-panel"><div class="empty-icon">📦</div><p>No orders yet.</p></div>';
+      } else {
+        listEl.innerHTML = orders.map(buildOrderCard).join('');
+      }
+    }
+
+    function loadWishlist() {
+      var wl   = window.storage.getWishlist();
+      var grid = document.getElementById('wishlistGrid');
+      if (!grid) return;
+      if (!wl.length) {
+        grid.innerHTML = '<div class="empty-panel" style="grid-column:1/-1"><div class="empty-icon">💙</div><p>Your wishlist is empty.</p></div>';
+        return;
+      }
+      grid.innerHTML = wl.map(function (id) {
+        var p = window.PRODUCTS ? window.PRODUCTS.find(function(x){return x.id===id;}) : null;
+        if (!p) return '';
+        var price = p.salePrice || p.price;
+        return '<div class="wishlist-mini-card" data-id="' + id + '">' +
+          '<div class="wmc-img"><img src="../' + p.image + '" alt="' + p.name + '"></div>' +
+          '<div class="wmc-body"><div class="wmc-name">' + p.name + '</div><div class="wmc-price">' + fmt(price) + '</div>' +
+          '<button class="btn btn-ghost btn-sm" style="margin-top:6px;width:100%;font-size:0.75rem;" data-remove-wl="' + id + '">Remove</button>' +
+          '</div></div>';
+      }).join('');
+
+      grid.querySelectorAll('[data-remove-wl]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          window.storage.toggleWishlist(this.dataset.removeWl);
+          loadWishlist();
+          loadOverview();
+        });
+      });
+    }
+
+    // Panel switching
+    function switchPanel(name) {
+      document.querySelectorAll('.dash-panel').forEach(function (p) { p.classList.remove('active'); });
+      document.querySelectorAll('.dash-nav-item').forEach(function (i) { i.classList.remove('active'); });
+      var panel = document.getElementById('panel' + name.charAt(0).toUpperCase() + name.slice(1));
+      var navItem = document.querySelector('[data-panel="' + name + '"]');
+      if (panel) panel.classList.add('active');
+      if (navItem) navItem.classList.add('active');
+
+      if (name === 'orders') loadOrders();
+      if (name === 'wishlist') loadWishlist();
+    }
+
+    document.querySelectorAll('[data-panel]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var href = this.getAttribute('data-href');
+        if (href) { window.location.href = href; return; }
+        switchPanel(this.getAttribute('data-panel'));
+      });
+    });
+
+    // Logout
+    ['logoutBtn','logoutDangerBtn'].forEach(function (id) {
+      var btn = document.getElementById(id);
+      if (btn) btn.addEventListener('click', function () {
+        window.storage.logout();
+        window.location.href = '../index.html';
+      });
+    });
+
+    // Profile save
+    var saveBtn = document.getElementById('saveProfileBtn');
+    if (saveBtn) saveBtn.addEventListener('click', function () {
+      var name = (document.getElementById('profileName') || {}).value || '';
+      try {
+        window.storage.updateUserProfile({ name: name });
+        user = window.storage.getCurrentUser();
+        populateUser();
+        if (window.utils) window.utils.showToast('Profile updated!', 'success');
+      } catch (e) {
+        if (window.utils) window.utils.showToast(e.message, 'error');
+      }
+    });
+
+    // Clear wishlist
+    var cwl = document.getElementById('clearWishlistBtn');
+    if (cwl) cwl.addEventListener('click', function () {
+      window.storage.saveWishlist([]);
+      loadWishlist(); loadOverview();
+    });
+
+    // Navbar scroll
+    window.addEventListener('scroll', function () {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+
+    // Init
+    populateUser();
+    loadOverview();
+  })();
   </script>
 </body>
 </html>

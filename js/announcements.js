@@ -3,7 +3,13 @@
 
   window.announcements = (function () {
     let initialized = false;
-    let db = null;
+
+    // Default local announcement
+    const DEFAULT_ANNOUNCEMENT = {
+      active: true,
+      message: "Welcome to the new Dragon-Tech experience! Free shipping on all orders over $50.",
+      expiresAt: "2026-12-31T23:59:59Z"
+    };
 
     function hashString(str) {
       let hash = 0;
@@ -27,12 +33,13 @@
       const existing = document.querySelector(".announcement-banner");
       if (existing) return;
 
+      const esc = (window.utils && window.utils.escapeHtml) ? window.utils.escapeHtml : (s) => s;
       const banner = document.createElement("div");
       banner.className = "announcement-banner";
       banner.setAttribute("role", "alert");
       banner.innerHTML =
         '<span class="announcement-message">' +
-        message +
+        esc(message) +
         "</span>" +
         '<button class="announcement-dismiss" aria-label="Dismiss announcement">&times;</button>';
 
@@ -89,10 +96,12 @@
 
       document.head.appendChild(style);
 
+      const messageHash = hashString(message);
       banner.querySelector(".announcement-dismiss").addEventListener("click", function () {
         banner.classList.add("dismissing");
         banner.addEventListener("animationend", function () {
           banner.remove();
+          markDismissed(messageHash);
         });
       });
 
@@ -109,35 +118,12 @@
       initialized = true;
 
       try {
-        const { getFirestore, doc, getDoc } = await import(
-          "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
-        );
-
-        if (!db) {
-          const { initializeApp } = await import(
-            "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
-          );
-
-          const firebaseConfig = window.__firebase_config || {};
-          if (firebaseConfig.apiKey) {
-            db = getFirestore(initializeApp(firebaseConfig));
-          } else {
-            db = getFirestore();
-          }
-        }
-
-        const configRef = doc(db, "config", "announcement");
-        const configSnap = await getDoc(configRef);
-
-        if (!configSnap.exists()) return;
-
-        const data = configSnap.data();
+        // Use local config instead of Firestore
+        const data = DEFAULT_ANNOUNCEMENT;
         if (!data || !data.active) return;
 
         if (data.expiresAt) {
-          const expiresAt = data.expiresAt.toDate
-            ? data.expiresAt.toDate()
-            : new Date(data.expiresAt);
+          const expiresAt = new Date(data.expiresAt);
           if (Date.now() > expiresAt.getTime()) return;
         }
 
@@ -149,7 +135,7 @@
 
         renderBanner(message);
       } catch (err) {
-        console.warn("[announcements] Failed to fetch announcement:", err);
+        console.warn("[announcements] Failed to initialize announcement:", err);
       }
     }
 

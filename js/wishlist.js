@@ -1,186 +1,90 @@
 /**
- * Wishlist Module
- * Manages wishlist in localStorage. Exposes window.wishlist.
+ * Dragon-Tech Wishlist Module — v2.0 (Local-Only)
+ * Renders wishlist sidebar, syncs badges, and integrates with storage-service.
  */
-(function() {
+(function () {
   'use strict';
 
-  var WISHLIST_STORAGE_KEY = 'dragon_wishlist';
+  function fmt(usd) { return window.currency ? window.currency.formatPrice(usd) : '$' + usd.toFixed(2); }
+  function esc(s) { return window.utils ? window.utils.escapeHtml(s) : String(s); }
 
-  // ---- Utilities ----
-
-  function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  function formatCurrency(amount) {
-    if (window.currency) return window.currency.formatPrice(amount);
-    return '$' + amount.toFixed(2);
-  }
-
-  function showToast(message, type) {
-    var toast = document.getElementById('toast');
-    if (!toast) return;
-    toast.textContent = message;
-    toast.className = 'toast ' + (type || 'info');
-    toast.classList.add('show');
-    setTimeout(function() { toast.classList.remove('show'); }, 3000);
-  }
-
-  function getProductById(id) {
-    return window.getProductById ? window.getProductById(id) : null;
-  }
-
-  // ---- Wishlist persistence ----
-
-  function getWishlist() {
-    try {
-      var data = localStorage.getItem(WISHLIST_STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
-    } catch (e) {
-      console.error('Failed to parse wishlist:', e);
-      return [];
-    }
-  }
-
-  function saveWishlist(list) {
-    try {
-      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(list));
-      updateWishlistBadge();
-    } catch (e) {
-      console.error('Failed to save wishlist:', e);
-    }
-  }
-
-  // ---- Wishlist operations ----
-
-  function addToWishlist(productId) {
-    var list = getWishlist();
-    var already = list.indexOf(productId);
-    if (already === -1) {
-      list.push(productId);
-      saveWishlist(list);
-      showToast('Added to wishlist', 'success');
-      renderWishlist();
-    } else {
-      showToast('Already in wishlist', 'info');
-    }
-  }
-
-  function removeFromWishlist(productId) {
-    var list = getWishlist().filter(function(id) { return id !== productId; });
-    saveWishlist(list);
-    renderWishlist();
-  }
-
-  function toggle(productId) {
-    if (isInWishlist(productId)) {
-      removeFromWishlist(productId);
-    } else {
-      addToWishlist(productId);
-    }
-    document.querySelectorAll('.wishlist-btn[data-product-id="' + productId + '"]').forEach(function(btn) {
-      btn.classList.toggle('active', isInWishlist(productId));
-    });
-  }
-
-  function isInWishlist(productId) {
-    return getWishlist().indexOf(productId) !== -1;
-  }
-
-  function getCount() {
-    return getWishlist().length;
-  }
-
-  function clearWishlist() {
-    saveWishlist([]);
-    renderWishlist();
-    showToast('Wishlist cleared', 'info');
-  }
-
-  // ---- UI Updates ----
-
-  function updateWishlistBadge() {
+  function updateBadge() {
     var badge = document.getElementById('wishlistBadge');
-    if (badge) {
-      badge.textContent = getCount();
-      badge.style.display = getCount() > 0 ? 'flex' : 'none';
-    }
+    if (!badge) return;
+    var count = window.storage ? window.storage.getWishlist().length : 0;
+    badge.textContent = count;
+    badge.classList.toggle('show', count > 0);
   }
-
-  // ---- Rendering ----
 
   function renderWishlist() {
-    var container = document.getElementById('wishlistGrid');
+    var container = document.getElementById('wishlistItems');
     if (!container) return;
 
-    var list = getWishlist();
-
-    if (list.length === 0) {
-      container.innerHTML = '<p class="empty-wishlist">Your wishlist is empty</p>';
+    var list = window.storage ? window.storage.getWishlist() : [];
+    if (!list.length) {
+      container.innerHTML =
+        '<div class="cart-empty-state">' +
+          '<div class="cart-empty-icon">💙</div>' +
+          '<div class="cart-empty-text">Your wishlist is empty</div>' +
+          '<a href="#products" class="btn btn-outline btn-sm" style="margin-top:10px;" id="browseFromWishlist">Browse Products</a>' +
+        '</div>';
+      var bfw = document.getElementById('browseFromWishlist');
+      if (bfw) bfw.addEventListener('click', function () {
+        var sidebar = document.getElementById('wishlistSidebar');
+        var overlay = document.getElementById('cartOverlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      });
       return;
     }
 
-    container.innerHTML = list.map(function(productId) {
-      var product = getProductById(productId);
-      if (!product) return '';
-
-      var currentPrice = product.salePrice || product.price;
-      return '<div class="wishlist-item" data-product-id="' + productId + '">' +
-        '<div class="wishlist-item-image" aria-hidden="true">' +
-          '<img src="' + product.image + '" alt="' + escapeHtml(product.name) + '">' +
-        '</div>' +
-        '<div class="wishlist-item-details">' +
-          '<div class="wishlist-item-name">' + escapeHtml(product.name) + '</div>' +
-          '<div class="wishlist-item-price" style="color:var(--neon-blue);">' + formatCurrency(currentPrice) + '</div>' +
-        '</div>' +
-        '<div class="wishlist-item-actions">' +
-          '<button class="btn btn-primary btn-sm" onclick="window.wishlist.moveToCart(\'' + productId + '\')">Move to Cart</button>' +
-          '<button class="btn btn-ghost btn-sm" onclick="window.wishlist.removeFromWishlist(\'' + productId + '\')">Remove</button>' +
+    container.innerHTML = list.map(function (id) {
+      var p = window.getProductById ? window.getProductById(id) : null;
+      if (!p) return '';
+      var price = p.salePrice || p.price;
+      return '<div class="cart-item-card" data-id="' + p.id + '">' +
+        '<div class="cart-item-img"><img src="' + esc(p.image) + '" alt="' + esc(p.name) + '" loading="lazy"></div>' +
+        '<div class="cart-item-info">' +
+          '<div class="cart-item-name">' + esc(p.name) + '</div>' +
+          '<div class="cart-item-price">' + fmt(price) + '</div>' +
+          '<div style="display:flex;gap:6px;margin-top:8px;">' +
+            '<button class="btn btn-primary btn-sm wl-add-cart" data-id="' + p.id + '">Add to Cart</button>' +
+            '<button class="btn btn-ghost btn-sm wl-remove" data-id="' + p.id + '" style="color:var(--text-muted);">Remove</button>' +
+          '</div>' +
         '</div>' +
       '</div>';
     }).join('');
+
+    container.querySelectorAll('.wl-add-cart').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = this.dataset.id;
+        if (window.cart) window.cart.addToCart(id);
+      });
+    });
+
+    container.querySelectorAll('.wl-remove').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = this.dataset.id;
+        if (window.storage) window.storage.toggleWishlist(id);
+        renderWishlist();
+        updateBadge();
+        // Update card button state
+        var cardBtn = document.querySelector('.wishlist-toggle[data-id="' + id + '"]');
+        if (cardBtn) {
+          cardBtn.classList.remove('active');
+          var path = cardBtn.querySelector('path');
+          if (path) path.setAttribute('fill', 'none');
+        }
+      });
+    });
   }
 
-  function moveToCart(productId) {
-    if (window.cart && window.cart.addToCart) {
-      window.cart.addToCart(productId);
-      removeFromWishlist(productId);
-      showToast('Moved to cart', 'success');
-    } else {
-      showToast('Cart not available', 'error');
-    }
-  }
-
-  // ---- Initialize on load ----
-
-  function init() {
-    if (document.getElementById('wishlistGrid')) {
-      renderWishlist();
-    }
-    updateWishlistBadge();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-
-  // ---- Public API ----
+  updateBadge();
 
   window.wishlist = {
-    getWishlist: getWishlist,
-    addToWishlist: addToWishlist,
-    removeFromWishlist: removeFromWishlist,
-    isInWishlist: isInWishlist,
-    toggle: toggle,
-    getCount: getCount,
-    clearWishlist: clearWishlist,
-    moveToCart: moveToCart,
-    renderWishlist: renderWishlist
+    renderWishlist: renderWishlist,
+    updateBadge:    updateBadge
   };
 
 })();

@@ -1,191 +1,939 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
-
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Dragon-Tech - Premium curated technology products">
-  <title>Dragon-Tech - Premium Tech Store</title>
+  <meta name="description" content="Dragon-Tech — Premium curated technology. Next-gen devices, earbuds, laptops & accessories.">
+  <meta name="theme-color" content="#00a8ff">
+  <title>Dragon-Tech | Premium Tech Store</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.json">
-
   <link rel="stylesheet" href="css/main.css">
 </head>
-
 <body>
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="container nav-container">
-      <a href="index.html" class="logo">
-        <span>Dragon</span><span class="logo-accent">-Tech</span>
+
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- PS5 Canvas Particle System -->
+  <canvas id="psCanvas"></canvas>
+
+  <!-- Atmospheric Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Scan Lines (subtle aesthetic effect) -->
+  <div class="scan-lines"></div>
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <!-- Logo -->
+      <a href="index.html" class="logo" aria-label="Dragon-Tech Home">
+        <div class="logo-mark">D</div>
+        <div class="logo-name">DRAGON<span class="logo-accent">-TECH</span></div>
       </a>
 
-      <div class="nav-actions">
-        <select id="currencySelector" class="nav-select" aria-label="Currency">
+      <!-- Nav Links -->
+      <div class="nav-links" role="menubar">
+        <a href="#products" class="nav-link active" role="menuitem">Products</a>
+        <a href="#newsletter" class="nav-link" role="menuitem">Deals</a>
+        <a href="pages/login.html" class="nav-link" role="menuitem" id="navAuthLink">Sign In</a>
+        <a href="pages/dashboard.html" class="nav-link" role="menuitem" id="navDashLink" style="display:none">Dashboard</a>
+      </div>
+
+      <!-- Controls -->
+      <div class="nav-controls">
+        <!-- Currency -->
+        <select id="currencySelector" class="nav-select" aria-label="Select currency">
           <option value="USD">USD $</option>
-          <option value="EUR">EUR</option>
-          <option value="GBP">GBP</option>
+          <option value="GBP">GBP £</option>
+          <option value="EUR">EUR €</option>
+          <option value="JPY">JPY ¥</option>
         </select>
 
-        <button class="nav-btn cart-btn" id="cartBtn" aria-label="Shopping cart">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <!-- Wishlist -->
+        <button class="nav-icon-btn" id="wishlistBtn" aria-label="Wishlist" title="Your Wishlist">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          <span class="nav-badge" id="wishlistBadge">0</span>
+        </button>
+
+        <!-- Cart -->
+        <button class="nav-icon-btn cart-btn" id="cartBtn" aria-label="Shopping cart" title="Your Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
           </svg>
-          <span class="cart-badge" id="cartBadge" style="display:none">0</span>
+          <span class="nav-badge" id="cartBadge">0</span>
         </button>
       </div>
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <header class="hero">
-    <div class="container hero-content">
-      <h1 class="hero-title">
-        <span class="gradient">Premium Tech</span><br>
-        For Everyone
-      </h1>
-      <p class="hero-subtitle">Discover our curated collection of premium technology products at unbeatable prices.</p>
-      <div class="hero-actions">
-        <a href="#products" class="btn btn-primary">Shop Now</a>
-        <a href="#newsletter" class="btn btn-secondary">Get Updates</a>
+  <!-- ==================== HERO ==================== -->
+  <header class="hero" role="banner">
+    <div class="hero-content">
+      <!-- Eyebrow -->
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        New Collection 2026
       </div>
-      <div class="hero-trust">
-        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Free Shipping</span>
-        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="22" height="14" rx="2"/><path d="M1 10h22"/></svg> Secure Payment</span>
-        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 12a9 9 0 0 0 9 9M3 12a9 9 0 0 1 9-9"/></svg> 30-Day Returns</span>
+
+      <!-- Title -->
+      <h1 class="hero-title">
+        <span class="hero-title-line1">Next-Gen Tech</span>
+        <span class="hero-title-line2"><span class="text-gradient">Redefined</span></span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="hero-sub">Premium devices and accessories for professionals who demand performance, reliability, and sleek design.</p>
+
+      <!-- Actions -->
+      <div class="hero-actions">
+        <a href="#products" class="btn btn-primary btn-lg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+          Shop Now
+        </a>
+        <a href="pages/login.html" class="btn btn-outline btn-lg">Create Account</a>
+      </div>
+
+      <!-- Stats -->
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-value">20+</div>
+          <div class="hero-stat-label">Products</div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">4.8★</div>
+          <div class="hero-stat-label">Average Rating</div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">30-Day</div>
+          <div class="hero-stat-label">Free Returns</div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">100%</div>
+          <div class="hero-stat-label">Secure</div>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- Trust Bar -->
-  <section class="trust-bar">
-    <div class="container">
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>Secure Checkout</span>
+  <!-- ==================== FEATURES STRIP ==================== -->
+  <section class="features-strip" aria-label="Store features">
+    <div class="features-strip-inner">
+      <div class="feature-item">
+        <div class="feature-icon feature-icon-blue">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3m-6 13h6m-5-7h12a2 2 0 0 1 0 4v4H7v-4a2 2 0 0 1 2-2z"/>
+          </svg>
+        </div>
+        <div class="feature-title">Express Shipping</div>
+        <div class="feature-desc">Free on orders over $50</div>
       </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="22" height="14" rx="2"/><path d="M1 10h22"/></svg>
-        <span>Fast Shipping</span>
+      <div class="feature-item">
+        <div class="feature-icon feature-icon-purple">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="feature-title">Secure Checkout</div>
+        <div class="feature-desc">End-to-end encryption</div>
       </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-        <span>Quality Guaranteed</span>
+      <div class="feature-item">
+        <div class="feature-icon feature-icon-cyan">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9"/>
+          </svg>
+        </div>
+        <div class="feature-title">30-Day Returns</div>
+        <div class="feature-desc">Hassle-free policy</div>
       </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/><path d="M9 12a3 3 0 1 0 6 0"/></svg>
-        <span>24/7 Support</span>
+      <div class="feature-item">
+        <div class="feature-icon feature-icon-warm">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.17 3.24 2 2 0 0 1 3.13 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16z"/>
+          </svg>
+        </div>
+        <div class="feature-title">24/7 Support</div>
+        <div class="feature-desc">Always here to help</div>
       </div>
     </div>
   </section>
 
-  <!-- Products Section -->
-  <main id="products" class="products-section">
+  <!-- ==================== PRODUCTS ==================== -->
+  <main id="main-content" class="products-section">
     <div class="container">
-      <h2 class="section-title">Featured Products</h2>
+      <!-- Section Header -->
+      <div class="section-header">
+        <p class="section-eyebrow">Our Collection</p>
+        <h2 class="section-title">Featured Products</h2>
+        <p class="section-sub">Hand-picked premium technology products for the modern professional.</p>
+      </div>
+
+      <!-- Category Tabs -->
+      <div class="category-tabs" role="tablist" aria-label="Product categories">
+        <button class="cat-tab active" data-category="all" role="tab" aria-selected="true">All</button>
+        <button class="cat-tab" data-category="audio" role="tab" aria-selected="false">🎧 Audio</button>
+        <button class="cat-tab" data-category="wearable" role="tab" aria-selected="false">⌚ Wearables</button>
+        <button class="cat-tab" data-category="computers" role="tab" aria-selected="false">💻 Computers</button>
+        <button class="cat-tab" data-category="accessories" role="tab" aria-selected="false">🖱️ Accessories</button>
+        <button class="cat-tab" data-category="bundles" role="tab" aria-selected="false">📦 Bundles</button>
+      </div>
 
       <!-- Discovery Controls -->
       <div class="discovery-controls">
         <div class="search-wrapper">
-          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input type="text" id="searchInput" class="search-input" placeholder="Search products...">
+          <input type="text" id="searchInput" class="search-input" placeholder="Search products..." aria-label="Search products" autocomplete="off">
+          <div class="search-autocomplete" id="searchAutocomplete" role="listbox" aria-label="Search suggestions"></div>
         </div>
-        <div class="filter-wrapper">
-          <select id="categoryFilter">
-            <option value="all">All Categories</option>
-            <option value="audio">Audio</option>
-            <option value="wearable">Wearables</option>
-            <option value="computers">Computers</option>
-            <option value="accessories">Accessories</option>
-            <option value="bundles">Bundles</option>
-          </select>
-        </div>
-        <div class="filter-wrapper">
-          <select id="sortFilter">
-            <option value="default">Sort: Featured</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="rating">Top Rated</option>
-          </select>
-        </div>
+        <select id="sortFilter" class="filter-select" aria-label="Sort products">
+          <option value="default">Sort: Featured</option>
+          <option value="price-low">Price: Low → High</option>
+          <option value="price-high">Price: High → Low</option>
+          <option value="rating">Top Rated</option>
+          <option value="discount">Biggest Discount</option>
+        </select>
+        <select id="stockFilter" class="filter-select" aria-label="Stock filter">
+          <option value="all">All Items</option>
+          <option value="in-stock">In Stock Only</option>
+          <option value="sale">On Sale</option>
+        </select>
       </div>
 
-      <div class="products-grid" id="productsGrid">
-        <!-- Products will be rendered here by JavaScript -->
+      <!-- Products Grid -->
+      <div class="products-grid" id="productsGrid" role="list" aria-label="Product catalog">
+        <!-- Rendered by JS -->
       </div>
     </div>
   </main>
 
-  <!-- Newsletter -->
-  <section id="newsletter" class="newsletter-section">
-    <div class="container newsletter-content">
-      <div class="newsletter-text">
-        <h3>Stay Updated</h3>
-        <p>Get notified about new products and exclusive deals.</p>
+  <!-- ==================== RECENTLY VIEWED ==================== -->
+  <section class="recently-viewed-section" id="recentlyViewedSection" style="display:none;">
+    <div class="container">
+      <div class="section-header" style="text-align:left; margin-bottom:20px;">
+        <p class="section-eyebrow">Continue Browsing</p>
+        <h2 class="section-title" style="font-size:1.4rem;">Recently Viewed</h2>
       </div>
-      <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thanks for subscribing!');">
-        <input type="email" class="newsletter-input" placeholder="your@email.com" required>
-        <button type="submit" class="btn btn-primary">Subscribe</button>
-      </form>
+      <div class="scroll-row" id="recentlyViewedRow"></div>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container footer-content">
-      <div class="footer-logo">
-        <span class="logo"><span>Dragon</span><span class="logo-accent">-Tech</span></span>
+  <!-- ==================== NEWSLETTER ==================== -->
+  <section id="newsletter" class="newsletter-section">
+    <div class="container">
+      <div class="newsletter-card glass">
+        <p class="section-eyebrow">Stay Ahead</p>
+        <h2 class="newsletter-title">Get Exclusive Deals</h2>
+        <p class="newsletter-sub">Subscribe for early access to new products, flash sales, and members-only discounts.</p>
+        <form class="newsletter-form" id="newsletterForm" novalidate>
+          <input type="email" id="newsletterEmail" class="email-input" placeholder="your@email.com" required aria-label="Email address">
+          <button type="submit" class="btn btn-primary">Subscribe Free</button>
+        </form>
       </div>
-      <div class="footer-links">
-        <a href="#">Home</a>
-        <a href="#products">Products</a>
-        <a href="#newsletter">Newsletter</a>
-        <a href="#">Contact</a>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Brand -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <div class="logo-mark" style="width:32px;height:32px;font-size:0.9rem;">D</div>
+            <div class="footer-brand-name">DRAGON-TECH</div>
+          </div>
+          <p class="footer-brand-desc">Premium curated technology for professionals who demand performance and refined design.</p>
+          <div class="footer-social">
+            <a href="#" class="social-btn" aria-label="Twitter">𝕏</a>
+            <a href="#" class="social-btn" aria-label="Instagram">📷</a>
+            <a href="#" class="social-btn" aria-label="Discord">💬</a>
+          </div>
+        </div>
+
+        <!-- Shop -->
+        <div>
+          <h3 class="footer-col-title">Shop</h3>
+          <div class="footer-links">
+            <a href="#products" class="footer-link">All Products</a>
+            <a href="#" class="footer-link" onclick="document.querySelector('[data-category=audio]').click()">Audio</a>
+            <a href="#" class="footer-link" onclick="document.querySelector('[data-category=computers]').click()">Computers</a>
+            <a href="#" class="footer-link" onclick="document.querySelector('[data-category=bundles]').click()">Bundles</a>
+          </div>
+        </div>
+
+        <!-- Account -->
+        <div>
+          <h3 class="footer-col-title">Account</h3>
+          <div class="footer-links">
+            <a href="pages/login.html" class="footer-link">Sign In</a>
+            <a href="pages/dashboard.html" class="footer-link">Dashboard</a>
+            <a href="pages/admin.html" class="footer-link">Admin</a>
+          </div>
+        </div>
+
+        <!-- Preferences -->
+        <div>
+          <h3 class="footer-col-title">Preferences</h3>
+          <div class="footer-selectors">
+            <select id="footerLanguage" class="footer-select" aria-label="Language">
+              <option value="en">🇬🇧 English</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="de">🇩🇪 Deutsch</option>
+            </select>
+            <select id="footerCurrency" class="footer-select" aria-label="Currency">
+              <option value="USD">$ US Dollar</option>
+              <option value="GBP">£ British Pound</option>
+              <option value="EUR">€ Euro</option>
+              <option value="JPY">¥ Japanese Yen</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <p class="footer-text">&copy; 2026 Dragon-Tech. All rights reserved.</p>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="footer-bottom-inner">
+          <p class="footer-copyright">© 2026 Dragon-Tech. All rights reserved. Fully local — no data leaves your device.</p>
+          <div class="footer-badges">
+            <span class="footer-badge">100% LOCAL</span>
+            <span class="footer-badge">SECURE</span>
+            <span class="footer-badge">PWA</span>
+          </div>
+        </div>
+      </div>
     </div>
   </footer>
 
-  <!-- Cart Sidebar -->
-  <aside class="cart-sidebar" id="cartSidebar" aria-label="Shopping cart">
-    <div class="cart-header">
-      <h2>Your Cart</h2>
-      <button class="close-btn" id="closeCart">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <!-- ==================== CART SIDEBAR ==================== -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-sidebar" id="cartSidebar" aria-label="Shopping cart" aria-modal="true" role="dialog">
+    <div class="cart-head">
+      <h2 class="cart-title">Your Cart</h2>
+      <button class="cart-close" id="closeCart" aria-label="Close cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
     </div>
-    <div class="cart-items" id="cartItems">
-      <p class="empty-cart">Your cart is empty</p>
-    </div>
-    <div class="cart-footer">
-      <div class="cart-total">
-        <span>Total</span>
-        <span id="cartTotal">$0.00</span>
+
+    <div class="cart-items-wrap" id="cartItems">
+      <div class="cart-empty-state" id="cartEmptyState">
+        <div class="cart-empty-icon">🛒</div>
+        <div class="cart-empty-text">Your cart is empty</div>
+        <a href="#products" class="btn btn-outline btn-sm" onclick="document.getElementById('closeCart').click()">Browse Products</a>
       </div>
-      <button class="btn btn-primary btn-block" id="checkoutBtn" disabled>Checkout</button>
+    </div>
+
+    <div class="cart-foot" id="cartFoot" style="display:none;">
+      <!-- Coupon -->
+      <div class="coupon-row">
+        <input type="text" id="couponInput" class="coupon-input" placeholder="Promo code..." aria-label="Coupon code">
+        <button class="apply-coupon" id="applyCoupon">Apply</button>
+      </div>
+      <div id="couponMessage" style="font-size:0.78rem;margin-bottom:10px;"></div>
+
+      <!-- Summary -->
+      <div class="cart-summary-row">
+        <span class="cart-summary-label">Subtotal</span>
+        <span class="cart-summary-value" id="cartSubtotal">$0.00</span>
+      </div>
+      <div class="cart-summary-row" id="discountRow" style="display:none;">
+        <span class="cart-summary-label">Discount</span>
+        <span class="cart-summary-value discount" id="cartDiscount">-$0.00</span>
+      </div>
+      <div class="cart-summary-row">
+        <span class="cart-summary-label">Shipping</span>
+        <span class="cart-summary-value" id="cartShipping">Free</span>
+      </div>
+
+      <div class="cart-total-row">
+        <span class="cart-total-label">Total</span>
+        <span class="cart-total-value" id="cartTotal">$0.00</span>
+      </div>
+
+      <button class="btn btn-primary btn-block" id="checkoutBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+        Proceed to Checkout
+      </button>
     </div>
   </aside>
-  <div class="cart-overlay" id="cartOverlay"></div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
+  <!-- ==================== WISHLIST SIDEBAR ==================== -->
+  <aside class="wishlist-sidebar" id="wishlistSidebar" aria-label="Wishlist" aria-modal="true" role="dialog">
+    <div class="cart-head">
+      <h2 class="cart-title">❤ Wishlist</h2>
+      <button class="cart-close" id="closeWishlist" aria-label="Close wishlist">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="cart-items-wrap" id="wishlistItems">
+      <div class="cart-empty-state">
+        <div class="cart-empty-icon">💙</div>
+        <div class="cart-empty-text">No items in wishlist</div>
+      </div>
+    </div>
+  </aside>
 
-  <!-- Scripts -->
+  <!-- ==================== PRODUCT MODAL ==================== -->
+  <div id="productModal"></div>
+
+  <!-- ==================== TOAST STACK ==================== -->
+  <div class="toast-stack" id="toastStack" role="region" aria-label="Notifications" aria-live="polite">
+    <!-- Toasts appended here by JS -->
+  </div>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
+      <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  </button>
+
+  <!-- ==================== SCRIPTS ==================== -->
   <script src="js/utils.js"></script>
-  <script src="js/theme.js"></script>
   <script src="js/storage-service.js"></script>
-  <script src="js/currency.js"></script>
   <script src="js/products.js"></script>
   <script src="js/cart.js"></script>
-  <script src="js/ui.js"></script>
-</body>
+  <script src="js/wishlist.js"></script>
+  <script src="js/product-modal.js"></script>
+  <script src="js/reviews.js"></script>
+  <script src="js/newsletter.js"></script>
+  <script src="js/currency.js"></script>
+  <script src="js/i18n.js"></script>
 
+  <script>
+  // ============================================================
+  //  MAIN SITE ORCHESTRATION
+  // ============================================================
+  (function() {
+    'use strict';
+
+    // ---- PS5 Particle System ----
+    function initPS5Particles() {
+      var canvas = document.getElementById('psCanvas');
+      if (!canvas) return;
+      
+      // Optimization: Check for reduced motion
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        canvas.style.display = 'none';
+        return;
+      }
+
+      var ctx = canvas.getContext('2d', { alpha: true });
+      var particles = [];
+      var W, H;
+      var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+      var isVisible = true;
+
+      // Optimization: Stop animation when tab is not visible
+      document.addEventListener('visibilitychange', function() {
+        isVisible = !document.hidden;
+      });
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+
+      resize();
+      window.addEventListener('resize', window.utils ? window.utils.debounce(resize, 200) : resize);
+
+      // PS5-style particle types: floating triangles, dots, lines
+      var PALETTE_DARK = ['#00a8ff', '#7b2fff', '#00ffd4', '#ffffff'];
+      var PALETTE_LIGHT = ['#0070d1', '#5020aa', '#0099aa'];
+
+      function createParticle() {
+        var colors = isDark ? PALETTE_DARK : PALETTE_LIGHT;
+        var type = Math.random() < 0.6 ? 'dot' : Math.random() < 0.5 ? 'triangle' : 'ring';
+        return {
+          x: Math.random() * W,
+          y: H + 40,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: -(Math.random() * 0.6 + 0.2),
+          size: Math.random() * (type === 'ring' ? 10 : 4) + 1,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          opacity: Math.random() * 0.4 + 0.1,
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.01,
+          type: type,
+          life: 0,
+          maxLife: Math.random() * 400 + 200
+        };
+      }
+
+      // Optimization: Scale particle count based on device performance (mobile/desktop)
+      var maxParticles = window.innerWidth < 768 ? 30 : 60;
+
+      for (var i = 0; i < maxParticles; i++) {
+        var p = createParticle();
+        p.y = Math.random() * H;
+        p.life = Math.random() * p.maxLife;
+        particles.push(p);
+      }
+
+      function drawParticle(p) {
+        var alpha = p.opacity * Math.min(1, p.life / 30) * Math.min(1, (p.maxLife - p.life) / 30);
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = p.color;
+        ctx.fillStyle = p.color;
+        ctx.lineWidth = 1;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+
+        switch (p.type) {
+          case 'dot':
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            // Glow
+            var g = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size * 3);
+            g.addColorStop(0, p.color + '88');
+            g.addColorStop(1, 'transparent');
+            ctx.globalAlpha = alpha * 0.4;
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size * 3, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+
+          case 'triangle':
+            var s = p.size * 2.5;
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            ctx.moveTo(0, -s);
+            ctx.lineTo(s * 0.866, s * 0.5);
+            ctx.lineTo(-s * 0.866, s * 0.5);
+            ctx.closePath();
+            ctx.fillStyle = 'transparent';
+            ctx.strokeStyle = p.color;
+            ctx.stroke();
+            break;
+
+          case 'ring':
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size, 0, Math.PI * 1.5);
+            ctx.strokeStyle = p.color;
+            ctx.stroke();
+            break;
+        }
+
+        ctx.restore();
+        ctx.globalAlpha = 1;
+      }
+
+      function animate() {
+        if (isVisible) {
+          ctx.clearRect(0, 0, W, H);
+
+          for (var i = particles.length - 1; i >= 0; i--) {
+            var p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.rotation += p.rotationSpeed;
+            p.life++;
+
+            drawParticle(p);
+
+            if (p.life > p.maxLife || p.y < -50) {
+              particles.splice(i, 1);
+              particles.push(createParticle());
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+
+      // Update theme
+      window.addEventListener('themechange', function(e) {
+        isDark = e.detail !== 'light';
+      });
+    }
+
+    // ---- Navbar scroll effect ----
+    function initNavbar() {
+      var navbar = document.getElementById('navbar');
+      if (!navbar) return;
+      window.addEventListener('scroll', function() {
+        navbar.classList.toggle('scrolled', window.scrollY > 60);
+      }, { passive: true });
+    }
+
+    // ---- Theme Toggle ----
+    function initTheme() {
+      var saved = localStorage.getItem('dragon_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+
+      var btn = document.getElementById('themeToggle');
+      if (!btn) return;
+
+      btn.addEventListener('click', function() {
+        var curr = document.documentElement.getAttribute('data-theme');
+        var next = curr === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('dragon_theme', next);
+        window.dispatchEvent(new CustomEvent('themechange', { detail: next }));
+
+        // Update icon
+        var icon = document.getElementById('themeIcon');
+        if (icon) {
+          if (next === 'light') {
+            icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+          } else {
+            icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+          }
+        }
+      });
+    }
+
+    // ---- Auth State ----
+    function updateAuthNav() {
+      var user = window.storage ? window.storage.getCurrentUser() : null;
+      var authLink = document.getElementById('navAuthLink');
+      var dashLink = document.getElementById('navDashLink');
+      if (!authLink || !dashLink) return;
+      if (user) {
+        authLink.style.display = 'none';
+        dashLink.style.display = '';
+        dashLink.textContent = user.name ? user.name.split(' ')[0] : 'Dashboard';
+      } else {
+        authLink.style.display = '';
+        dashLink.style.display = 'none';
+      }
+    }
+
+    // ---- Category Tabs ----
+    function initCategoryTabs() {
+      var tabs = document.querySelectorAll('.cat-tab');
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          tabs.forEach(function(t) { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+          this.classList.add('active');
+          this.setAttribute('aria-selected', 'true');
+
+          var cat = this.getAttribute('data-category');
+          // update the filter and re-render
+          var categoryFilter = { value: cat };
+          if (window.renderProducts) {
+            window.renderProducts({ category: cat });
+          }
+          // Scroll to products
+          document.getElementById('main-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+
+    // ---- Smart Search Autocomplete ----
+    function initSearchAutocomplete() {
+      var input = document.getElementById('searchInput');
+      var box = document.getElementById('searchAutocomplete');
+      if (!input || !box) return;
+
+      var debounceTimer;
+
+      input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        var q = this.value.trim();
+        if (q.length < 2) { box.classList.remove('active'); return; }
+
+        debounceTimer = setTimeout(function() {
+          if (!window.PRODUCTS) return;
+          var matches = window.PRODUCTS.filter(function(p) {
+            return p.name.toLowerCase().includes(q.toLowerCase()) ||
+                   p.category.toLowerCase().includes(q.toLowerCase()) ||
+                   p.description.toLowerCase().includes(q.toLowerCase());
+          }).slice(0, 6);
+
+          if (!matches.length) { box.classList.remove('active'); return; }
+
+          var formatPrice = function(price) {
+            if (window.currency && window.currency.formatPrice) return window.currency.formatPrice(price);
+            return '$' + price.toFixed(2);
+          };
+
+          var escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          var regex = new RegExp('(' + escaped + ')', 'gi');
+
+          box.innerHTML = matches.map(function(p) {
+            var price = p.salePrice || p.price;
+            var highlighted = p.name.replace(regex, '<mark>$1</mark>');
+            return '<div class="autocomplete-item" data-id="' + p.id + '" role="option" tabindex="-1">' +
+              '<div class="autocomplete-thumb"><img src="' + p.image + '" alt="' + p.name + '"></div>' +
+              '<div><div class="autocomplete-name">' + highlighted + '</div>' +
+              '<div class="autocomplete-cat">' + p.category + '</div></div>' +
+              '<div class="autocomplete-price">' + formatPrice(price) + '</div>' +
+            '</div>';
+          }).join('');
+
+          box.querySelectorAll('.autocomplete-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+              var id = this.getAttribute('data-id');
+              box.classList.remove('active');
+              input.value = '';
+              if (window.openProductModal) window.openProductModal(id);
+            });
+            item.addEventListener('keydown', function(e) {
+              if (e.key === 'Enter') this.click();
+            });
+          });
+
+          box.classList.add('active');
+        }, 200);
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !box.contains(e.target)) {
+          box.classList.remove('active');
+        }
+      });
+
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') box.classList.remove('active');
+      });
+    }
+
+    // ---- Cart Sidebar ----
+    function initCartSidebar() {
+      var cartBtn = document.getElementById('cartBtn');
+      var closeCart = document.getElementById('closeCart');
+      var overlay = document.getElementById('cartOverlay');
+      var sidebar = document.getElementById('cartSidebar');
+
+      function openCart() {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeCartFn() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      if (cartBtn) cartBtn.addEventListener('click', openCart);
+      if (closeCart) closeCart.addEventListener('click', closeCartFn);
+      if (overlay) overlay.addEventListener('click', closeCartFn);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar && sidebar.classList.contains('open')) closeCartFn();
+      });
+
+      // Checkout
+      var checkoutBtn = document.getElementById('checkoutBtn');
+      if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', function() {
+          if (window.cart && window.cart.processCheckout) {
+            window.cart.processCheckout();
+          }
+        });
+      }
+
+      // Coupon
+      var applyBtn = document.getElementById('applyCoupon');
+      if (applyBtn) {
+        applyBtn.addEventListener('click', function() {
+          var code = (document.getElementById('couponInput').value || '').trim().toUpperCase();
+          applyCoupon(code);
+        });
+      }
+    }
+
+    // Coupon system
+    var COUPONS = {
+      'DRAGON20': { type: 'percent', value: 20, label: '20% off' },
+      'FIRST10': { type: 'percent', value: 10, label: '10% off your first order' },
+      'TECH5': { type: 'fixed', value: 5, label: '$5 off' },
+      'SAVE15': { type: 'percent', value: 15, label: '15% off' }
+    };
+
+    var activeCoupon = null;
+
+    function applyCoupon(code) {
+      var msgEl = document.getElementById('couponMessage');
+      if (!code) {
+        activeCoupon = null;
+        if (msgEl) msgEl.innerHTML = '';
+        if (window.cart && window.cart.updateCartUI) window.cart.updateCartUI();
+        return;
+      }
+
+      var coupon = COUPONS[code];
+      if (!coupon) {
+        if (msgEl) msgEl.innerHTML = '<span style="color:#ff6666;">Invalid code</span>';
+        activeCoupon = null;
+      } else {
+        activeCoupon = { code: code, ...coupon };
+        if (msgEl) msgEl.innerHTML = '<span style="color:#00c97b;">✓ ' + coupon.label + ' applied!</span>';
+        if (window.utils) window.utils.showToast('Coupon ' + code + ' applied — ' + coupon.label + '!', 'success');
+      }
+
+      if (window.cart && window.cart.updateCartUI) window.cart.updateCartUI();
+    }
+
+    window.getActiveCoupon = function() { return activeCoupon; };
+
+    // ---- Wishlist Sidebar ----
+    function initWishlistSidebar() {
+      var wishlistBtn = document.getElementById('wishlistBtn');
+      var closeWl = document.getElementById('closeWishlist');
+      var sidebar = document.getElementById('wishlistSidebar');
+      var overlay = document.getElementById('cartOverlay');
+
+      function openWishlist() {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        if (window.wishlist && window.wishlist.renderWishlist) window.wishlist.renderWishlist();
+      }
+
+      function closeWishlistFn() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      if (wishlistBtn) wishlistBtn.addEventListener('click', openWishlist);
+      if (closeWl) closeWl.addEventListener('click', closeWishlistFn);
+    }
+
+    // ---- Recently Viewed ----
+    function renderRecentlyViewed() {
+      var viewed = [];
+      try { viewed = JSON.parse(localStorage.getItem('dragon_recently_viewed') || '[]'); } catch(e) {}
+      if (!viewed.length || !window.PRODUCTS) return;
+
+      var section = document.getElementById('recentlyViewedSection');
+      var row = document.getElementById('recentlyViewedRow');
+      if (!section || !row) return;
+
+      var html = '';
+      viewed.slice(0, 8).forEach(function(id) {
+        var p = window.PRODUCTS.find(function(x) { return x.id === id; });
+        if (!p) return;
+        var price = p.salePrice || p.price;
+        var fmt = window.currency && window.currency.formatPrice ? window.currency.formatPrice(price) : '$' + price.toFixed(2);
+        html += '<div class="scroll-card" data-id="' + p.id + '">' +
+          '<div class="scroll-card-img"><img src="' + p.image + '" alt="' + p.name + '" loading="lazy"></div>' +
+          '<div class="scroll-card-name">' + p.name + '</div>' +
+          '<div class="scroll-card-price">' + fmt + '</div>' +
+        '</div>';
+      });
+
+      row.innerHTML = html;
+      section.style.display = '';
+
+      row.querySelectorAll('.scroll-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          if (window.openProductModal) window.openProductModal(this.dataset.id);
+        });
+      });
+    }
+
+    // ---- Currency & Language footer selectors ----
+    function initFooterPrefs() {
+      var langSel = document.getElementById('footerLanguage');
+      var currSel = document.getElementById('footerCurrency');
+      var currNav = document.getElementById('currencySelector');
+
+      if (langSel) {
+        langSel.value = localStorage.getItem('dragon_language') || 'en';
+        langSel.addEventListener('change', function() {
+          if (window.i18n) window.i18n.setLanguage(this.value);
+          localStorage.setItem('dragon_language', this.value);
+        });
+      }
+
+      function syncCurrencySelects(val) {
+        if (currSel) currSel.value = val;
+        if (currNav) currNav.value = val;
+      }
+
+      if (currSel) {
+        currSel.value = localStorage.getItem('dragon_currency') || 'USD';
+        currSel.addEventListener('change', function() {
+          if (window.currency) window.currency.setCurrency(this.value);
+          localStorage.setItem('dragon_currency', this.value);
+          syncCurrencySelects(this.value);
+        });
+      }
+
+      if (currNav) {
+        currNav.value = localStorage.getItem('dragon_currency') || 'USD';
+        currNav.addEventListener('change', function() {
+          if (window.currency) window.currency.setCurrency(this.value);
+          localStorage.setItem('dragon_currency', this.value);
+          syncCurrencySelects(this.value);
+        });
+      }
+    }
+
+    // ---- Card hover glow effect ----
+    function initCardGlow() {
+      document.addEventListener('mousemove', function(e) {
+        var card = e.target.closest('.product-card');
+        if (!card) return;
+        var rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+        card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+      });
+    }
+
+    // ---- Auth state listener ----
+    window.addEventListener('auth-change', updateAuthNav);
+
+    // ---- INIT ----
+    document.addEventListener('DOMContentLoaded', function() {
+      initTheme();
+      initPS5Particles();
+      initNavbar();
+      initCartSidebar();
+      initWishlistSidebar();
+      initCategoryTabs();
+      initSearchAutocomplete();
+      initCardGlow();
+      initFooterPrefs();
+      updateAuthNav();
+
+      // Render recently viewed after products are loaded
+      setTimeout(renderRecentlyViewed, 500);
+
+      // Update recently viewed when modal closes
+      window.addEventListener('productModalClose', renderRecentlyViewed);
+    });
+
+  })();
+  </script>
+</body>
 </html>

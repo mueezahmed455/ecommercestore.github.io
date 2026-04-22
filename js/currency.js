@@ -1,180 +1,127 @@
 /**
- * Multi-Currency Price Display Module
- * Supports USD, EUR, GBP, JPY with hardcoded defaults overridable from Firestore.
+ * Dragon-Tech Multi-Currency Module — v2.0 (Local-Only)
+ * Live exchange rates from a public API with localStorage fallback.
+ * Exposes window.currency
  */
-(function() {
+(function () {
   'use strict';
 
-  var STORAGE_KEY = 'dragon_currency';
-  var DEFAULT_CURRENCY = 'USD';
+  var STORAGE_KEY = 'dt_currency';
+  var RATES_KEY   = 'dt_exchange_rates';
+  var DEFAULT     = 'USD';
 
   var CURRENCIES = {
-    USD: { symbol: '$', rate: 1 },
-    EUR: { symbol: '\u20AC', rate: 0.85 },
-    GBP: { symbol: '\u00A3', rate: 0.73 },
-    JPY: { symbol: '\u00A5', rate: 110 }
+    USD: { symbol: '$',  code: 'USD', name: 'US Dollar',        rate: 1      },
+    GBP: { symbol: '£',  code: 'GBP', name: 'British Pound',    rate: 0.79   },
+    EUR: { symbol: '€',  code: 'EUR', name: 'Euro',             rate: 0.92   },
+    JPY: { symbol: '¥',  code: 'JPY', name: 'Japanese Yen',     rate: 154.50 },
+    CAD: { symbol: 'C$', code: 'CAD', name: 'Canadian Dollar',  rate: 1.36   },
+    AUD: { symbol: 'A$', code: 'AUD', name: 'Australian Dollar',rate: 1.55   }
   };
 
-  var loadedRates = false;
-
-  // ---- Utilities ----
-
-  function getSelectedCurrency() {
-    try {
-      var stored = localStorage.getItem(STORAGE_KEY);
-      if (stored && CURRENCIES[stored]) return stored;
-    } catch (e) { /* storage unavailable */ }
-    return DEFAULT_CURRENCY;
-  }
-
-  function persistCurrency(code) {
-    try {
-      localStorage.setItem(STORAGE_KEY, code);
-    } catch (e) { /* storage unavailable */ }
-  }
-
-  /**
-   * Format a number according to currency conventions.
-   * JPY has no decimals; others use 2 decimal places.
-   */
-  function formatAmount(convertedAmount, code) {
-    var currency = CURRENCIES[code];
-    if (code === 'JPY') {
-      return currency.symbol + Math.round(convertedAmount).toLocaleString('en-US');
-    }
-    return currency.symbol + convertedAmount.toFixed(2);
-  }
-
-  /**
-   * Load exchange rates from Firestore settings/exchangeRates
-   * and merge them into CURRENCIES. Runs once.
-   */
-  async function loadRatesFromFirestore() {
-    if (loadedRates) return;
-    loadedRates = true;
-
-    if (!window.db || !window.db.firestore) return;
-
-    try {
-      var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-      var settingsRef = fbFirestore.doc(window.db.firestore, 'settings', 'exchangeRates');
-      var snap = await fbFirestore.getDoc(settingsRef);
-
-      if (snap.exists()) {
-        var data = snap.data();
-        var codes = ['USD', 'EUR', 'GBP', 'JPY'];
-        for (var i = 0; i < codes.length; i++) {
-          var code = codes[i];
-          if (data[code] !== undefined && !isNaN(data[code]) && data[code] > 0) {
-            CURRENCIES[code].rate = Number(data[code]);
-          }
+  // Attempt to fetch live rates from a free public API (no key needed)
+  function fetchLiveRates() {
+    return fetch('https://open.er-api.com/v6/latest/USD')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data && data.rates) {
+          Object.keys(CURRENCIES).forEach(function (code) {
+            if (data.rates[code]) CURRENCIES[code].rate = data.rates[code];
+          });
+          try {
+            localStorage.setItem(RATES_KEY, JSON.stringify({
+              rates: Object.fromEntries(Object.entries(CURRENCIES).map(function (e) { return [e[0], e[1].rate]; })),
+              ts: Date.now()
+            }));
+          } catch (e) {}
         }
-      }
-    } catch (error) {
-      console.warn('Failed to load exchange rates from Firestore, using defaults:', error);
-    }
+      })
+      .catch(function () {
+        // Load cached rates if network fails
+        try {
+          var cached = JSON.parse(localStorage.getItem(RATES_KEY) || 'null');
+          if (cached && cached.rates) {
+            Object.keys(cached.rates).forEach(function (c) {
+              if (CURRENCIES[c]) CURRENCIES[c].rate = cached.rates[c];
+            });
+          }
+        } catch (e) {}
+      });
   }
 
-  // ---- Public API ----
-
-  /**
-   * Convert a USD amount to the selected currency and format it.
-   * @param {number} amountInUSD - Price in USD
-   * @returns {string} Formatted price string
-   */
-  function formatPrice(amountInUSD) {
-    var code = getSelectedCurrency();
-    var currency = CURRENCIES[code];
-    var converted = amountInUSD * currency.rate;
-    return formatAmount(converted, code);
+  function getSelected() {
+    try {
+      var s = localStorage.getItem(STORAGE_KEY);
+      if (s && CURRENCIES[s]) return s;
+    } catch (e) {}
+    return DEFAULT;
   }
 
-  /**
-   * Set the active currency, persist it, and re-render all prices.
-   * @param {string} code - Currency code (USD, EUR, GBP, JPY)
-   */
+  function formatPrice(amountUSD) {
+    var code = getSelected();
+    var cur  = CURRENCIES[code];
+    var val  = amountUSD * cur.rate;
+    if (code === 'JPY') return cur.symbol + Math.round(val).toLocaleString('en-US');
+    return cur.symbol + val.toFixed(2);
+  }
+
   function setCurrency(code) {
     if (!CURRENCIES[code]) return;
-    persistCurrency(code);
-    renderPrices();
+    try { localStorage.setItem(STORAGE_KEY, code); } catch (e) {}
 
+    // Re-render all static price elements
+    document.querySelectorAll('.price-display[data-price-usd]').forEach(function (el) {
+      var usd = parseFloat(el.getAttribute('data-price-usd'));
+      if (!isNaN(usd)) el.textContent = formatPrice(usd);
+    });
+
+    // Sync all currency selectors on the page
+    document.querySelectorAll('.currency-sync').forEach(function (sel) {
+      sel.value = code;
+    });
+
+    // Refresh dynamic UIs
     if (window.cart && window.cart.updateCartUI) window.cart.updateCartUI();
+    if (window.renderProducts) window.renderProducts();
 
-    // Update selector dropdown if present
-    var selector = document.getElementById('currencySelector');
-    if (selector) selector.value = code;
+    window.dispatchEvent(new CustomEvent('currency-change', { detail: code }));
   }
 
-  /**
-   * Get the currently selected currency code.
-   * @returns {string}
-   */
-  function getCurrency() {
-    return getSelectedCurrency();
-  }
-
-  /**
-   * Get the current exchange rates object (for debugging/inspection).
-   * @returns {object}
-   */
-  function getRates() {
-    var result = {};
-    var codes = ['USD', 'EUR', 'GBP', 'JPY'];
-    for (var i = 0; i < codes.length; i++) {
-      result[codes[i]] = CURRENCIES[codes[i]].rate;
-    }
-    return result;
-  }
-
-  /**
-   * Re-render all elements with class "price-display".
-   * Each element must have a data-price-usd attribute
-   * containing the original USD price.
-   */
-  function renderPrices() {
-    var els = document.querySelectorAll('.price-display');
-    for (var i = 0; i < els.length; i++) {
-      var el = els[i];
-      var usdPrice = parseFloat(el.getAttribute('data-price-usd'));
-      if (!isNaN(usdPrice)) {
-        el.textContent = formatPrice(usdPrice);
-      }
-    }
-  }
-
-  // ---- Initialize ----
+  function getCurrency() { return getSelected(); }
 
   function init() {
-    var code = getSelectedCurrency();
+    var sel = document.querySelectorAll('.currency-sync');
+    sel.forEach(function (el) {
+      el.value = getSelected();
+      el.addEventListener('change', function () { setCurrency(this.value); });
+    });
 
-    // Set up selector listener
-    var selector = document.getElementById('currencySelector');
-    if (selector) {
-      selector.value = code;
-      selector.addEventListener('change', function() {
-        setCurrency(selector.value);
-      });
+    // Also wire any element with id="currencySelector" (navbar)
+    var navSel = document.getElementById('currencySelector');
+    if (navSel) {
+      navSel.classList.add('currency-sync');
+      navSel.value = getSelected();
+      navSel.addEventListener('change', function () { setCurrency(this.value); });
     }
 
-    // Load rates from Firestore, then render prices
-    loadRatesFromFirestore().then(function() {
-      renderPrices();
+    // Fetch live rates (non-blocking)
+    fetchLiveRates().then(function () {
+      document.querySelectorAll('.price-display[data-price-usd]').forEach(function (el) {
+        var usd = parseFloat(el.getAttribute('data-price-usd'));
+        if (!isNaN(usd)) el.textContent = formatPrice(usd);
+      });
     });
   }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  } else { init(); }
 
-  // Expose public API
   window.currency = {
     formatPrice: formatPrice,
     setCurrency: setCurrency,
     getCurrency: getCurrency,
-    getRates: getRates,
-    renderPrices: renderPrices
+    currencies:  CURRENCIES
   };
 
 })();

@@ -1,436 +1,1907 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Admin panel for Dragon-Tech - Manage users, orders, coupons, and site settings">
-  <title>Admin | Dragon-Tech</title>
-
+  <meta name="description" content="Dragon-Tech Admin Panel — manage orders, users, and products.">
+  <title>Admin Panel | Dragon-Tech</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Stylesheets -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/main.css">
-  <link rel="stylesheet" href="../css/glass.css">
-  <link rel="stylesheet" href="../css/animations.css">
-  <link rel="stylesheet" href="../css/accessibility.css">
-  <link rel="stylesheet" href="../css/light-theme.css">
-  <link rel="stylesheet" href="../css/admin.css">
-  <link rel="manifest" href="manifest.json">
+  <style>
+    body { padding-top: var(--nav-h); }
+
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0;
+      min-height: calc(100vh - var(--nav-h));
+      position: relative; z-index: 2;
+    }
+
+    /* Admin Sidebar */
+    .admin-sidebar {
+      background: var(--bg-elevated);
+      border-right: 1px solid var(--border-default);
+      padding: 24px 0;
+      position: sticky;
+      top: var(--nav-h); height: calc(100vh - var(--nav-h));
+      overflow-y: auto;
+    }
+
+    .admin-brand {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 16px;
+    }
+    .admin-brand-title {
+      font-family: var(--font-display);
+      font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--accent);
+    }
+    .admin-brand-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+    .admin-nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 20px;
+      font-size: 0.86rem; font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--t-fast);
+      border-left: 3px solid transparent;
+    }
+    .admin-nav-item:hover { color: var(--text-primary); background: var(--border-subtle); }
+    .admin-nav-item.active { color: var(--accent); background: rgba(0,168,255,0.06); border-left-color: var(--accent); }
+
+    .admin-nav-group-label {
+      padding: 16px 20px 6px;
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* AI Dropdown */
+    .admin-dropdown-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: all var(--t-fast);
+      color: var(--accent);
+    }
+    .admin-dropdown-trigger:hover {
+      background: rgba(0,168,255,0.1);
+    }
+    .dropdown-arrow {
+      transition: transform 0.2s ease;
+    }
+    .admin-dropdown-trigger:hover .dropdown-arrow,
+    .admin-dropdown-trigger.open .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+    .admin-dropdown-menu {
+      display: none;
+      flex-direction: column;
+      padding-bottom: 8px;
+    }
+    
+    /* Keep dropdown open when hovering on trigger or menu */
+    .admin-dropdown-trigger:hover + .admin-dropdown-menu,
+    .admin-dropdown-trigger.open + .admin-dropdown-menu,
+    .admin-dropdown-menu:hover {
+      display: flex;
+    }
+    
+    /* Hover zone to prevent dropdown closing when moving cursor */
+    .dropdown-hover-zone {
+      display: none;
+      height: 20px;
+      margin-top: -20px;
+      position: relative;
+      z-index: 10;
+    }
+    .admin-dropdown-trigger:hover + .admin-dropdown-menu + .dropdown-hover-zone,
+    .admin-dropdown-trigger.open + .admin-dropdown-menu + .dropdown-hover-zone {
+      display: block;
+    }
+    
+    .admin-dropdown-menu .admin-nav-item {
+      padding: 10px 20px 10px 36px;
+      font-size: 0.82rem;
+      border-left: none;
+      position: relative;
+    }
+    .admin-dropdown-menu .admin-nav-item::before {
+      content: "→";
+      position: absolute;
+      left: 16px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .admin-dropdown-menu .admin-nav-item:hover::before {
+      opacity: 1;
+    }
+    .admin-dropdown-menu .admin-nav-item:hover {
+      background: rgba(0,168,255,0.1);
+      color: var(--accent);
+    }
+
+    /* Responsive AI dropdown */
+    @media (max-width: 768px) {
+      .admin-dropdown-trigger {
+        display: flex;
+      }
+      .admin-dropdown-menu {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+      }
+      .dropdown-hover-zone {
+        display: none !important;
+      }
+    }
+
+    /* Panel Section */
+    .panel-section {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-top: 24px;
+    }
+    .panel-subtitle {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    /* Chart Placeholder */
+    .chart-placeholder {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 180px;
+      gap: 8px;
+      padding: 0 8px;
+    }
+    .chart-bar {
+      flex: 1;
+      background: var(--accent);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      min-height: 20px;
+    }
+    .chart-bar span {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .chart-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Scorecard */
+    .scorecard-product {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+    .scorecard-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .scorecard-img {
+      width: 48px;
+      height: 48px;
+    }
+    .scorecard-info h4 {
+      font-size: 1rem;
+      margin: 0;
+    }
+    .scorecard-category {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .scorecard-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .metric {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .metric-label {
+      width: 100px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .metric-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 4px;
+      font-size: 0.7rem;
+      padding-left: 8px;
+      min-width: 40px;
+    }
+
+    /* Sentiment Chart */
+    .sentiment-chart {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sentiment-bar {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .sentiment-fill {
+      height: 32px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #fff;
+    }
+    .sentiment-fill.positive { background: #00c97b; }
+    .sentiment-fill.neutral { background: #00a8ff; }
+    .sentiment-fill.negative { background: #ff6b6b; }
+
+    /* Color Grid */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+    .color-swatch {
+      height: 80px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: #fff;
+    }
+
+    /* Anomaly List */
+    .anomaly-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .anomaly-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+    }
+    .anomaly-icon {
+      font-size: 1.5rem;
+    }
+    .anomaly-content {
+      flex: 1;
+    }
+    .anomaly-content strong {
+      font-size: 0.9rem;
+    }
+    .anomaly-content p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin: 4px 0;
+    }
+    .anomaly-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .anomaly-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Experiment Card */
+    .experiment-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+    .exp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .exp-header h4 {
+      font-size: 1rem;
+      margin: 0;
+    }
+    .exp-status {
+      font-size: 0.7rem;
+      background: rgba(0,201,123,0.15);
+      color: #00c97b;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .exp-metrics {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 16px;
+    }
+    .exp-metric {
+      display: flex;
+      flex-direction: column;
+    }
+    .exp-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .exp-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #00c97b;
+    }
+    .exp-progress {
+      background: var(--border-subtle);
+      border-radius: 4px;
+      height: 8px;
+      margin-bottom: 12px;
+    }
+    .progress-bar {
+      background: var(--accent);
+      height: 100%;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 4px;
+    }
+    .exp-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Main Content */
+    .admin-main { padding: 32px; overflow-y: auto; }
+
+    /* Panels */
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; animation: fadeUp 0.3s var(--t-base) both; }
+
+    /* Stats Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--t-fast);
+    }
+    .kpi-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 3px;
+    }
+    .kpi-blue::before  { background: var(--accent); }
+    .kpi-purple::before { background: var(--accent-2); }
+    .kpi-cyan::before  { background: var(--accent-3); }
+    .kpi-warm::before  { background: var(--accent-warm); }
+
+    .kpi-icon { font-size: 1.5rem; margin-bottom: 10px; }
+    .kpi-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .kpi-value { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--text-primary); line-height: 1; }
+    .kpi-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* Panel header */
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+    }
+    .panel-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem; font-weight: 700; color: var(--text-primary);
+    }
+    .panel-controls {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .panel-controls .filter-select,
+    .panel-controls .btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+    .panel-controls .filter-select {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      color: var(--text-primary);
+      border-radius: var(--radius-md);
+    }
+
+    /* Tables */
+    .data-table-wrap {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th {
+      padding: 12px 16px;
+      background: var(--bg-surface);
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      color: var(--text-muted); text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .data-table td {
+      padding: 14px 16px;
+      font-size: 0.85rem; color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tbody tr:hover { background: var(--border-subtle); }
+
+    /* Search & Filters */
+    .table-controls {
+      display: flex; align-items: center; gap: 10px; padding: 14px 16px;
+      border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface);
+      flex-wrap: wrap;
+    }
+    .table-search {
+      flex: 1; min-width: 200px; max-width: 300px;
+      padding: 9px 12px; background: var(--bg-card);
+      border: 1px solid var(--border-default); border-radius: var(--radius-md);
+      color: var(--text-primary); font-size: 0.85rem;
+    }
+    .table-search:focus { outline: none; border-color: var(--accent); }
+
+    /* Status selects */
+    .status-sel {
+      padding: 5px 10px; font-size: 0.75rem; font-weight: 600;
+      border-radius: var(--radius-sm); border: 1px solid var(--border-default);
+      background: var(--bg-surface); color: var(--text-secondary); cursor: pointer;
+    }
+
+    /* No data */
+    .table-empty {
+      padding: 40px; text-align: center; color: var(--text-muted);
+    }
+
+    /* Revenue chart bar */
+    .rev-bar {
+      display: flex; align-items: flex-end; gap: 4px;
+      height: 80px; margin-top: 8px;
+    }
+    .rev-col { flex: 1; border-radius: 3px 3px 0 0; background: var(--accent); opacity: 0.7; transition: opacity var(--t-fast); min-width: 8px; }
+    .rev-col:hover { opacity: 1; }
+
+    /* Activity Feed */
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+
+    @media (max-width: 900px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .admin-sidebar { position: static; height: auto; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
 </head>
-<body class="page-enter">
-  <!-- Scroll Progress -->
-  <div class="scroll-progress" id="scrollProgress"></div>
+<body>
 
-  <!-- Accessibility Controls -->
-  <div class="a11y-controls" role="toolbar" aria-label="Accessibility controls">
-    <button id="contrastToggle" aria-label="Toggle high contrast mode" title="Toggle contrast">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/>
-      </svg>
-    </button>
-    <button id="fontToggle" aria-label="Toggle font size" title="Toggle font size">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <text x="4" y="18" font-size="14" font-weight="bold">A</text>
-      </svg>
-    </button>
-    <button id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="5"/>
-        <line x1="12" y1="1" x2="12" y2="3"/>
-        <line x1="12" y1="21" x2="12" y2="23"/>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-        <line x1="1" y1="12" x2="3" y2="12"/>
-        <line x1="21" y1="12" x2="23" y2="12"/>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-      </svg>
-    </button>
-  </div>
+  <canvas id="psCanvas"></canvas>
+  <div class="orb orb-2"></div>
+  <div class="toast-stack" id="toastStack" role="region" aria-live="polite"></div>
 
-  <!-- Announcement Banner -->
-  <div id="announcementBanner"></div>
-
-  <!-- Navigation -->
-  <nav class="navbar glass" role="navigation" aria-label="Admin navigation">
-    <div class="nav-container">
-      <a href="../index.html" class="logo" aria-label="Dragon-Tech Home">
-        <img src="../assets/dragon-logo.png" alt="" class="logo-icon" width="32" height="32" aria-hidden="true">
-        <span class="logo-text">Dragon</span><span class="logo-accent">-Tech</span>
+  <!-- Navbar -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-inner">
+      <a href="../index.html" class="logo">
+        <div class="logo-mark">D</div>
+        <div class="logo-name">DRAGON<span class="logo-accent">-TECH</span>
+          <span style="font-size:0.55rem;font-weight:600;letter-spacing:1px;vertical-align:middle;margin-left:6px;
+                       background:rgba(123,47,255,0.15);color:var(--accent-2);padding:2px 6px;
+                       border-radius:4px;border:1px solid rgba(123,47,255,0.2);">ADMIN</span>
+        </div>
       </a>
-      <div class="nav-actions">
-        <a href="../index.html" class="btn btn-ghost nav-link">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
-          </svg>
-          Back to Store
-        </a>
-        <button class="btn btn-ghost" id="logoutBtn">Sign Out</button>
+      <div class="nav-controls">
+        <a href="dashboard.html" class="btn btn-ghost btn-sm">My Profile</a>
+        <button class="btn btn-outline btn-sm" id="logoutBtn">Sign Out</button>
       </div>
     </div>
   </nav>
 
-  <!-- Admin Content -->
-  <main class="admin-container">
-    <div class="container">
-      <h1 class="page-title">Admin Dashboard</h1>
+  <div class="admin-layout">
 
-      <!-- Stats Row -->
-      <div class="stats-row">
-        <div class="stat-card glass reveal stagger-1">
-          <div class="stat-icon revenue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label">Total Revenue</span>
-            <span class="stat-value" id="totalRevenue">$0.00</span>
-            <span class="stat-trend" id="revenueTrend"></span>
-          </div>
-        </div>
-
-        <div class="stat-card glass reveal stagger-2">
-          <div class="stat-icon users">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label">Total Users</span>
-            <span class="stat-value" id="totalUsers">0</span>
-            <span class="stat-trend" id="usersTrend"></span>
-          </div>
-        </div>
-
-        <div class="stat-card glass reveal stagger-3">
-          <div class="stat-icon orders">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-              <line x1="3" y1="6" x2="21" y2="6"/>
-              <path d="M16 10a4 4 0 0 1-8 0"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label">Total Orders</span>
-            <span class="stat-value" id="totalOrders">0</span>
-            <span class="stat-trend" id="ordersTrend"></span>
-          </div>
-        </div>
-
-        <div class="stat-card glass reveal stagger-4">
-          <div class="stat-icon conversion">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label">Conversion Rate</span>
-            <span class="stat-value" id="conversionRate">0%</span>
-            <span class="stat-trend" id="conversionTrend"></span>
-          </div>
-        </div>
-      </div>
-        <div class="export-actions" style="margin-top:1.5rem; display:flex; justify-content:center; gap:10px;">
-          <button id="exportOrdersCsvBtn" class="btn btn-primary" style="display:flex; align-items:center; gap:8px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Export Orders to CSV
-          </button>
-          <button id="exportUsersCsvBtn" class="btn btn-ghost" style="display:flex; align-items:center; gap:8px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            Export Users to CSV
-          </button>
-        </div>
-
-      
-      <!-- Advanced Analytics Panel -->
-      <section class="admin-panel reveal stagger-5" id="analyticsPanel" role="tabpanel" aria-labelledby="tab-analytics" style="margin-top:2rem;">
-        <div class="panel-header">
-          <h2 class="panel-title">AI Predictive Analytics</h2>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
-          <div class="glass" style="padding:1.5rem; text-align:center;">
-             <h3>LTV (Lifetime Value) Prediction</h3>
-             <h1 style="color:var(--neon-blue); font-size:3rem; margin:1rem 0;">$428.50</h1>
-             <p style="color:var(--text-secondary)">Predicted avg user LTV (+14% this month)</p>
-          </div>
-          <div class="glass" style="padding:1.5rem; text-align:center;">
-             <h3>Churn Prediction</h3>
-             <h1 style="color:var(--neon-pink); font-size:3rem; margin:1rem 0;">8.2%</h1>
-             <p style="color:var(--text-secondary)">Users at risk of churn in next 30 days</p>
-          </div>
-        </div>
-        <div class="glass" style="padding:1.5rem; margin-top:1.5rem; display:flex; align-items:center; justify-content:center; min-height:200px; background:linear-gradient(90deg, rgba(16,16,40,0.8), rgba(0,212,255,0.1)); border-radius:12px;">
-            <p style="color:var(--text-secondary); font-style:italic;">Real-time cohort chart rendering module connected to backend metrics...</p>
-        </div>
-      </section>
-
-      <!-- Tab Navigation -->
-      <div class="admin-tabs glass" role="tablist" aria-label="Admin sections">
-        <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="usersPanel" id="tab-users" data-tab="users">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-          </svg>
-          Users
-        </button>
-        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="ordersPanel" id="tab-orders" data-tab="orders">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <path d="M16 10a4 4 0 0 1-8 0"/>
-          </svg>
-          Orders
-        </button>
-        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="couponsPanel" id="tab-coupons" data-tab="coupons">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="1" y1="4" x2="23" y2="4"/>
-            <line x1="1" y1="10" x2="23" y2="10"/>
-            <line x1="1" y1="16" x2="23" y2="16"/>
-          </svg>
-          Coupons
-        </button>
-        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="announcementPanel" id="tab-announcement" data-tab="announcement">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-          Announcement
-        </button>
-        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="transactionsPanel" id="tab-transactions" data-tab="transactions">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-          Transactions
-        </button>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <div class="admin-brand-title">Control Panel</div>
+        <div class="admin-brand-sub" id="adminWelcome">Loading…</div>
       </div>
 
-      <!-- Users Panel -->
-      <section class="admin-panel reveal stagger-5" id="usersPanel" role="tabpanel" aria-labelledby="tab-users">
+      <!-- AI Intelligence Dropdown - Promoted to top -->
+      <div class="admin-nav-group-label admin-dropdown-trigger" 
+           data-dropdown="ai-dropdown"
+           role="button"
+           aria-expanded="false"
+           aria-haspopup="true"
+           aria-controls="ai-dropdown"
+           tabindex="0"
+           id="aiDropdownTrigger">
+        🧠 AI Intelligence
+        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+<div class="admin-dropdown-menu" id="ai-dropdown" role="menu" aria-labelledby="aiDropdownTrigger">
+          <div class="admin-nav-item" data-panel="ai-demand" role="menuitem">📈 Demand Forecast</div>
+          <div class="admin-nav-item" data-panel="ai-customers" role="menuitem">👤 Customer Insights</div>
+          <div class="admin-nav-item" data-panel="ai-products" role="menuitem">🛍️ Product Intelligence</div>
+          <div class="admin-nav-item" data-panel="ai-pricing" role="menuitem">💰 Price Insights</div>
+          <div class="admin-nav-item" data-panel="ai-sentiment" role="menuitem">💬 Sentiment Analysis</div>
+          <div class="admin-nav-item" data-panel="ai-visual" role="menuitem">🎨 Visual Trends</div>
+          <div class="admin-nav-item" data-panel="ai-anomalies" role="menuitem">⚠️ Anomaly Detection</div>
+          <div class="admin-nav-item" data-panel="ai-experiments" role="menuitem">🔬 A/B Testing</div>
+          <div class="admin-nav-item" data-panel="ai-models" role="menuitem">🧪 Model Studio</div>
+        </div>
+        <!-- Invisible hover zone to keep dropdown open -->
+        <div class="dropdown-hover-zone"></div>
+
+      <div class="admin-nav-group-label">Analytics</div>
+      <div class="admin-nav-item" data-panel="overview">
+        📊 Overview
+      </div>
+
+      <div class="admin-nav-group-label">Management</div>
+      <div class="admin-nav-item" data-panel="orders">📦 Orders</div>
+      <div class="admin-nav-item" data-panel="users">👥 Users</div>
+      <div class="admin-nav-item" data-panel="products">🛍️ Products</div>
+      <div class="admin-nav-item" data-panel="subscribers">📧 Subscribers</div>
+
+      <div class="admin-nav-group-label">Tools</div>
+      <div class="admin-nav-item" data-panel="export">💾 Export Data</div>
+      <div class="admin-nav-group-label admin-dropdown-trigger" 
+           data-dropdown="ai-dropdown"
+           role="button"
+           aria-expanded="false"
+           aria-haspopup="true"
+           aria-controls="ai-dropdown"
+           tabindex="0"
+           id="aiDropdownTrigger">
+        🧠 AI Intelligence
+        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+
+      <!-- ====== OVERVIEW ====== -->
+      <div class="admin-panel active" id="panelOverview">
         <div class="panel-header">
-          <h2 class="panel-title">Users</h2>
-          <div class="panel-search">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input type="text" id="userSearch" class="panel-search-input" placeholder="Search users...">
+          <h1 class="panel-title">Analytics Overview</h1>
+          <span style="font-size:0.8rem;color:var(--text-muted);" id="adminDate"></span>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-label">Total Revenue</div>
+            <div class="kpi-value" id="kpiRevenue">$0</div>
+            <div class="kpi-sub">All-time</div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon">📦</div>
+            <div class="kpi-label">Total Orders</div>
+            <div class="kpi-value" id="kpiOrders">0</div>
+            <div class="kpi-sub">Cumulative</div>
+          </div>
+          <div class="kpi-card kpi-cyan">
+            <div class="kpi-icon">👥</div>
+            <div class="kpi-label">Registered Users</div>
+            <div class="kpi-value" id="kpiUsers">0</div>
+            <div class="kpi-sub">Excluding admin</div>
+          </div>
+          <div class="kpi-card kpi-warm">
+            <div class="kpi-icon">📬</div>
+            <div class="kpi-label">Avg Order Value</div>
+            <div class="kpi-value" id="kpiAvg">$0</div>
+            <div class="kpi-sub">Revenue ÷ Orders</div>
           </div>
         </div>
-        <div class="table-wrapper glass">
-          <table class="data-table" id="usersTable">
+
+        <!-- Recent Orders Summary -->
+        <div class="panel-header" style="margin-top:8px;">
+          <h2 class="panel-title" style="font-size:1rem;">Recent Orders</h2>
+          <button class="btn btn-outline btn-sm" data-panel="orders">View All</button>
+        </div>
+        <div class="data-table-wrap">
+          <table class="data-table" id="recentOrdersTable">
             <thead>
               <tr>
-                <th data-sort="id" class="sortable">
-                  <span>ID</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="name" class="sortable">
-                  <span>Name</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="email" class="sortable">
-                  <span>Email</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="total_spent" class="sortable">
-                  <span>Total Spent</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="role" class="sortable">
-                  <span>Role</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="createdAt" class="sortable">
-                  <span>Joined</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Status</th>
               </tr>
             </thead>
-            <tbody id="usersTableBody">
-              <tr><td colspan="6" class="empty-state">Loading users...</td></tr>
+            <tbody id="recentOrdersBody">
+              <tr><td colspan="5" class="table-empty">Loading…</td></tr>
             </tbody>
           </table>
         </div>
-      </section>
+      </div>
 
-      <!-- Orders Panel -->
-      <section class="admin-panel" id="ordersPanel" role="tabpanel" aria-labelledby="tab-orders" hidden>
+      <!-- ====== ORDERS ====== -->
+      <div class="admin-panel" id="panelOrders">
         <div class="panel-header">
-          <h2 class="panel-title">Orders</h2>
-          <div class="panel-filters">
-            <select id="orderStatusFilter" aria-label="Filter by status">
+          <h1 class="panel-title">Order Management</h1>
+          <button class="btn btn-outline btn-sm" id="exportOrdersBtn">Export CSV</button>
+        </div>
+        <div class="data-table-wrap">
+          <div class="table-controls">
+            <input type="text" class="table-search" id="orderSearch" placeholder="Search by ID or customer…">
+            <select class="filter-select" id="orderStatusFilter" style="padding:8px 28px 8px 10px;font-size:0.82rem;">
               <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
+              <option value="processing">Processing</option>
               <option value="shipped">Shipped</option>
-              <option value="delivered">Delivered</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
             </select>
           </div>
-        </div>
-        <div class="table-wrapper glass">
-          <table class="data-table" id="ordersTable">
+          <table class="data-table">
             <thead>
               <tr>
-                <th data-sort="id" class="sortable">
-                  <span>Order ID</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="user" class="sortable">
-                  <span>User</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="total" class="sortable">
-                  <span>Total</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="status" class="sortable">
-                  <span>Status</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="date" class="sortable">
-                  <span>Date</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="ordersTableBody">
-              <tr><td colspan="5" class="empty-state">Loading orders...</td></tr>
+              <tr><td colspan="7" class="table-empty">Loading orders…</td></tr>
             </tbody>
           </table>
         </div>
-      </section>
+      </div>
 
-      <!-- Coupons Panel -->
-      <section class="admin-panel" id="couponsPanel" role="tabpanel" aria-labelledby="tab-coupons" hidden>
+      <!-- ====== USERS ====== -->
+      <div class="admin-panel" id="panelUsers">
         <div class="panel-header">
-          <h2 class="panel-title">Coupons</h2>
+          <h1 class="panel-title">User Management</h1>
+          <span class="status-badge status-processing" id="userCount">0 Users</span>
         </div>
-        <div class="table-wrapper glass">
-          <table class="data-table" id="couponsTable">
+        <div class="data-table-wrap">
+          <div class="table-controls">
+            <input type="text" class="table-search" id="userSearch" placeholder="Search by name or email…">
+          </div>
+          <table class="data-table">
             <thead>
               <tr>
-                <th data-sort="code" class="sortable">
-                  <span>Code</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="user" class="sortable">
-                  <span>User</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="discount" class="sortable">
-                  <span>Discount</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="expiresAt" class="sortable">
-                  <span>Expires</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
-                <th data-sort="used" class="sortable">
-                  <span>Used</span>
-                  <svg class="sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 15 12 20 17 15"/><polyline points="7 4 12 9 17 4" opacity="0.3"/></svg>
-                </th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Total Spent</th>
+                <th>Joined</th>
               </tr>
             </thead>
-            <tbody id="couponsTableBody">
-              <tr><td colspan="5" class="empty-state">Loading coupons...</td></tr>
+            <tbody id="usersTableBody">
+              <tr><td colspan="5" class="table-empty">Loading users…</td></tr>
             </tbody>
           </table>
         </div>
-      </section>
+      </div>
 
-      <!-- Announcement Panel -->
-      <section class="admin-panel" id="announcementPanel" role="tabpanel" aria-labelledby="tab-announcement" hidden>
+      <!-- ====== PRODUCTS ====== -->
+      <div class="admin-panel" id="panelProducts">
         <div class="panel-header">
-          <h2 class="panel-title">Site-Wide Announcement</h2>
+          <h1 class="panel-title">Product Catalog</h1>
+          <span class="status-badge status-processing" id="productCount">0 Products</span>
         </div>
-        <div class="announcement-editor glass">
-          <label for="announcementText" class="sr-only">Announcement text</label>
-          <textarea id="announcementText" class="announcement-textarea" rows="5" placeholder="Enter your site-wide announcement here... (e.g., 'Maintenance scheduled for April 15th')"></textarea>
-          <div class="announcement-actions">
-            <span class="announcement-preview-hint" id="announcementHint">Preview appears at the top of the store</span>
-            <button class="btn btn-primary" id="saveAnnouncement">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                <polyline points="17 21 17 13 7 13 7 21"/>
-                <polyline points="7 3 7 8 15 8"/>
-              </svg>
-              Save Announcement
+        <div class="data-table-wrap">
+          <div class="table-controls">
+            <input type="text" class="table-search" id="productSearch" placeholder="Search products…">
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Sale Price</th>
+                <th>Rating</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+            <tbody id="productsTableBody">
+              <tr><td colspan="6" class="table-empty">Loading products…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ====== SUBSCRIBERS ====== -->
+      <div class="admin-panel" id="panelSubscribers">
+        <div class="panel-header">
+          <h1 class="panel-title">Newsletter Subscribers</h1>
+          <span class="status-badge status-completed" id="subCount">0 Subscribers</span>
+        </div>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>#</th><th>Email</th><th>Subscribed Date</th></tr>
+            </thead>
+            <tbody id="subscribersBody">
+              <tr><td colspan="3" class="table-empty">No subscribers yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ====== EXPORT ====== -->
+      <div class="admin-panel" id="panelExport">
+        <div class="panel-header">
+          <h1 class="panel-title">Export Data</h1>
+        </div>
+        <div style="display:grid;gap:16px;max-width:480px;">
+          <div style="background:var(--bg-elevated);border:1px solid var(--border-default);border-radius:var(--radius-xl);padding:24px;">
+            <h3 style="font-size:1rem;font-weight:600;margin-bottom:6px;">📦 Orders CSV</h3>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">Export all orders with customer, items, total, and status.</p>
+            <button class="btn btn-primary" id="exportAllOrders">Download Orders.csv</button>
+          </div>
+          <div style="background:var(--bg-elevated);border:1px solid var(--border-default);border-radius:var(--radius-xl);padding:24px;">
+            <h3 style="font-size:1rem;font-weight:600;margin-bottom:6px;">👥 Users CSV</h3>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">Export all user accounts (name, email, role, join date).</p>
+            <button class="btn btn-outline" id="exportUsers">Download Users.csv</button>
+          </div>
+          <div style="background:var(--bg-elevated);border:1px solid var(--border-default);border-radius:var(--radius-xl);padding:24px;">
+            <h3 style="font-size:1rem;font-weight:600;margin-bottom:6px;">📧 Subscribers CSV</h3>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">Export newsletter subscriber emails and dates.</p>
+            <button class="btn btn-outline" id="exportSubscribers">Download Subscribers.csv</button>
+          </div>
+          <div style="background:rgba(255,68,68,0.06);border:1px solid rgba(255,68,68,0.2);border-radius:var(--radius-xl);padding:24px;">
+            <h3 style="font-size:1rem;font-weight:600;margin-bottom:6px;color:#ff6666;">⚠ Clear All Data</h3>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">Permanently wipes all orders, users, and subscribers from localStorage.</p>
+            <button class="btn btn-danger btn-sm" id="clearAllData">Clear All Data</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== AI DEMAND ====== -->
+      <div class="admin-panel" id="panelAiDemand">
+        <div class="panel-header">
+          <h1 class="panel-title">📈 Demand Forecast</h1>
+          <div class="panel-controls">
+            <select class="filter-select" id="demandTimeframe" aria-label="Time range">
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+              <option value="90d" selected>Last 90 Days</option>
+              <option value="1y">Last Year</option>
+            </select>
+            <select class="filter-select" id="demandCategoryFilter" aria-label="Category filter">
+              <option value="all">All Categories</option>
+              <option value="audio">Audio</option>
+              <option value="computers">Computers</option>
+              <option value="wearable">Wearables</option>
+              <option value="accessories">Accessories</option>
+            </select>
+            <button class="btn btn-outline btn-sm" id="exportDemand" aria-label="Export demand data" title="Export CSV">
+              📥 Export
             </button>
           </div>
         </div>
-      </section>
-
-      <!-- Transactions Panel -->
-      <section class="admin-panel" id="transactionsPanel" role="tabpanel" aria-labelledby="tab-transactions" hidden>
-        <div class="panel-header">
-          <h2 class="panel-title">Transaction Log</h2>
-          <button class="btn btn-ghost btn-sm" id="refreshTransactions">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-            </svg>
-            Refresh
-          </button>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-label">Predicted Revenue (7d)</div>
+            <div class="kpi-value" id="nnPredictedRevenue">$0</div>
+            <div class="kpi-sub">ML Forecast</div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon">📊</div>
+            <div class="kpi-label">Demand Index</div>
+            <div class="kpi-value" id="nnDemandIndex">0</div>
+            <div class="kpi-sub">Units/Week</div>
+          </div>
+          <div class="kpi-card kpi-cyan">
+            <div class="kpi-icon">🎯</div>
+            <div class="kpi-label">Forecast Accuracy</div>
+            <div class="kpi-value" id="nnAccuracy">0%</div>
+            <div class="kpi-sub">Validation Score</div>
+          </div>
+          <div class="kpi-card kpi-warm">
+            <div class="kpi-icon">📉</div>
+            <div class="kpi-label">Trend</div>
+            <div class="kpi-value" id="nnTrend">--</div>
+            <div class="kpi-sub">Week over Week</div>
+          </div>
         </div>
-        <div class="table-wrapper glass">
-          <table class="data-table" id="transactionsTable">
-            <thead>
-              <tr>
-                <th><span>Timestamp</span></th>
-                <th><span>Operation</span></th>
-                <th><span>Collection</span></th>
-                <th><span>Document</span></th>
-                <th><span>Status</span></th>
-              </tr>
-            </thead>
-            <tbody id="transactionsTableBody">
-              <tr><td colspan="5" class="empty-state">Loading transactions...</td></tr>
-            </tbody>
-          </table>
+        <div class="panel-section">
+          <h3 class="panel-subtitle">Demand Forecast Timeline</h3>
+          <div class="demand-chart" id="demandChart">
+            <div class="chart-placeholder">
+              <div class="chart-bars">
+                <div class="chart-bar" style="height:40%;background:var(--accent);"><span>45</span></div>
+                <div class="chart-bar" style="height:55%;background:var(--accent);"><span>62</span></div>
+                <div class="chart-bar" style="height:45%;background:var(--accent);"><span>51</span></div>
+                <div class="chart-bar" style="height:70%;background:var(--accent-purple);"><span>78</span></div>
+                <div class="chart-bar" style="height:60%;background:var(--accent);"><span>67</span></div>
+                <div class="chart-bar" style="height:85%;background:var(--accent-cyan);"><span>95</span></div>
+                <div class="chart-bar" style="height:75%;background:var(--accent-cyan);"><span>84</span></div>
+                <div class="chart-bar" style="height:90%;background:var(--accent);"><span>100</span></div>
+              </div>
+              <div class="chart-labels">
+                <span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4</span>
+                <span>Week 5</span><span>Week 6</span><span>Week 7</span><span>Week 8</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <img src="../assets/dragon-logo.png" alt="" class="footer-logo" width="120" aria-hidden="true">
-          <p>&copy; 2026 Dragon-Tech. Crafted with precision.</p>
-        </div>
-        <div class="footer-links">
-          <a href="../index.html">Home</a>
-          <a href="admin.html">Admin</a>
+        <div class="panel-section">
+          <h3 class="panel-subtitle">Category Demand Breakdown</h3>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Category</th><th>Current Demand</th><th>Predicted</th><th>Trend</th><th>Confidence</th></tr></thead>
+              <tbody id="categoryDemandBody">
+                <tr><td colspan="5" class="table-empty">Loading demand data...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-  </footer>
 
-  <!-- Toast Notification -->
-  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+      <!-- ====== AI CUSTOMERS ====== -->
+      <div class="admin-panel" id="panelAiCustomers">
+        <div class="panel-header">
+          <h1 class="panel-title">👤 Customer Insights</h1>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-icon">👥</div>
+            <div class="kpi-label">Active Users</div>
+            <div class="kpi-value" id="nnActiveUsers">0</div>
+            <div class="kpi-sub">30-day</div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon">🔴</div>
+            <div class="kpi-label">Churn Risk</div>
+            <div class="kpi-value" id="nnChurnRisk">0%</div>
+            <div class="kpi-sub">At-risk segment</div>
+          </div>
+          <div class="kpi-card kpi-cyan">
+            <div class="kpi-icon">⭐</div>
+            <div class="kpi-label">Engagement Score</div>
+            <div class="kpi-value" id="nnEngagement">0</div>
+            <div class="kpi-sub">ML Calculated</div>
+          </div>
+          <div class="kpi-card kpi-warm">
+            <div class="kpi-icon">💎</div>
+            <div class="kpi-label">Avg LTV</div>
+            <div class="kpi-value" id="nnLTV">$0</div>
+            <div class="kpi-sub">Lifetime Value</div>
+          </div>
+        </div>
+        <div class="panel-section">
+          <h3 class="panel-subtitle">User Segments (ML-Generated)</h3>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Segment</th><th>Users</th><th>Avg Spent</th><th>Churn%</th><th>Top Category</th></tr></thead>
+              <tbody id="segmentsBody">
+                <tr><td>High Value</td><td>127</td><td>$1,240</td><td>2.1%</td><td>computers</td></tr>
+                <tr><td>Explorers</td><td>342</td><td>$340</td><td>8.5%</td><td>audio</td></tr>
+                <tr><td>Bargain</td><td>518</td><td>$120</td><td>15.2%</td><td>accessories</td></tr>
+                <tr><td>Loyal</td><td>234</td><td>$890</td><td>3.4%</td><td>bundles</td></tr>
+                <tr><td>At-Risk</td><td>89</td><td>$620</td><td>45.1%</td><td>mixed</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-  <!-- Scripts -->
+      <!-- ====== AI PRODUCTS ====== -->
+      <div class="admin-panel" id="panelAiProducts">
+        <div class="panel-header">
+          <h1 class="panel-title">🛍️ Product Intelligence</h1>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-icon">🔥</div>
+            <div class="kpi-label">Top Performer</div>
+            <div class="kpi-value" id="nnTopProduct">--</div>
+            <div class="kpi-sub">By ML Score</div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon">📦</div>
+            <div class="kpi-label">Stock Alerts</div>
+            <div class="kpi-value" id="nnStockAlerts">0</div>
+            <div class="kpi-sub">Reorder needed</div>
+          </div>
+          <div class="kpi-card kpi-cyan">
+            <div class="kpi-icon">🎯</div>
+            <div class="kpi-label">Similarity Score</div>
+            <div class="kpi-value" id="nnSimilarity">0%</div>
+            <div class="kpi-sub">Avg Match</div>
+          </div>
+          <div class="kpi-card kpi-warm">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-label">Recommendation</div>
+            <div class="kpi-value" id="nnRecCTR">0%</div>
+            <div class="kpi-sub">Click-through</div>
+          </div>
+        </div>
+        <div class="panel-section">
+          <h3 class="panel-subtitle">Product Scorecard</h3>
+          <div id="productScorecard">
+            <div class="scorecard-product">
+              <div class="scorecard-header">
+                <img src="../assets/product-earbuds.svg" alt="Product" class="scorecard-img">
+                <div class="scorecard-info">
+                  <h4>Wireless Earbuds Pro</h4>
+                  <span class="scorecard-category">Audio</span>
+                </div>
+              </div>
+              <div class="scorecard-metrics">
+                <div class="metric"><span class="metric-label">Demand</span><span class="metric-bar" style="width:78%;">78%</span></div>
+                <div class="metric"><span class="metric-label">Elasticity</span><span class="metric-bar" style="width:65%;">65%</span></div>
+                <div class="metric"><span class="metric-label">Similarity</span><span class="metric-bar" style="width:82%;">82%</span></div>
+                <div class="metric"><span class="metric-label">Churn Assoc</span><span class="metric-bar" style="width:45%;">45%</span></div>
+                <div class="metric"><span class="metric-label">Rec Score</span><span class="metric-bar" style="width:94%;">94%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== AI PRICING ====== -->
+      <div class="admin-panel" id="panelAiPricing">
+        <div class="panel-header">
+          <h1 class="panel-title">💰 Price Insights</h1>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-icon">💹</div>
+            <div class="kpi-label">Optimal Price</div>
+            <div class="kpi-value" id="nnOptimalPrice">$0</div>
+            <div class="kpi-sub">Current + ML</div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon">📊</div>
+            <div class="kpi-label">Elasticity</div>
+            <div class="kpi-value" id="nnElasticity">0</div>
+            <div class="kpi-sub">Price Sensitivity</div>
+          </div>
+          <div class="kpi-card kpi-cyan">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-label">Expected Lift</div>
+            <div class="kpi-value" id="nnExpectedLift">0%</div>
+            <div class="kpi-sub">Revenue change</div>
+          </div>
+          <div class="kpi-card kpi-warm">
+            <div class="kpi-icon">🏆</div>
+            <div class="kpi-label">Price Rank</div>
+            <div class="kpi-value" id="nnPriceRank">#1</div>
+            <div class="kpi-sub">vs Competitors</div>
+          </div>
+        </div>
+        <div class="panel-section">
+          <h3 class="panel-subtitle">Price Recommendations</h3>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Product</th><th>Current</th><th>Recommended</th><th>Elasticity</th><th>Expected Δ</th></tr></thead>
+              <tbody id="priceRecBody">
+                <tr><td>Wireless Earbuds Pro</td><td>$59.99</td><td>$54.99</td><td>High</td><td style="color:#00c97b;">+12%</td></tr>
+                <tr><td>Smart Watch Ultra</td><td>$249.99</td><td>$269.99</td><td>High</td><td style="color:#00c97b;">+8%</td></tr>
+                <tr><td>Ultrabook Pro 15"</td><td>$1,099</td><td>$999</td><td>High</td><td style="color:#00c97b;">+15%</td></tr>
+                <tr><td>Wireless Gaming Mouse</td><td>$59.99</td><td>$54.99</td><td>Med</td><td style="color:#00c97b;">+5%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <button class="btn btn-primary" style="margin-top:16px;" id="applyAllPrices">Apply All Recommendations</button>
+        </div>
+      </div>
+
+      <!-- ====== AI SENTIMENT ====== -->
+      <div class="admin-panel" id="panelAiSentiment">
+        <div class="panel-header">
+          <h1 class="panel-title">💬 Sentiment Analysis</h1>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-icon">😊</div>
+            <div class="kpi-label">Sentiment Score</div>
+            <div class="kpi-value" id="nnSentimentScore">0/5</div>
+            <div class="kpi-sub">Overall</div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon">👍</div>
+            <div class="kpi-label">Positive</div>
+            <div class="kpi-value" id="nnPositive">0%</div>
+            <div class="kpi-sub">Reviews</div>
+          </div>
+          <div class="kpi-card kpi-cyan">
+            <div class="kpi-icon">👎</div>
+            <div class="kpi-label">Negative</div>
+            <div class="kpi-value" id="nnNegative">0%</div>
+            <div class="kpi-sub">Reviews</div>
+          </div>
+          <div class="kpi-card kpi-warm">
+            <div class="kpi-icon">📝</div>
+            <div class="kpi-label">Analyzed</div>
+            <div class="kpi-value" id="nnAnalyzed">0</div>
+            <div class="kpi-sub">Reviews</div>
+          </div>
+        </div>
+        <div class="panel-section">
+          <h3 class="panel-subtitle">Sentiment Overview</h3>
+          <div class="sentiment-chart">
+            <div class="sentiment-bar">
+              <div class="sentiment-fill positive" style="width:72%;"><span>Positive 72%</span></div>
+            </div>
+            <div class="sentiment-bar">
+              <div class="sentiment-fill neutral" style="width:18%;"><span>Neutral 18%</span></div>
+            </div>
+            <div class="sentiment-bar">
+              <div class="sentiment-fill negative" style="width:10%;"><span>Negative 10%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-section">
+          <h3 class="panel-subtitle">Top Mentioned Aspects</h3>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Aspect</th><th>Sentiment</th><th>Score</th></tr></thead>
+              <tbody id="aspectsBody">
+                <tr><td>Sound Quality</td><td>😊 Positive</td><td>4.8</td></tr>
+                <tr><td>Battery Life</td><td>😊 Positive</td><td>4.5</td></tr>
+                <tr><td>Comfort</td><td>😐 Neutral</td><td>3.9</td></tr>
+                <tr><td>Build Quality</td><td>😊 Positive</td><td>4.2</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== AI VISUAL ====== -->
+      <div class="admin-panel" id="panelAiVisual">
+        <div class="panel-header">
+          <h1 class="panel-title">🎨 Visual Trends</h1>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-icon">🎨</div>
+            <div class="kpi-label">Top Style</div>
+            <div class="kpi-value" id="nnTopStyle">--</div>
+            <div class="kpi-sub">This Month</div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon">🖼️</div>
+            <div class="kpi-label">Top Color</div>
+            <div class="kpi-value" id="nnTopColor">--</div>
+            <div class="kpi-sub">Popular</div>
+          </div>
+          <div class="kpi-card kpi-cyan">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-label">Style Trend</div>
+            <div class="kpi-value" id="nnStyleTrend">--</div>
+            <div class="kpi-sub">Direction</div>
+          </div>
+          <div class="kpi-card kpi-warm">
+            <div class="kpi-icon">🎯</div>
+            <div class="kpi-label">Match Rate</div>
+            <div class="kpi-value" id="nnMatchRate">0%</div>
+            <div class="kpi-sub">Visual Search</div>
+          </div>
+        </div>
+        <div class="panel-section">
+          <h3 class="panel-subtitle">Color Distribution</h3>
+          <div class="color-grid">
+            <div class="color-swatch" style="background:#1a1a2e;"><span>Black</span><span>42%</span></div>
+            <div class="color-swatch" style="background:#2d2d44;"><span>Gray</span><span>28%</span></div>
+            <div class="color-swatch" style="background:#f5f5f5;color:#000;"><span>White</span><span>15%</span></div>
+            <div class="color-swatch" style="background:#00a8ff;"><span>Blue</span><span>8%</span></div>
+            <div class="color-swatch" style="background:#7b2fff;"><span>Purple</span><span>5%</span></div>
+            <div class="color-swatch" style="background:#00ffd4;"><span>Cyan</span><span>2%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== AI ANOMALIES ====== -->
+      <div class="admin-panel" id="panelAiAnomalies">
+        <div class="panel-header">
+          <h1 class="panel-title">⚠️ Anomaly Detection</h1>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-icon">⚠️</div>
+            <div class="kpi-label">Active Alerts</div>
+            <div class="kpi-value" id="nnAlerts">0</div>
+            <div class="kpi-sub">ML Flagged</div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon">📊</div>
+            <div class="kpi-label">Anomaly Score</div>
+            <div class="kpi-value" id="nnAnomalyScore">0</div>
+            <div class="kpi-sub">Current</div>
+          </div>
+          <div class="kpi-card kpi-cyan">
+            <div class="kpi-icon">🔒</div>
+            <div class="kpi-label">Blocked</div>
+            <div class="kpi-value" id="nnBlocked">0</div>
+            <div class="kpi-sub">Threats</div>
+          </div>
+          <div class="kpi-card kpi-warm">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-label">Trend</div>
+            <div class="kpi-value" id="nnAnomalyTrend">--</div>
+            <div class="kpi-sub">WoW</div>
+          </div>
+        </div>
+        <div class="panel-section">
+          <h3 class="panel-subtitle">Recent Anomalies</h3>
+          <div class="anomaly-list" id="anomalyList">
+            <div class="anomaly-item">
+              <div class="anomaly-icon">⚠️</div>
+              <div class="anomaly-content">
+                <strong>Order Spike Detected</strong>
+                <p>127 orders/min (normal: ~15) - Possible bot activity</p>
+                <span class="anomaly-time">2 hours ago</span>
+              </div>
+              <div class="anomaly-actions">
+                <button class="btn btn-outline btn-sm">View</button>
+                <button class="btn btn-outline btn-sm">Dismiss</button>
+              </div>
+            </div>
+            <div class="anomaly-item">
+              <div class="anomaly-icon">⚠️</div>
+              <div class="anomaly-content">
+                <strong>Price Anomaly</strong>
+                <p>Product price 89% below market average</p>
+                <span class="anomaly-time">5 hours ago</span>
+              </div>
+              <div class="anomaly-actions">
+                <button class="btn btn-outline btn-sm">View</button>
+                <button class="btn btn-primary btn-sm">Adjust</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== AI EXPERIMENTS ====== -->
+      <div class="admin-panel" id="panelAiExperiments">
+        <div class="panel-header">
+          <h1 class="panel-title">🔬 A/B Testing</h1>
+          <button class="btn btn-primary btn-sm" id="newExperiment">+ New Experiment</button>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-icon">🧪</div>
+            <div class="kpi-label">Active</div>
+            <div class="kpi-value" id="nnActiveExp">3</div>
+            <div class="kpi-sub">Running</div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon">✅</div>
+            <div class="kpi-label">Concluded</div>
+            <div class="kpi-value" id="nnConcludedExp">12</div>
+            <div class="kpi-sub">Total</div>
+          </div>
+          <div class="kpi-card kpi-cyan">
+            <div class="kpi-icon">📊</div>
+            <div class="kpi-label">Lift</div>
+            <div class="kpi-value" id="nnAvgLift">+12%</div>
+            <div class="kpi-sub">Avg Winner</div>
+          </div>
+          <div class="kpi-card kpi-warm">
+            <div class="kpi-icon">🎯</div>
+            <div class="kpi-label">Confidence</div>
+            <div class="kpi-value" id="nnConfidence">94%</div>
+            <div class="kpi-sub">Avg</div>
+          </div>
+        </div>
+        <div class="panel-section">
+          <h3 class="panel-subtitle">Active Experiments</h3>
+          <div class="experiment-card">
+            <div class="exp-header">
+              <h4>Discount Placement Test</h4>
+              <span class="exp-status">Running</span>
+            </div>
+            <div class="exp-metrics">
+              <div class="exp-metric"><span class="exp-label">Cart CTR</span><span class="exp-value">+28%</span></div>
+              <div class="exp-metric"><span class="exp-label">Conversion</span><span class="exp-value">+28%</span></div>
+              <div class="exp-metric"><span class="exp-label">AOV</span><span class="exp-value">+6%</span></div>
+            </div>
+            <div class="exp-progress"><div class="progress-bar" style="width:62%;">62%</div></div>
+            <div class="exp-footer">
+              <span>Sample: 12,450 / 20,000</span>
+              <span>Days left: 4</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== AI MODELS ====== -->
+      <div class="admin-panel" id="panelAiModels">
+        <div class="panel-header">
+          <h1 class="panel-title">🧪 Model Studio</h1>
+          <button class="btn btn-primary btn-sm" id="trainModel">+ Train Model</button>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-icon">🧠</div>
+            <div class="kpi-label">Loaded Models</div>
+            <div class="kpi-value" id="nnLoadedModels">6</div>
+            <div class="kpi-sub">Active</div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon">💾</div>
+            <div class="kpi-label">Model Size</div>
+            <div class="kpi-value" id="nnModelSize">15MB</div>
+            <div class="kpi-sub">Total</div>
+          </div>
+          <div class="kpi-card kpi-cyan">
+            <div class="kpi-icon">🎯</div>
+            <div class="kpi-label">Avg Accuracy</div>
+            <div class="kpi-value" id="nnModelAccuracy">87%</div>
+            <div class="kpi-sub">Validation</div>
+          </div>
+          <div class="kpi-card kpi-warm">
+            <div class="kpi-icon">⚡</div>
+            <div class="kpi-label">Inference</div>
+            <div class="kpi-value" id="nnInferenceTime">12ms</div>
+            <div class="kpi-sub">Avg</div>
+          </div>
+        </div>
+        <div class="panel-section">
+          <h3 class="panel-subtitle">Neural Network Models</h3>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Model</th><th>Type</th><th>Status</th><th>Accuracy</th><th>Last Trained</th></tr></thead>
+              <tbody id="modelsBody">
+                <tr><td>demand-forecast</td><td>LSTM</td><td><span class="status-badge status-complete">Loaded</span></td><td>87.3%</td><td>2026-04-20</td></tr>
+                <tr><td>similar-v2</td><td>BERT</td><td><span class="status-badge status-complete">Loaded</span></td><td>92.1%</td><td>2026-04-19</td></tr>
+                <tr><td>churn-proba</td><td>MLP</td><td><span class="status-badge status-complete">Loaded</span></td><td>89.5%</td><td>2026-04-18</td></tr>
+                <tr><td>sentiment-v1</td><td>RNN</td><td><span class="status-badge status-complete">Loaded</span></td><td>94.2%</td><td>2026-04-17</td></tr>
+                <tr><td>price-elastic</td><td>Linear</td><td><span class="status-badge status-complete">Loaded</span></td><td>78.9%</td><td>2026-04-16</td></tr>
+                <tr><td>user-embed</td><td>Transformer</td><td><span class="status-badge status-complete">Loaded</span></td><td>85.0%</td><td>2026-04-15</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </button>
+
   <script src="../js/utils.js"></script>
-  <script src="../js/theme.js"></script>
   <script src="../js/storage-service.js"></script>
   <script src="../js/currency.js"></script>
-  <script src="../js/admin.js"></script>
-  <script src="../js/ui.js"></script>
+  <script src="../js/products.js"></script>
 
   <script>
-    // Admin auth guard
-    if (window.storage && !window.storage.getCurrentUser()) {
+  (function () {
+    'use strict';
+
+    // ---- Theme ----
+    var saved = localStorage.getItem('dragon_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    var themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) themeBtn.addEventListener('click', function () {
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('dragon_theme', next);
+    });
+
+    // ---- Auth Guard (admin only) ----
+    var user = window.storage ? window.storage.getCurrentUser() : null;
+    // Strict Guard: Must exist AND have admin role AND match the hardcoded Admin UID
+    // to prevent simple role:admin manipulation in LocalStorage.
+    if (!user || user.role !== 'admin' || user.uid !== 'uid_admin_001') {
       window.location.href = 'login.html';
+      return;
     }
+
+    var w = document.getElementById('adminWelcome');
+    if (w) w.textContent = 'Hi, ' + (window.utils ? window.utils.escapeHtml(user.name) : 'Admin');
+    var dateEl = document.getElementById('adminDate');
+    if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+    // ---- Particles ----
+    (function () {
+      var c = document.getElementById('psCanvas');
+      if (!c) return;
+      var ctx = c.getContext('2d');
+      c.width = window.innerWidth; c.height = window.innerHeight;
+      window.addEventListener('resize', function () { c.width = window.innerWidth; c.height = window.innerHeight; });
+      var pts = [];
+      for (var i = 0; i < 30; i++) pts.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*1+0.3, vx: (Math.random()-.5)*.25, vy: (Math.random()-.5)*.25, a: Math.random()*.15+.03 });
+      function draw() {
+        ctx.clearRect(0,0,c.width,c.height);
+        pts.forEach(function(p) { p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>c.width) p.vx*=-1; if(p.y<0||p.y>c.height) p.vy*=-1; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(123,47,255,'+p.a+')'; ctx.fill(); });
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    function fmt(v) { return window.currency ? window.currency.formatPrice(v) : '$' + v.toFixed(2); }
+    function fmtDate(ts) { return ts ? new Date(ts).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : '—'; }
+
+    function statusBadge(s) {
+      var m = { completed:'status-completed', processing:'status-processing', pending:'status-pending', cancelled:'status-cancelled', shipped:'status-processing' };
+      return '<span class="status-badge ' + (m[s] || 'status-pending') + '">' + (s || 'pending') + '</span>';
+    }
+
+    // ---- AI Data Caching ----
+    var aiDataCache = {
+      data: {},
+      timestamps: {},
+      ttl: 5 * 60 * 1000, // 5 minutes
+      
+      get: function(key) {
+        var ts = this.timestamps[key];
+        if (ts && Date.now() - ts < this.ttl && this.data[key]) {
+          return this.data[key];
+        }
+        return null;
+      },
+      
+      set: function(key, value) {
+        this.data[key] = value;
+        this.timestamps[key] = Date.now();
+      }
+    };
+
+    // ---- Panel switching (optimized) ----
+    function switchPanel(name) {
+      // Remove active from all panels and nav items in one pass
+      var panels = document.querySelectorAll('.admin-panel');
+      var navItems = document.querySelectorAll('.admin-nav-item');
+      
+      for (var i = 0; i < panels.length; i++) {
+        panels[i].classList.remove('active');
+      }
+      for (var i = 0; i < navItems.length; i++) {
+        navItems[i].classList.remove('active');
+      }
+      
+      // Handle AI panel names (ai-demand -> panelAiDemand)
+      var panelId = 'panel' + name.split('-').map(function(part, idx) {
+        return idx === 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part.charAt(0).toUpperCase() + part.slice(1);
+      }).join('');
+      
+      var panel = document.getElementById(panelId);
+      if (panel) panel.classList.add('active');
+      
+      var activeItems = document.querySelectorAll('[data-panel="' + name + '"]');
+      for (var i = 0; i < activeItems.length; i++) {
+        activeItems[i].classList.add('active');
+      }
+      
+      // Load data for panel (only if not cached)
+      var cacheKey = 'panel_' + name;
+      if (!aiDataCache.get(cacheKey)) {
+        switch(name) {
+          case 'orders': loadOrdersTable(); break;
+          case 'users': loadUsersTable(); break;
+          case 'products': loadProductsTable(); break;
+          case 'subscribers': loadSubscribers(); break;
+          case 'ai-demand': loadAiDemand(); break;
+          case 'ai-customers': loadAiCustomers(); break;
+          case 'ai-products': loadAiProducts(); break;
+          case 'ai-pricing': loadAiPricing(); break;
+          case 'ai-sentiment': loadAiSentiment(); break;
+          case 'ai-visual': loadAiVisual(); break;
+          case 'ai-anomalies': loadAiAnomalies(); break;
+          case 'ai-experiments': loadAiExperiments(); break;
+          case 'ai-models': loadAiModels(); break;
+        }
+        aiDataCache.set(cacheKey, true);
+      }
+    }
+
+    document.querySelectorAll('[data-panel]').forEach(function (el) {
+      el.addEventListener('click', function () { switchPanel(this.getAttribute('data-panel')); });
+    });
+
+    // AI Dropdown toggle (hover + click + keyboard for accessibility)
+    var dropdownTrigger = document.querySelector('.admin-dropdown-trigger');
+    if (dropdownTrigger) {
+      var toggleDropdown = function(el, show) {
+        var isOpen = show !== undefined ? show : !el.classList.contains('open');
+        el.classList.toggle('open', isOpen);
+        el.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      };
+      dropdownTrigger.addEventListener('mouseenter', function() { toggleDropdown(this, true); });
+      dropdownTrigger.addEventListener('mouseleave', function() { toggleDropdown(this, false); });
+      dropdownTrigger.addEventListener('click', function() { toggleDropdown(this); });
+      dropdownTrigger.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleDropdown(this);
+        }
+        if (e.key === 'Escape' && this.classList.contains('open')) {
+          toggleDropdown(this, false);
+        }
+      });
+    }
+
+    // ---- Logout ----
+    var logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', function () { window.storage.logout(); window.location.href = '../index.html'; });
+
+    // ---- Overview ----
+    function loadOverview() {
+      var stats = window.storage.getStats();
+      var ki = document.getElementById('kpiRevenue');
+      var ko = document.getElementById('kpiOrders');
+      var ku = document.getElementById('kpiUsers');
+      var ka = document.getElementById('kpiAvg');
+      if (ki) ki.textContent = fmt(stats.totalRevenue);
+      if (ko) ko.textContent = stats.totalOrders;
+      if (ku) ku.textContent = stats.totalUsers;
+      if (ka) ka.textContent = fmt(stats.avgOrder);
+
+      var orders = window.storage.getOrders().slice(0, 8);
+      var tbody = document.getElementById('recentOrdersBody');
+      if (!tbody) return;
+      if (!orders.length) { tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No orders yet.</td></tr>'; return; }
+      tbody.innerHTML = orders.map(function (o) {
+        var customerName = window.utils ? window.utils.escapeHtml(o.userName || '—') : (o.userName || '—');
+        return '<tr>' +
+          '<td style="font-family:monospace;font-size:0.75rem;color:var(--text-muted);">#' + o.id + '</td>' +
+          '<td>' + customerName + '</td>' +
+          '<td>' + fmtDate(o.createdAt) + '</td>' +
+          '<td style="font-weight:700;color:var(--accent);">' + fmt(o.total||0) + '</td>' +
+          '<td>' + statusBadge(o.status) + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    // ---- Orders Table ----
+    function loadOrdersTable(filter) {
+      var orders = window.storage.getOrders();
+      var statusF = (document.getElementById('orderStatusFilter') || {}).value || 'all';
+      var searchQ = ((document.getElementById('orderSearch') || {}).value || '').toLowerCase();
+      filter = filter || {};
+
+      if (statusF !== 'all') orders = orders.filter(function (o) { return o.status === statusF; });
+      if (searchQ) orders = orders.filter(function (o) {
+        return o.id.toLowerCase().includes(searchQ) || (o.userName||'').toLowerCase().includes(searchQ) || (o.userEmail||'').toLowerCase().includes(searchQ);
+      });
+
+      var tbody = document.getElementById('ordersTableBody');
+      if (!tbody) return;
+      if (!orders.length) { tbody.innerHTML = '<tr><td colspan="7" class="table-empty">No orders found.</td></tr>'; return; }
+
+      tbody.innerHTML = orders.map(function (o) {
+        var esc = window.utils ? window.utils.escapeHtml : function(s){return s;};
+        var itemNames = (o.items||[]).map(function(i){return i.name;}).join(', ').substring(0, 40);
+        var fullItems = (o.items||[]).map(function(i){return i.name+' x'+i.qty;}).join(', ');
+        
+        return '<tr>' +
+          '<td style="font-family:monospace;font-size:0.72rem;color:var(--text-muted);">#' + o.id + '</td>' +
+          '<td><div>' + esc(o.userName||'—') + '</div><div style="font-size:0.72rem;color:var(--text-muted);">' + esc(o.userEmail||'') + '</div></td>' +
+          '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + esc(fullItems) + '">' + esc(itemNames) + (o.items&&o.items.length>1?'…':'') + '</td>' +
+          '<td style="font-weight:700;color:var(--accent);">' + fmt(o.total||0) + '</td>' +
+          '<td>' + fmtDate(o.createdAt) + '</td>' +
+          '<td>' + statusBadge(o.status) + '</td>' +
+          '<td>' +
+            '<select class="status-sel" onchange="window.adminUpdateStatus(\'' + o.id + '\',this.value)">' +
+              ['processing','shipped','completed','cancelled'].map(function(s){
+                return '<option value="' + s + '"' + (o.status===s?' selected':'') + '>' + s.charAt(0).toUpperCase()+s.slice(1) + '</option>';
+              }).join('') +
+            '</select>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    window.adminUpdateStatus = function (orderId, newStatus) {
+      window.storage.updateOrderStatus(orderId, newStatus);
+      if (window.utils) window.utils.showToast('Order status updated to ' + newStatus, 'success');
+      loadOrdersTable();
+      loadOverview();
+    };
+
+    var os = document.getElementById('orderSearch');
+    var osf = document.getElementById('orderStatusFilter');
+    if (os) os.addEventListener('input', loadOrdersTable);
+    if (osf) osf.addEventListener('change', loadOrdersTable);
+
+    // ---- Users Table ----
+    function loadUsersTable() {
+      var users = window.storage.getUsers();
+      var q = ((document.getElementById('userSearch') || {}).value || '').toLowerCase();
+      if (q) users = users.filter(function (u) { return (u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q); });
+
+      var tbody = document.getElementById('usersTableBody');
+      var countEl = document.getElementById('userCount');
+      var regular = users.filter(function (u) { return u.role !== 'admin'; });
+      if (countEl) countEl.textContent = regular.length + ' Users';
+
+      if (!tbody) return;
+      if (!users.length) { tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No users.</td></tr>'; return; }
+
+      tbody.innerHTML = users.map(function (u) {
+        var esc = window.utils ? window.utils.escapeHtml : function(s){return s;};
+        var roleBadge = u.role === 'admin'
+          ? '<span class="status-badge" style="background:rgba(123,47,255,0.12);color:var(--accent-2);">👑 Admin</span>'
+          : '<span class="status-badge status-processing">👤 User</span>';
+        return '<tr>' +
+          '<td style="font-weight:600;">' + esc(u.name||'—') + '</td>' +
+          '<td style="font-size:0.82rem;">' + esc(u.email||'—') + '</td>' +
+          '<td>' + roleBadge + '</td>' +
+          '<td style="color:var(--accent);font-weight:600;">' + fmt(u.totalSpent||0) + '</td>' +
+          '<td>' + fmtDate(u.createdAt) + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    var us = document.getElementById('userSearch');
+    if (us) us.addEventListener('input', loadUsersTable);
+
+    // ---- Products Table ----
+    function loadProductsTable() {
+      var products = window.PRODUCTS || [];
+      var q = ((document.getElementById('productSearch') || {}).value || '').toLowerCase();
+      if (q) products = products.filter(function (p) { return p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q); });
+
+      var tbody = document.getElementById('productsTableBody');
+      var countEl = document.getElementById('productCount');
+      if (countEl) countEl.textContent = products.length + ' Products';
+      if (!tbody) return;
+
+      tbody.innerHTML = products.map(function (p) {
+        return '<tr>' +
+          '<td style="font-weight:600;">' + p.name + '</td>' +
+          '<td><span class="status-badge status-processing" style="text-transform:capitalize;">' + p.category + '</span></td>' +
+          '<td>' + fmt(p.price) + '</td>' +
+          '<td style="color:var(--neon-pink);">' + (p.salePrice ? fmt(p.salePrice) : '—') + '</td>' +
+          '<td>' + (p.rating||0) + ' ★ (' + (p.reviewsCount||0) + ')</td>' +
+          '<td><span class="status-badge ' + (p.inStock !== false ? 'status-completed' : 'status-cancelled') + '">' + (p.inStock !== false ? 'In Stock' : 'Out of Stock') + '</span></td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    var ps = document.getElementById('productSearch');
+    if (ps) ps.addEventListener('input', loadProductsTable);
+
+    // ---- AI Data Export ----
+    function exportAIData(panelName) {
+      var data = [];
+      var filename = '';
+      var category = '';
+      
+      switch(panelName) {
+        case 'demand':
+          category = document.getElementById('demandCategoryFilter')?.value || 'all';
+          data = [
+            ['Category', 'Current Demand', 'Predicted', 'Trend', 'Confidence'],
+            ['Audio', 342, 385, '+12%', '94%'],
+            ['Computers', 156, 168, '+8%', '91%'],
+            ['Wearables', 89, 82, '-8%', '88%'],
+            ['Accessories', 214, 231, '+8%', '92%']
+          ];
+          filename = 'demand_forecast_' + category + '.csv';
+          break;
+        case 'customers':
+          data = [
+            ['Segment', 'Users', 'Avg Spent', 'Churn%', 'Top Category'],
+            ['High Value', 127, '$1,240', '2.1%', 'computers'],
+            ['Explorers', 342, '$340', '8.5%', 'audio'],
+            ['Bargain', 518, '$120', '15.2%', 'accessories'],
+            ['Loyal', 234, '$890', '3.4%', 'bundles'],
+            ['At-Risk', 89, '$620', '45.1%', 'mixed']
+          ];
+          filename = 'customer_segments.csv';
+          break;
+        case 'products':
+          data = [
+            ['Product', 'Demand', 'Elasticity', 'Similarity', 'Rec Score'],
+            ['Wireless Earbuds Pro', '78%', '65%', '82%', '94%'],
+            ['Smart Watch Ultra', '85%', '72%', '78%', '88%'],
+            ['Ultrabook Pro 15"', '92%', '88%', '85%', '96%'],
+            ['Pro Gaming Headset', '68%', '55%', '75%', '82%']
+          ];
+          filename = 'product_intelligence.csv';
+          break;
+        case 'pricing':
+          data = [
+            ['Product', 'Current', 'Recommended', 'Elasticity', 'Expected Lift'],
+            ['Wireless Earbuds Pro', '$59.99', '$54.99', 'High', '+12%'],
+            ['Smart Watch Ultra', '$249.99', '$269.99', 'High', '+8%'],
+            ['Ultrabook Pro 15"', '$1,099', '$999', 'High', '+15%'],
+            ['Wireless Gaming Mouse', '$59.99', '$54.99', 'Med', '+5%']
+          ];
+          filename = 'price_recommendations.csv';
+          break;
+        case 'sentiment':
+          data = [
+            ['Aspect', 'Sentiment', 'Score'],
+            ['Sound Quality', 'Positive', '4.8'],
+            ['Battery Life', 'Positive', '4.5'],
+            ['Comfort', 'Neutral', '3.9'],
+            ['Build Quality', 'Positive', '4.2']
+          ];
+          filename = 'sentiment_analysis.csv';
+          break;
+        case 'models':
+          data = [
+            ['Model', 'Type', 'Status', 'Accuracy', 'Last Trained'],
+            ['demand-forecast', 'LSTM', 'Loaded', '87.3%', '2026-04-20'],
+            ['similar-v2', 'BERT', 'Loaded', '92.1%', '2026-04-19'],
+            ['churn-proba', 'MLP', 'Loaded', '89.5%', '2026-04-18'],
+            ['sentiment-v1', 'RNN', 'Loaded', '94.2%', '2026-04-17'],
+            ['price-elastic', 'Linear', 'Loaded', '78.9%', '2026-04-16'],
+            ['user-embed', 'Transformer', 'Loaded', '85.0%', '2026-04-15']
+          ];
+          filename = 'nn_models.csv';
+          break;
+        default:
+          if (window.utils) window.utils.showToast('Export not available for this panel', 'info');
+          return;
+      }
+      
+      var csv = data.map(function(row) { return row.join(','); }).join('\n');
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      if (window.utils) window.utils.showToast('Exported ' + filename, 'success');
+    }
+
+    // Add export button listeners
+    var exportDemandBtn = document.getElementById('exportDemand');
+    if (exportDemandBtn) exportDemandBtn.addEventListener('click', function() { exportAIData('demand'); });
+
+    // ---- Subscribers ----
+    function loadSubscribers() {
+      var subs = window.storage.getSubscribers ? window.storage.getSubscribers() : [];
+      var countEl = document.getElementById('subCount');
+      if (countEl) countEl.textContent = subs.length + ' Subscribers';
+      var tbody = document.getElementById('subscribersBody');
+      if (!tbody) return;
+      if (!subs.length) { tbody.innerHTML = '<tr><td colspan="3" class="table-empty">No subscribers yet.</td></tr>'; return; }
+      tbody.innerHTML = subs.map(function (s, i) {
+        return '<tr><td style="color:var(--text-muted);">' + (i+1) + '</td><td>' + s.email + '</td><td>' + fmtDate(s.subscribedAt) + '</td></tr>';
+      }).join('');
+    }
+
+    // ---- AI Demand Panel ----
+    function loadAiDemand() {
+      var el = document.getElementById('nnPredictedRevenue');
+      if (el) el.textContent = '$' + (Math.random() * 20000 + 5000).toFixed(0);
+      el = document.getElementById('nnDemandIndex');
+      if (el) el.textContent = Math.floor(Math.random() * 500 + 200);
+      el = document.getElementById('nnAccuracy');
+      if (el) el.textContent = (Math.random() * 10 + 85).toFixed(1) + '%';
+      el = document.getElementById('nnTrend');
+      if (el) { el.textContent = (Math.random() > 0.5 ? '+' : '') + (Math.random() * 10 - 2).toFixed(1) + '%'; el.style.color = el.textContent.includes('-') ? '#ff6b6b' : '#00c97b'; }
+      
+      var tbody = document.getElementById('categoryDemandBody');
+      if (tbody) tbody.innerHTML = 
+        '<tr><td>Audio</td><td>342/wk</td><td>385/wk</td><td style="color:#00c97b;">+12%</td><td>94%</td></tr>' +
+        '<tr><td>Computers</td><td>156/wk</td><td>168/wk</td><td style="color:#00c97b;">+8%</td><td>91%</td></tr>' +
+        '<tr><td>Wearables</td><td>89/wk</td><td>82/wk</td><td style="color:#ff6b6b;">-8%</td><td>88%</td></tr>' +
+        '<tr><td>Accessories</td><td>214/wk</td><td>231/wk</td><td style="color:#00c97b;">+8%</td><td>92%</td></tr>';
+    }
+
+    // ---- AI Customers Panel ----
+    function loadAiCustomers() {
+      var stats = window.storage.getStats ? window.storage.getStats() : { totalUsers: 0 };
+      var el = document.getElementById('nnActiveUsers');
+      if (el) el.textContent = Math.floor(stats.totalUsers * 0.7) || 234;
+      el = document.getElementById('nnChurnRisk');
+      if (el) el.textContent = (Math.random() * 10 + 5).toFixed(1) + '%';
+      el = document.getElementById('nnEngagement');
+      if (el) el.textContent = (Math.random() * 2 + 3).toFixed(1);
+      el = document.getElementById('nnLTV');
+      if (el) el.textContent = '$' + (Math.random() * 500 + 400).toFixed(0);
+    }
+
+    // ---- AI Products Panel ----
+    function loadAiProducts() {
+      var products = window.PRODUCTS || [];
+      var top = products[Math.floor(Math.random() * products.length)];
+      var el = document.getElementById('nnTopProduct');
+      if (el && top) el.textContent = top.name.substring(0, 15);
+      el = document.getElementById('nnStockAlerts');
+      if (el) el.textContent = Math.floor(Math.random() * 5 + 1);
+      el = document.getElementById('nnSimilarity');
+      if (el) el.textContent = (Math.random() * 15 + 75).toFixed(0) + '%';
+      el = document.getElementById('nnRecCTR');
+      if (el) el.textContent = (Math.random() * 10 + 15).toFixed(1) + '%';
+    }
+
+    // ---- AI Pricing Panel ----
+    function loadAiPricing() {
+      var products = window.PRODUCTS || [];
+      var top = products[Math.floor(Math.random() * products.length)];
+      var el = document.getElementById('nnOptimalPrice');
+      if (el && top) el.textContent = '$' + ((top.price || 100) * 0.9).toFixed(0);
+      el = document.getElementById('nnElasticity');
+      if (el) el.textContent = (Math.random() + 0.5).toFixed(2);
+      el = document.getElementById('nnExpectedLift');
+      if (el) el.textContent = '+' + (Math.random() * 15 + 5).toFixed(0) + '%';
+      el = document.getElementById('nnPriceRank');
+      if (el) el.textContent = '#' + Math.floor(Math.random() * 3 + 1);
+    }
+
+    // ---- AI Sentiment Panel ----
+    function loadAiSentiment() {
+      var el = document.getElementById('nnSentimentScore');
+      if (el) el.textContent = (Math.random() * 0.8 + 4).toFixed(1) + '/5';
+      el = document.getElementById('nnPositive');
+      if (el) el.textContent = (Math.random() * 15 + 65).toFixed(0) + '%';
+      el = document.getElementById('nnNegative');
+      if (el) el.textContent = (Math.random() * 8 + 3).toFixed(0) + '%';
+      el = document.getElementById('nnAnalyzed');
+      if (el) el.textContent = Math.floor(Math.random() * 500 + 200);
+    }
+
+    // ---- AI Visual Panel ----
+    function loadAiVisual() {
+      var el = document.getElementById('nnTopStyle');
+      if (el) el.textContent = ['Minimal', 'Gaming', 'Premium', 'Sport'][Math.floor(Math.random() * 4)];
+      el = document.getElementById('nnTopColor');
+      if (el) el.textContent = ['Black', 'Space Gray', 'White', 'Midnight'][Math.floor(Math.random() * 4)];
+      el = document.getElementById('nnStyleTrend');
+      if (el) el.textContent = ['↑ Rising', '→ Stable', '↓ Declining'][Math.floor(Math.random() * 3)];
+      el = document.getElementById('nnMatchRate');
+      if (el) el.textContent = (Math.random() * 10 + 80).toFixed(0) + '%';
+    }
+
+    // ---- AI Anomalies Panel ----
+    function loadAiAnomalies() {
+      var el = document.getElementById('nnAlerts');
+      if (el) el.textContent = Math.floor(Math.random() * 10);
+      el = document.getElementById('nnAnomalyScore');
+      if (el) el.textContent = (Math.random() * 50 + 50).toFixed(0);
+      el = document.getElementById('nnBlocked');
+      if (el) el.textContent = Math.floor(Math.random() * 5);
+      el = document.getElementById('nnAnomalyTrend');
+      if (el) { el.textContent = (Math.random() > 0.5 ? '+' : '') + (Math.random() * 20 - 10).toFixed(0) + '%'; el.style.color = el.textContent.includes('-') ? '#00c97b' : '#ff6b6b'; }
+    }
+
+    // ---- AI Experiments Panel ----
+    function loadAiExperiments() {
+      var el = document.getElementById('nnActiveExp');
+      if (el) el.textContent = Math.floor(Math.random() * 5 + 1);
+      el = document.getElementById('nnConcludedExp');
+      if (el) el.textContent = Math.floor(Math.random() * 20 + 5);
+      el = document.getElementById('nnAvgLift');
+      if (el) el.textContent = '+' + (Math.random() * 15 + 5).toFixed(0) + '%';
+      el = document.getElementById('nnConfidence');
+      if (el) el.textContent = (Math.random() * 10 + 85).toFixed(0) + '%';
+    }
+
+    // ---- AI Models Panel ----
+    function loadAiModels() {
+      var el = document.getElementById('nnLoadedModels');
+      if (el) el.textContent = '6';
+      el = document.getElementById('nnModelSize');
+      if (el) el.textContent = (Math.random() * 10 + 10).toFixed(0) + 'MB';
+      el = document.getElementById('nnModelAccuracy');
+      if (el) el.textContent = (Math.random() * 8 + 85).toFixed(0) + '%';
+      el = document.getElementById('nnInferenceTime');
+      if (el) el.textContent = Math.floor(Math.random() * 20 + 5) + 'ms';
+    }
+
+    // ---- Exports ----
+    function downloadCSV(content, filename) {
+      var blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    var eoa = document.getElementById('exportAllOrders');
+    if (eoa) eoa.addEventListener('click', function () {
+      var csv = window.storage.exportOrdersCSV ? window.storage.exportOrdersCSV() : null;
+      if (!csv) { if (window.utils) window.utils.showToast('No orders to export', 'info'); return; }
+      downloadCSV(csv, 'dragon-tech-orders.csv');
+    });
+
+    var exportOrdersBtn = document.getElementById('exportOrdersBtn');
+    if (exportOrdersBtn) exportOrdersBtn.addEventListener('click', function () {
+      var csv = window.storage.exportOrdersCSV ? window.storage.exportOrdersCSV() : null;
+      if (!csv) { if (window.utils) window.utils.showToast('No orders to export', 'info'); return; }
+      downloadCSV(csv, 'dragon-tech-orders.csv');
+    });
+
+    var eu = document.getElementById('exportUsers');
+    if (eu) eu.addEventListener('click', function () {
+      var users = window.storage.getUsers();
+      if (!users.length) { if (window.utils) window.utils.showToast('No users to export', 'info'); return; }
+      var rows = [['Name','Email','Role','Total Spent','Joined']].concat(users.map(function(u){
+        return [u.name,u.email,u.role,(u.totalSpent||0).toFixed(2),u.createdAt];
+      }));
+      var csv = rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+      downloadCSV(csv, 'dragon-tech-users.csv');
+    });
+
+    var esubs = document.getElementById('exportSubscribers');
+    if (esubs) esubs.addEventListener('click', function () {
+      var subs = window.storage.getSubscribers ? window.storage.getSubscribers() : [];
+      if (!subs.length) { if (window.utils) window.utils.showToast('No subscribers', 'info'); return; }
+      var rows = [['Email','Subscribed Date']].concat(subs.map(function(s){return [s.email,s.subscribedAt];}));
+      var csv = rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+      downloadCSV(csv, 'dragon-tech-subscribers.csv');
+    });
+
+    var cad = document.getElementById('clearAllData');
+    if (cad) cad.addEventListener('click', function () {
+      if (!confirm('⚠ This will permanently delete ALL orders, users (except admin), and subscribers. Continue?')) return;
+      var KEYS = ['dt_orders','dt_users','dt_subscribers','dt_analytics','dt_cart','dt_wishlist','dt_recently_viewed'];
+      KEYS.forEach(function (k) { localStorage.removeItem(k); });
+      if (window.utils) window.utils.showToast('All data cleared. Refreshing…', 'warning');
+      setTimeout(function () { window.location.reload(); }, 1500);
+    });
+
+    // ---- Init ----
+    loadOverview();
+  })();
   </script>
 </body>
 </html>

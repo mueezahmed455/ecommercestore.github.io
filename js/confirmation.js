@@ -48,27 +48,21 @@
    */
   function getQueryParam(name) {
     var params = new URLSearchParams(window.location.search);
-    return params.get(name);
+    return params.get(name) || params.get('orderId'); // Support both 'id' and 'orderId'
   }
-
-  var db = window.db;
-
-  // ---- Self-Initialize ----
-
-  initConfirmation();
 
   /**
    * Main initializer for the confirmation page.
    */
-  async function initConfirmation() {
-    var orderId = getQueryParam('orderId');
+  function initConfirmation() {
+    var orderId = getQueryParam('id');
 
     if (!orderId) {
       showError('No order ID provided. Please check your confirmation link.');
       return;
     }
 
-    await loadOrder(orderId);
+    loadOrder(orderId);
   }
 
   // ---- Loading / Error States ----
@@ -95,65 +89,35 @@
 
   // ---- Load Order ----
 
-  async function loadOrder(orderId) {
-    try {
-      var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-      var orderRef = fbFirestore.doc(db.firestore, 'orders', orderId);
-      var orderSnap = await fbFirestore.getDoc(orderRef);
-
-      if (!orderSnap.exists()) {
-        showError('Order not found. It may have been removed or the link is incorrect.');
+  function loadOrder(orderId) {
+    if (!window.storage) {
+        showError('System error: storage service not available.');
         return;
-      }
-
-      var order = orderSnap.data();
-      order.id = orderSnap.id;
-
-      hideLoading();
-      populateOrderDetails(order);
-
-      // Fetch user data in parallel
-      if (order.userId) {
-        await loadUser(order.userId);
-      }
-
-      // Render items
-      renderOrderItems(order.items || []);
-
-      // Show the content and animate
-      showOrderContent();
-      triggerStaggeredReveal();
-    } catch (error) {
-      console.error('Failed to load order:', error);
-      showError('An error occurred while loading your order. Please try again later.');
     }
-  }
 
-  // ---- Load User ----
+    var orders = window.storage.getOrders();
+    var order = orders.find(o => o.id === orderId);
 
-  async function loadUser(userId) {
-    try {
-      var fbFirestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-      var userRef = fbFirestore.doc(db.firestore, 'users', userId);
-      var userSnap = await fbFirestore.getDoc(userRef);
-
-      if (userSnap.exists()) {
-        var userData = userSnap.data();
-        var buyerName = userData.name || 'Customer';
-        // Update the thank-you message if a buyer element exists
-        var thankYouEl = document.getElementById('buyerName');
-        if (thankYouEl) {
-          thankYouEl.textContent = escapeHtml(buyerName);
-        }
-        // Also update header paragraph
-        var headerP = document.querySelector('.confirmation-header p');
-        if (headerP && userData.name) {
-          headerP.textContent = 'Thank you, ' + escapeHtml(userData.name) + '! Your order is being processed.';
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load user:', error);
+    if (!order) {
+      showError('Order not found. It may have been removed or the link is incorrect.');
+      return;
     }
+
+    hideLoading();
+    populateOrderDetails(order);
+
+    // Update header paragraph
+    var headerP = document.querySelector('.confirmation-header p');
+    if (headerP && order.userName) {
+      headerP.textContent = 'Thank you, ' + escapeHtml(order.userName) + '! Your order is being processed.';
+    }
+
+    // Render items
+    renderOrderItems(order.items || []);
+
+    // Show the content and animate
+    showOrderContent();
+    triggerStaggeredReveal();
   }
 
   // ---- Populate Order Details ----
@@ -244,6 +208,12 @@
         detail.classList.add('reveal', 'visible');
       }, (index + 1) * 80);
     });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initConfirmation);
+  } else {
+    initConfirmation();
   }
 
 })();

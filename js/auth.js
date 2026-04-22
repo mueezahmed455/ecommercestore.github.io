@@ -1,334 +1,214 @@
 /**
- * Authentication Module
- * Handles signup, login, logout with Firebase Auth
- * Includes input validation and XSS protection
+ * Dragon-Tech Auth Module — v2.0
+ * Handles login/signup forms with real-time validation,
+ * password strength meter, and storage-service integration.
  */
-(function() {
+(function () {
   'use strict';
 
-  // DOM Elements
-  var loginForm = document.getElementById('loginForm');
-  var signupForm = document.getElementById('signupForm');
-  var loginTab = document.getElementById('loginTab');
-  var signupTab = document.getElementById('signupTab');
+  function $id(id) { return document.getElementById(id); }
+  function toast(msg, type) { if (window.utils) window.utils.showToast(msg, type); }
 
-  // Initialize if on auth page
-  if (loginForm || signupForm) {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initAuth);
-    } else {
-      initAuth();
-    }
+  // ---- Field validation ----
+  function setError(fieldId, errId, msg) {
+    var field = $id(fieldId);
+    var err   = $id(errId);
+    if (field) field.classList.toggle('error', !!msg);
+    if (err)   err.textContent = msg || '';
   }
 
-  /**
-   * Initialize authentication page
-   */
-  function initAuth() {
-    // Tab switching
-    if (loginTab && signupTab) {
-      loginTab.addEventListener('click', function() { switchTab('login'); });
-      signupTab.addEventListener('click', function() { switchTab('signup'); });
-    }
+  function clearErrors(ids) {
+    ids.forEach(function (id) { setError(id, id + 'Error', ''); });
+  }
 
-    // Form submissions
-    if (loginForm) loginForm.addEventListener('submit', handleLogin);
-    if (signupForm) signupForm.addEventListener('submit', handleSignup);
+  // ---- Password visibility toggle ----
+  function initPasswordToggles() {
+    document.querySelectorAll('.pw-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = $id(this.getAttribute('data-target'));
+        if (!target) return;
+        var show = target.type === 'password';
+        target.type = show ? 'text' : 'password';
+        this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        var svg = this.querySelector('svg');
+        if (svg && show) {
+          svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+        } else if (svg) {
+          svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+        }
+      });
+    });
+  }
 
-    // Password visibility toggles
-    document.querySelectorAll('.toggle-password').forEach(function(btn) {
-      btn.addEventListener('click', togglePasswordVisibility);
+  // ---- Password Strength ----
+  function initPasswordStrength(inputId, barsId, labelId) {
+    var input = $id(inputId);
+    var bars  = $id(barsId);
+    var label = $id(labelId);
+    if (!input || !bars) return;
+
+    input.addEventListener('input', function () {
+      var strength = window.utils ? window.utils.passwordStrength(this.value) : { score: 0, label: '', color: '' };
+      var score = strength.score;
+      bars.querySelectorAll('.strength-bar').forEach(function (bar, idx) {
+        var level = idx < 2 ? 'weak' : idx < 3 ? 'fair' : idx < 4 ? 'good' : 'strong';
+        bar.className = 'strength-bar' + (idx < score ? ' ' + level : '');
+      });
+      if (label) {
+        label.textContent = strength.label;
+        label.style.color = strength.color;
+      }
+    });
+  }
+
+  // ---- Tab Switching ----
+  function initTabs() {
+    var tabs = document.querySelectorAll('.auth-tab[data-tab]');
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var target = this.getAttribute('data-tab');
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        this.classList.add('active');
+        document.querySelectorAll('.auth-form').forEach(function (f) {
+          f.classList.toggle('active', f.id === target + 'Form');
+        });
+        // Update URL hash silently
+        history.replaceState(null, '', '#' + target);
+      });
     });
 
-    // Password strength meter
-    var passwordInput = document.getElementById('signupPassword');
-    if (passwordInput) {
-      passwordInput.addEventListener('input', updatePasswordStrength);
+    // Activate from hash
+    var hash = (location.hash || '').replace('#', '');
+    if (hash) {
+      var tab = document.querySelector('.auth-tab[data-tab="' + hash + '"]');
+      if (tab) tab.click();
     }
-
-    // Real-time validation
-    setupRealTimeValidation();
   }
 
-  /**
-   * Switch between login and signup tabs
-   */
-  function switchTab(tab) {
-    var tabs = document.querySelectorAll('.auth-tab');
-    var forms = document.querySelectorAll('.auth-form');
+  // ---- Login Form ----
+  function initLoginForm() {
+    var form = $id('loginForm');
+    if (!form) return;
 
-    tabs.forEach(function(t) {
-      t.classList.remove('active');
-      t.setAttribute('aria-selected', 'false');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      clearErrors(['loginEmail', 'loginPassword']);
+
+      var email = ($id('loginEmail') || {}).value || '';
+      var pw    = ($id('loginPassword') || {}).value || '';
+      var btn   = $id('loginSubmit');
+
+      var valid = true;
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setError('loginEmail', 'loginEmailError', 'Please enter a valid email address');
+        valid = false;
+      }
+      if (!pw) {
+        setError('loginPassword', 'loginPasswordError', 'Password is required');
+        valid = false;
+      }
+      if (!valid) return;
+
+      if (btn) btn.classList.add('loading');
+
+      // Small async delay for UX
+      setTimeout(function () {
+        try {
+          var user = window.storage.login(email, pw);
+          toast('Welcome back, ' + user.name + '!', 'success');
+
+          // Redirect after short delay
+          var params = new URLSearchParams(window.location.search);
+          var redirect = params.get('redirect');
+          setTimeout(function () {
+            if (redirect === 'checkout') {
+              window.location.href = '../index.html#checkout';
+            } else if (user.role === 'admin') {
+              window.location.href = 'admin.html';
+            } else {
+              window.location.href = 'dashboard.html';
+            }
+          }, 800);
+        } catch (err) {
+          if (btn) btn.classList.remove('loading');
+          toast(err.message, 'error');
+          setError('loginEmail', 'loginEmailError', ' ');
+          setError('loginPassword', 'loginPasswordError', err.message);
+        }
+      }, 400);
     });
-
-    forms.forEach(function(f) { f.classList.remove('active'); });
-
-    if (tab === 'login') {
-      loginTab.classList.add('active');
-      loginTab.setAttribute('aria-selected', 'true');
-      loginForm.classList.add('active');
-    } else {
-      signupTab.classList.add('active');
-      signupTab.setAttribute('aria-selected', 'true');
-      signupForm.classList.add('active');
-    }
   }
 
-  /**
-   * Handle login form submission
-   */
-  async function handleLogin(e) {
-    e.preventDefault();
-    clearErrors();
+  // ---- Signup Form ----
+  function initSignupForm() {
+    var form = $id('signupForm');
+    if (!form) return;
 
-    var email = document.getElementById('loginEmail').value.trim();
-    var password = document.getElementById('loginPassword').value;
-    var isValid = true;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      clearErrors(['signupName', 'signupEmail', 'signupPassword', 'signupConfirm']);
 
-    if (!validateEmail(email)) {
-      showError('loginEmailError', 'Please enter a valid email address');
-      isValid = false;
-    }
+      var name    = ($id('signupName')    || {}).value || '';
+      var email   = ($id('signupEmail')   || {}).value || '';
+      var pw      = ($id('signupPassword')|| {}).value || '';
+      var pw2     = ($id('signupConfirm') || {}).value || '';
+      var btn     = $id('signupSubmit');
+      var valid   = true;
 
-    if (!password) {
-      showError('loginPasswordError', 'Password is required');
-      isValid = false;
-    }
+      if (!name || name.trim().length < 2) {
+        setError('signupName', 'signupNameError', 'Name must be at least 2 characters');
+        valid = false;
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setError('signupEmail', 'signupEmailError', 'Please enter a valid email address');
+        valid = false;
+      }
+      if (!pw || pw.length < 8) {
+        setError('signupPassword', 'signupPasswordError', 'Password must be at least 8 characters');
+        valid = false;
+      }
+      if (pw !== pw2) {
+        setError('signupConfirm', 'signupConfirmError', 'Passwords do not match');
+        valid = false;
+      }
+      if (!valid) return;
 
-    if (!isValid) return;
+      if (btn) btn.classList.add('loading');
 
-    var submitBtn = document.getElementById('loginSubmit');
-    submitBtn.classList.add('loading');
-
-    try {
-      // Use Local Storage Service instead of Firebase
-      const user = window.storage.login(email, password);
-      
-      showToast('Successfully signed in', 'success');
-      
-      // Redirect to dashboard or previous page
-      setTimeout(() => {
-        window.location.href = window.location.search.includes('redirect=admin') ? 'admin.html' : 'dashboard.html';
-      }, 800);
-      
-    } catch (error) {
-      handleAuthError(error, 'login');
-    } finally {
-      submitBtn.classList.remove('loading');
-    }
+      setTimeout(function () {
+        try {
+          var user = window.storage.signup(name, email, pw);
+          toast('Account created! Welcome, ' + user.name + '!', 'success');
+          setTimeout(function () { window.location.href = 'dashboard.html'; }, 800);
+        } catch (err) {
+          if (btn) btn.classList.remove('loading');
+          toast(err.message, 'error');
+          if (err.message.includes('email')) {
+            setError('signupEmail', 'signupEmailError', err.message);
+          }
+        }
+      }, 400);
+    });
   }
 
-  /**
-   * Handle signup form submission
-   */
-  async function handleSignup(e) {
-    e.preventDefault();
-    clearErrors();
-
-    var name = document.getElementById('signupName').value.trim();
-    var email = document.getElementById('signupEmail').value.trim();
-    var password = document.getElementById('signupPassword').value;
-    var confirmPassword = document.getElementById('signupConfirm').value;
-    var isValid = true;
-
-    if (name.length < 2) {
-      showError('signupNameError', 'Name must be at least 2 characters');
-      isValid = false;
-    }
-
-    if (!validateEmail(email)) {
-      showError('signupEmailError', 'Please enter a valid email address');
-      isValid = false;
-    }
-
-    var passwordValidation = validatePassword(password);
-    if (!passwordValidation.valid) {
-      showError('signupPasswordError', passwordValidation.message);
-      isValid = false;
-    }
-
-    if (password !== confirmPassword) {
-      showError('signupConfirmError', 'Passwords do not match');
-      isValid = false;
-    }
-
-    if (!isValid) return;
-
-    var submitBtn = document.getElementById('signupSubmit');
-    submitBtn.classList.add('loading');
-
-    try {
-      // Use Local Storage Service instead of Firebase
-      window.storage.signup(name, email, password);
-
-      showToast('Account created successfully!', 'success');
-      
-      setTimeout(() => {
-        window.location.href = 'dashboard.html';
-      }, 800);
-      
-    } catch (error) {
-      handleAuthError(error, 'signup');
-    } finally {
-      submitBtn.classList.remove('loading');
-    }
-  }
-
-  /**
-   * Validate email format
-   */
-  function validateEmail(email) {
-    var re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    return re.test(email) && email.length <= 254;
-  }
-
-  /**
-   * Validate password strength
-   */
-  function validatePassword(password) {
-    if (password.length < 8) return { valid: false, message: 'Password must be at least 8 characters' };
-    if (password.length > 128) return { valid: false, message: 'Password must be less than 128 characters' };
-    if (!/[A-Z]/.test(password)) return { valid: false, message: 'Must contain at least one uppercase letter' };
-    if (!/[a-z]/.test(password)) return { valid: false, message: 'Must contain at least one lowercase letter' };
-    if (!/[0-9]/.test(password)) return { valid: false, message: 'Must contain at least one number' };
-    return { valid: true };
-  }
-
-  /**
-   * Update password strength meter UI
-   */
-  function updatePasswordStrength(e) {
-    var password = e.target.value;
-    var strengthEl = document.getElementById('passwordStrength');
-    if (!strengthEl) return;
-
-    var fill = strengthEl.querySelector('.strength-fill');
-    var text = strengthEl.querySelector('.strength-text');
-
-    var score = 0;
-    if (password.length >= 8) score++;
-    if (password.length >= 12) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[a-z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-
-    fill.className = 'strength-fill';
-
-    if (password.length === 0) {
-      text.textContent = '';
+  // ---- Init ----
+  function init() {
+    // Redirect if already logged in
+    if (window.storage && window.storage.getCurrentUser()) {
+      var user = window.storage.getCurrentUser();
+      window.location.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
       return;
     }
 
-    if (score <= 2) {
-      fill.classList.add('weak');
-      text.textContent = 'Weak';
-    } else if (score <= 3) {
-      fill.classList.add('fair');
-      text.textContent = 'Fair';
-    } else if (score <= 4) {
-      fill.classList.add('good');
-      text.textContent = 'Good';
-    } else {
-      fill.classList.add('strong');
-      text.textContent = 'Strong';
-    }
+    initTabs();
+    initLoginForm();
+    initSignupForm();
+    initPasswordToggles();
+    initPasswordStrength('signupPassword', 'strengthBars', 'strengthLabel');
   }
 
-  /**
-   * Toggle password visibility
-   */
-  function togglePasswordVisibility(e) {
-    var targetId = e.currentTarget.dataset.target;
-    var input = document.getElementById(targetId);
-    if (!input) return;
-
-    var isPassword = input.type === 'password';
-    input.type = isPassword ? 'text' : 'password';
-    e.currentTarget.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
-  }
-
-  /**
-   * Setup real-time form validation
-   */
-  function setupRealTimeValidation() {
-    var emailInputs = document.querySelectorAll('input[type="email"]');
-    emailInputs.forEach(function(input) {
-      input.addEventListener('blur', function() {
-        if (input.value && !validateEmail(input.value)) {
-          var errorId = input.id.replace('Email', 'EmailError');
-          var errorEl = document.getElementById(errorId);
-          if (errorEl) errorEl.textContent = 'Please enter a valid email';
-        }
-      });
-
-      input.addEventListener('input', function() {
-        var errorId = input.id.replace('Email', 'EmailError');
-        var errorEl = document.getElementById(errorId);
-        if (errorEl) errorEl.textContent = '';
-      });
-    });
-  }
-
-  /**
-   * Show form error message
-   */
-  function showError(elementId, message) {
-    var el = document.getElementById(elementId);
-    if (el) el.textContent = message;
-  }
-
-  /**
-   * Clear all form errors
-   */
-  function clearErrors() {
-    document.querySelectorAll('.form-error').forEach(function(el) {
-      el.textContent = '';
-    });
-  }
-
-  /**
-   * Handle Firebase Auth errors
-   */
-  function handleAuthError(error, context) {
-    var messageEl = document.getElementById(context + 'Message');
-    var message = 'An unexpected error occurred. Please try again.';
-
-    switch (error.code) {
-      case 'auth/email-already-in-use':
-        message = 'This email is already registered';
-        break;
-      case 'auth/invalid-email':
-        message = 'Invalid email address';
-        break;
-      case 'auth/weak-password':
-        message = 'Password is too weak';
-        break;
-      case 'auth/user-not-found':
-      case 'auth/wrong-password':
-      case 'auth/invalid-credential':
-        message = 'Invalid email or password';
-        break;
-      case 'auth/too-many-requests':
-        message = 'Too many attempts. Please try again later.';
-        break;
-      case 'auth/network-request-failed':
-        message = 'Network error. Check your connection.';
-        break;
-    }
-
-    if (messageEl) {
-      messageEl.textContent = message;
-      messageEl.classList.add('error');
-    } else {
-      showToast(message, 'error');
-    }
-  }
-
-  /**
-   * Show toast notification
-   */
-  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else { init(); }
 
 })();

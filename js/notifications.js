@@ -1,18 +1,16 @@
 /**
  * Notifications Module
- * Firebase realtime notification bell for logged-in users.
- * Listens to Firestore notifications/{userId}.
+ * Pure local notification bell for logged-in users.
+ * Uses localStorage for persistence.
  * Exposes window.notifications.
  */
 (function() {
   'use strict';
 
   var BELL_CONTAINER_ID = 'notificationBell';
-  var FIRESTORE_MODULE_URL = 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-  var AUTH_MODULE_URL = 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  var STORAGE_KEY_PREFIX = 'dragon_notifications_';
 
   var currentUserId = null;
-  var unsubscribeFn = null;
   var notificationsCache = [];
   var dropdownOpen = false;
 
@@ -26,7 +24,7 @@
 
   function formatDate(ts) {
     if (!ts) return '';
-    var d = ts.toDate ? ts.toDate() : new Date(ts);
+    var d = new Date(ts);
     var now = new Date();
     var diffMs = now - d;
     var diffMins = Math.floor(diffMs / 60000);
@@ -41,34 +39,9 @@
   }
 
   function showToast(message, type) {
-    if (window.showToast) {
-      window.showToast(message, type || 'info');
+    if (window.utils && window.utils.showToast) {
+      window.utils.showToast(message, type || 'info');
     }
-  }
-
-  function getFirestoreFunctions() {
-    return import(FIRESTORE_MODULE_URL).then(function(m) {
-      return {
-        collection: m.collection,
-        doc: m.doc,
-        query: m.query,
-        orderBy: m.orderBy,
-        limit: m.limit,
-        where: m.where,
-        updateDoc: m.updateDoc,
-        serverTimestamp: m.serverTimestamp,
-        onSnapshot: m.onSnapshot,
-        writeBatch: m.writeBatch
-      };
-    });
-  }
-
-  function getAuthFunctions() {
-    return import(AUTH_MODULE_URL).then(function(m) {
-      return {
-        onAuthStateChanged: m.onAuthStateChanged
-      };
-    });
   }
 
   // ---- Notification type helpers ----
@@ -91,61 +64,77 @@
     return colors[type] || colors.info;
   }
 
-  // ---- Firestore operations ----
+  // ---- Local operations ----
 
-  function listenToNotifications(userId) {
-    return getFirestoreFunctions().then(function(fb) {
-      var notificationsRef = fb.collection(window.db.firestore, 'notifications', userId);
-      var q = fb.query(
-        notificationsRef,
-        fb.orderBy('createdAt', 'desc'),
-        fb.limit(20)
-      );
-
-      if (unsubscribeFn) {
-        unsubscribeFn();
-        unsubscribeFn = null;
-      }
-
-      unsubscribeFn = fb.onSnapshot(q, function(snapshot) {
-        notificationsCache = [];
-        snapshot.forEach(function(doc) {
-          notificationsCache.push(Object.assign({ id: doc.id }, doc.data()));
-        });
-
-        renderBell();
-        if (dropdownOpen) {
-          renderDropdown();
+  function loadNotifications(userId) {
+    var key = STORAGE_KEY_PREFIX + userId;
+    var stored = localStorage.getItem(key);
+    notificationsCache = stored ? JSON.parse(stored) : [];
+    
+    // Add dummy notifications if empty for demonstration
+    if (notificationsCache.length === 0) {
+      notificationsCache = [
+        {
+          id: 'n1',
+          type: 'info',
+          title: 'Welcome to Dragon-Tech!',
+          message: 'Explore our latest tech arrivals and premium bundles.',
+          read: false,
+          createdAt: new Date(Date.now() - 3600000).toISOString()
+        },
+        {
+          id: 'n2',
+          type: 'promo',
+          title: 'New Bundle Available',
+          message: 'Check out the new Audio Starter Pack at 25% off!',
+          read: false,
+          createdAt: new Date(Date.now() - 86400000).toISOString()
         }
-      }, function(error) {
-        console.error('Notifications listener error:', error);
-      });
-    });
+      ];
+      saveNotifications(userId);
+    }
+
+    renderBell();
+    if (dropdownOpen) {
+      renderDropdown();
+    }
   }
 
-  async function markAsRead(notificationId) {
+  function saveNotifications(userId) {
+    if (!userId) return;
+    var key = STORAGE_KEY_PREFIX + userId;
+    localStorage.setItem(key, JSON.stringify(notificationsCache));
+  }
+
+  function markAsRead(notificationId) {
     if (!currentUserId || !notificationId) return;
 
-    var fb = await getFirestoreFunctions();
-    var notifRef = fb.doc(window.db.firestore, 'notifications', currentUserId, 'items', notificationId);
-    await fb.updateDoc(notifRef, { read: true });
+    var notif = notificationsCache.find(n => n.id === notificationId);
+    if (notif && !notif.read) {
+      notif.read = true;
+      saveNotifications(currentUserId);
+      renderBell();
+      if (dropdownOpen) renderDropdown();
+    }
   }
 
-  async function markAllAsRead() {
+  function markAllAsRead() {
     if (!currentUserId) return;
 
-    var fb = await getFirestoreFunctions();
-    var unread = notificationsCache.filter(function(n) { return !n.read; });
-    if (unread.length === 0) return;
-
-    var batch = fb.writeBatch(window.db.firestore);
-    unread.forEach(function(n) {
-      var ref = fb.doc(window.db.firestore, 'notifications', currentUserId, 'items', n.id);
-      batch.update(ref, { read: true });
+    var changed = false;
+    notificationsCache.forEach(function(n) {
+      if (!n.read) {
+        n.read = true;
+        changed = true;
+      }
     });
 
-    await batch.commit();
-    showToast('All notifications marked as read', 'info');
+    if (changed) {
+      saveNotifications(currentUserId);
+      renderBell();
+      if (dropdownOpen) renderDropdown();
+      showToast('All notifications marked as read', 'info');
+    }
   }
 
   // ---- Rendering ----
@@ -276,23 +265,14 @@
   // ---- Auth state management ----
 
   function initAuthListener() {
-    if (!window.db || !window.db.auth) {
-      console.warn('notifications.js: window.db.auth not available');
-      return;
-    }
+    // Listen for custom event from storage-service.js
+    window.addEventListener('auth-change', function(e) {
+      handleAuthChange(e.detail);
+    });
 
-    // Use onAuthStateChanged directly (already loaded by the main script)
-    if (window.db.auth.onAuthStateChanged) {
-      window.db.auth.onAuthStateChanged(function(user) {
-        handleAuthChange(user);
-      });
-    } else {
-      // Fall back to dynamic import
-      getAuthFunctions().then(function(authFb) {
-        authFb.onAuthStateChanged(window.db.auth, function(user) {
-          handleAuthChange(user);
-        });
-      });
+    // Check initial state
+    if (window.storage && window.storage.getCurrentUser) {
+      handleAuthChange(window.storage.getCurrentUser());
     }
   }
 
@@ -302,13 +282,8 @@
 
     if (user) {
       currentUserId = user.uid;
-      renderBell();
-      listenToNotifications(currentUserId);
+      loadNotifications(currentUserId);
     } else {
-      if (unsubscribeFn) {
-        unsubscribeFn();
-        unsubscribeFn = null;
-      }
       currentUserId = null;
       notificationsCache = [];
       renderBell();
@@ -323,10 +298,23 @@
     getUnreadCount: getUnreadCount,
     getNotifications: function() { return notificationsCache.slice(); },
     toggleDropdown: toggleDropdown,
-    closeDropdown: closeDropdown
+    closeDropdown: closeDropdown,
+    addNotification: function(notif) {
+        if (!currentUserId) return;
+        var newNotif = {
+            id: 'n_' + Date.now(),
+            read: false,
+            createdAt: new Date().toISOString(),
+            ...notif
+        };
+        notificationsCache.unshift(newNotif);
+        saveNotifications(currentUserId);
+        renderBell();
+        if (dropdownOpen) renderDropdown();
+    }
   };
 
-  // ---- Self-initialize on auth state ----
+  // ---- Self-initialize ----
 
   // Close dropdown on outside click
   if (document.readyState === 'loading') {

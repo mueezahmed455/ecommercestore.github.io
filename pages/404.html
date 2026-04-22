@@ -1,46 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 | Dragon-Tech</title>
+  <title>404 — Page Not Found | Dragon-Tech</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/main.css">
-  <link rel="stylesheet" href="../css/glass.css">
   <style>
-    .not-found {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      padding: 2rem;
+    body { display:flex; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:20px; }
+    .err-page { position:relative; z-index:2; max-width:500px; }
+    .err-code {
+      font-family: var(--font-display); font-size: clamp(6rem, 20vw, 10rem);
+      font-weight: 900; line-height: 1;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 16px;
+      text-shadow: none;
     }
-    .not-found h1 {
-      font-size: clamp(4rem, 12vw, 8rem);
-      font-weight: 700;
-      background: linear-gradient(135deg, #00d4ff, #a855f7);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      line-height: 1;
-      margin-bottom: 1rem;
-    }
-    .not-found p {
-      font-size: 1.25rem;
-      color: #a0a0b0;
-      margin-bottom: 2rem;
-    }
+    .err-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
+    .err-sub { color: var(--text-secondary); margin-bottom: 32px; }
   </style>
 </head>
 <body>
-  <main class="not-found">
-    <h1>404</h1>
-    <p>This page doesn't exist.</p>
-    <a href="../index.html" class="btn btn-primary">Back to Store</a>
-  </main>
+  <canvas id="psCanvas"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="err-page">
+    <div class="err-code">404</div>
+    <h1 class="err-title">Page Not Found</h1>
+    <p class="err-sub">This page doesn't exist or has been moved.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="../index.html" class="btn btn-primary">← Back to Store</a>
+      <a href="javascript:history.back()" class="btn btn-outline">Go Back</a>
+    </div>
+  </div>
+
+  <script>
+    var saved = localStorage.getItem('dragon_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    // Mini particle system
+    (function () {
+      var c = document.getElementById('psCanvas');
+      if (!c) return;
+      var ctx = c.getContext('2d');
+      c.width = window.innerWidth; c.height = window.innerHeight;
+      var pts = [];
+      for (var i = 0; i < 60; i++) pts.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*2+0.5, vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4, a: Math.random()*.4+.05, col: i % 3 === 0 ? '123,47,255' : i % 3 === 1 ? '0,255,212' : '0,168,255' });
+      function draw() {
+        ctx.clearRect(0,0,c.width,c.height);
+        pts.forEach(function(p) { p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>c.width) p.vx*=-1; if(p.y<0||p.y>c.height) p.vy*=-1; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba('+p.col+','+p.a+')'; ctx.fill(); });
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+  </script>
 </body>
 </html>
